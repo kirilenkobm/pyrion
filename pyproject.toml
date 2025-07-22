@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyrion"
+version = "0.1.0"
+description = "Python tools for comparative genomics and sequence analysis"
+dependencies = [
+    "numpy",
+    "twobitreader",
+    "numba",
+]
+requires-python = ">=3.8"
+
+[tool.setuptools.packages.find]
+where = ["pyrion"]

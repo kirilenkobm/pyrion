@@ -1,0 +1,10 @@
+name: pyrion
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - numpy
+  - twobitreader
+  - pip
+  - pip:
+      - numba
