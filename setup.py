@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+"""Setup script for pyrion C extensions.
+
+All package metadata is in pyproject.toml - this file only handles C extensions.
+"""
+
+from setuptools import setup, Extension
+import numpy as np
+
+# C extension modules with optimization flags
+ext_modules = [
+    Extension(
+        "pyrion._chainparser",
+        sources=["csrc/chainparser.c"],
+        include_dirs=[np.get_include()],
+        extra_compile_args=["-O3", "-Wall"],
+    ),
+    Extension(
+        "pyrion._bed12parser",
+        sources=["csrc/bed12parser.c"],
+        include_dirs=[np.get_include()],
+        extra_compile_args=["-O3", "-Wall"],
+    ),
+    Extension(
+        "pyrion._fastaparser",
+        sources=["csrc/fastaparser.c"],
+        include_dirs=[np.get_include()],
+        extra_compile_args=["-O3", "-Wall"],
+    ),
+    Extension(
+        "pyrion._narrowbedparser",
+        sources=["csrc/narrowbedparser.c"],
+        include_dirs=[np.get_include()],
+        extra_compile_args=["-O3", "-Wall"],
+    ),
+    Extension(
+        "pyrion._faiparser",
+        sources=["csrc/faiparser.c"],
+        extra_compile_args=["-O3", "-Wall"],
+    ),
+    Extension(
+        "pyrion._gtfparser",
+        sources=["csrc/gtfparser.c"],
+        include_dirs=[np.get_include()],
+        extra_compile_args=["-O3", "-Wall"],
+    ),
+]
+
+if __name__ == "__main__":
+    setup(ext_modules=ext_modules)

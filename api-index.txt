@@ -1,0 +1,562 @@
+PYRION API INDEX
+Generated: 2025-08-02 19:53:00
+Concise reference with type signatures only.
+============================================================
+
+MODULE pyrion
+  FUNCTION cite()
+  FUNCTION get_version()
+  FUNCTION get_version_info()
+  FUNCTION quick_start()
+MODULE pyrion._bed12parser
+MODULE pyrion._chainparser
+MODULE pyrion._faiparser
+MODULE pyrion._fastaparser
+MODULE pyrion._gtfparser
+MODULE pyrion._narrowbedparser
+MODULE pyrion._version
+MODULE pyrion.config
+  CLASS PyrionConfig
+    __init__(self)
+    __init__(self)
+    disable_parallel(self) -> None
+    enable_parallel(self, max_cores: Optional[int] = None) -> None
+    get_optimal_processes(self, n_items: int, max_processes: Optional[int] = None) -> int
+    summary(self) -> dict
+    available_cores -> int
+    max_cores -> int
+    min_items_for_parallel -> int
+    multiprocessing_available -> bool
+  FUNCTION disable_parallel() -> None
+  FUNCTION enable_parallel(max_cores: Optional[int] = None) -> None
+  FUNCTION get_available_cores() -> int
+  FUNCTION get_config_summary() -> dict
+  FUNCTION get_max_cores() -> int
+  FUNCTION get_min_items_for_parallel() -> int
+  FUNCTION is_multiprocessing_available() -> bool
+  FUNCTION set_max_cores(cores: int) -> None
+  FUNCTION set_min_items_for_parallel(items: int) -> None
+MODULE pyrion.constants
+MODULE pyrion.core
+MODULE pyrion.core.amino_acid_auxiliary
+  FUNCTION calculate_molecular_weight(sequence) -> float
+  FUNCTION count_amino_acids_in_sequence(sequence) -> Dict[str, int]
+  FUNCTION get_amino_acid_composition(sequence) -> Dict[str, float]
+MODULE pyrion.core.amino_acid_sequences
+  CLASS AminoAcidSequence
+    __init__(self, data: 'np.ndarray', metadata: 'Optional[Metadata]' = None) -> None
+    __init__(self, data: 'np.ndarray', metadata: 'Optional[Metadata]' = None) -> None
+    __repr__(self) -> 'str'
+    __str__(self) -> 'str'
+    apply_masking(self) -> "'AminoAcidSequence'"
+    count_amino_acids(self) -> 'dict'
+    find_stop_codons(self) -> 'np.ndarray'
+    from_string(sequence: 'str', metadata: 'Optional[Metadata]' = None) -> "'AminoAcidSequence'"
+    get_amino_acid_content(self) -> 'dict'
+    get_gap_positions(self) -> 'np.ndarray'
+    get_masked_positions(self) -> 'np.ndarray'
+    get_stop_positions(self) -> 'np.ndarray'
+    molecular_weight(self) -> 'float'
+    remove_gaps(self) -> "'AminoAcidSequence'"
+    remove_masking(self) -> "'AminoAcidSequence'"
+    reverse(self) -> "'AminoAcidSequence'"
+    slice(self, start: 'int', end: 'int') -> "'AminoAcidSequence'"
+    to_fasta_string(self, width: 'int' = 80, header: 'Optional[str]' = None) -> 'str'
+    to_string(self) -> 'str'
+MODULE pyrion.core.canonizer
+  FUNCTION DEFAULT_CANONIZER(transcripts: List, **kwargs) -> Optional[str]
+  FUNCTION first_transcript_canonizer(transcripts: List, **kwargs) -> Optional[str]
+  FUNCTION longest_cds_canonizer(transcripts: List, **kwargs) -> Optional[str]
+  FUNCTION longest_isoform_canonizer(transcripts: List, **kwargs) -> Optional[str]
+  FUNCTION longest_transcript_span_canonizer(transcripts: List, **kwargs) -> Optional[str]
+  FUNCTION most_exons_canonizer(transcripts: List, **kwargs) -> Optional[str]
+MODULE pyrion.core.codons
+  CLASS Codon
+    __init__(self, symbols: numpy.ndarray, is_rna: bool = False) -> None
+    __init__(self, symbols: numpy.ndarray, is_rna: bool = False) -> None
+    __repr__(self) -> str
+    __str__(self) -> str
+    is_complete(self) -> bool
+    to_string(self) -> str
+    translate(self, translation_table=None) -> str
+  CLASS CodonSequence
+    __init__(self, nucleotide_sequence)
+    __init__(self, nucleotide_sequence)
+    __repr__(self) -> str
+    __str__(self) -> str
+    get_codons(self, preserve_gaps: bool = False) -> List[pyrion.core.codons.Codon]
+    get_frameshift_positions(self) -> List[Tuple[int, int]]
+    insert_frameshift(self, position: int) -> None
+    remove_frameshift(self, position: int) -> None
+    remove_gaps(self) -> None
+    to_fasta_string(self, width: int = 80, header: Optional[str] = None) -> str
+    translate(self, translation_table=None)
+    data -> ndarray
+MODULE pyrion.core.fai
+  CLASS FaiEntry
+    __init__(self, name: 'str', length: 'int', offset: 'int', line_bases: 'int', line_bytes: 'int') -> None
+    __init__(self, name: 'str', length: 'int', offset: 'int', line_bases: 'int', line_bytes: 'int') -> None
+    __repr__(self) -> 'str'
+    __str__(self) -> 'str'
+    from_fai_line(line: 'str') -> "'FaiEntry'"
+    get_sequence_end_offset(self) -> 'int'
+  CLASS FaiStore
+    __init__(self, entries: 'Optional[Dict[str, FaiEntry]]' = None)
+    __init__(self, entries: 'Optional[Dict[str, FaiEntry]]' = None)
+    __repr__(self) -> 'str'
+    get_total_bases(self) -> 'int'
+    load_from_file(filename: 'Union[str, Path]') -> "'FaiStore'"
+    save_to_file(self, filename: 'Union[str, Path]') -> 'None'
+MODULE pyrion.core.gene_data
+  CLASS GeneData
+    __init__(self, source_file: Optional[str] = None)
+    __init__(self, source_file: Optional[str] = None)
+    __repr__(self) -> str
+    add_gene_name(self, gene_id: str, gene_name: str) -> None
+    add_gene_transcript_mapping(self, gene_id: str, transcript_id: str) -> None
+    add_transcript_biotype(self, transcript_id: str, biotype: str) -> None
+    get_biotype_count(self) -> int
+    get_gene(self, transcript_id: str) -> Optional[str]
+    get_gene_name(self, gene_id: str) -> Optional[str]
+    get_gene_name_count(self) -> int
+    get_gene_transcript_count(self) -> int
+    get_genes_by_name(self, gene_name: str) -> Set[str]
+    get_transcript_biotype(self, transcript_id: str) -> Optional[str]
+    get_transcripts(self, gene_id: str) -> Set[str]
+    has_biotype_mapping(self) -> bool
+    has_gene(self, gene_id: str) -> bool
+    has_gene_name_mapping(self) -> bool
+    has_gene_transcript_mapping(self) -> bool
+    has_transcript(self, transcript_id: str) -> bool
+    summary(self) -> str
+    gene_ids -> Set
+    transcript_ids -> Set
+MODULE pyrion.core.genes
+  CLASS Gene
+    __init__(self, gene_id: str, transcripts: List[pyrion.core.genes.Transcript], gene_name: Optional[str] = None)
+    __init__(self, gene_id: str, transcripts: List[pyrion.core.genes.Transcript], gene_name: Optional[str] = None)
+    __repr__(self) -> str
+    apply_canonizer(self, canonizer_func: Optional[Callable] = None, **kwargs) -> None
+    clear_canonical_transcript(self) -> None
+    get_transcript(self, transcript_id: str) -> Optional[pyrion.core.genes.Transcript]
+    has_transcript(self, transcript_id: str) -> bool
+    set_canonical_transcript(self, transcript_id: str) -> None
+    canonical_transcript -> Optional
+    canonical_transcript_id -> Optional
+    chrom -> str
+    has_canonical_transcript -> bool
+    is_coding -> bool
+    length -> int
+    strand -> Strand
+    transcript_ids -> Set
+    transcripts -> List
+  CLASS Transcript
+    __init__(self, blocks: numpy.ndarray, strand: pyrion.core.strand.Strand, chrom: str, id: str, cds_start: Optional[int] = None, cds_end: Optional[int] = None, biotype: Optional[str] = None) -> None
+    __init__(self, blocks: numpy.ndarray, strand: pyrion.core.strand.Strand, chrom: str, id: str, cds_start: Optional[int] = None, cds_end: Optional[int] = None, biotype: Optional[str] = None) -> None
+    __repr__(self) -> str
+    __str__(self) -> str
+    compute_flanks(self, flank_size: int, chrom_sizes: Dict[str, int]) -> Tuple[Optional[pyrion.core.intervals.GenomicInterval], Optional[pyrion.core.intervals.GenomicInterval]]
+    contains_interval(self, interval: pyrion.core.intervals.GenomicInterval) -> bool
+    get_annotated_regions(self, chrom_sizes: dict, flank_size: int = 5000) -> pyrion.core.intervals.AnnotatedIntervalSet
+    splice_junctions(self)
+    is_coding -> bool
+  CLASS TranscriptsCollection
+    __init__(self, transcripts: Optional[List[pyrion.core.genes.Transcript]] = None, source_file: Optional[str] = None)
+    __init__(self, transcripts: Optional[List[pyrion.core.genes.Transcript]] = None, source_file: Optional[str] = None)
+    __repr__(self) -> str
+    __str__(self) -> str
+    apply_gene_canonical_mapping(self, gene_to_canonical: Dict[str, str]) -> None
+    bind_gene_data(self, gene_data: 'GeneData') -> None
+    canonize_transcripts(self, canonizer_func: Optional[Callable] = None, **kwargs) -> None
+    from_json(file_path: Union[str, pathlib.Path]) -> 'TranscriptsCollection'
+    get_all_chromosomes(self) -> List[str]
+    get_by_chrom(self, chrom: str) -> List[pyrion.core.genes.Transcript]
+    get_by_gene_name(self, gene_name: str) -> List[pyrion.core.genes.Gene]
+    get_by_id(self, transcript_id: str) -> Optional[pyrion.core.genes.Transcript]
+    get_canonical_transcripts(self) -> 'TranscriptsCollection'
+    get_gene_by_id(self, gene_id: str) -> Optional[pyrion.core.genes.Gene]
+    get_gene_by_transcript_id(self, transcript_id: str) -> Optional[pyrion.core.genes.Gene]
+    get_genes_without_canonical_transcript(self) -> List[pyrion.core.genes.Gene]
+    get_transcript_ids_by_chrom(self, chrom: str) -> List[str]
+    get_transcripts_in_interval(self, interval: pyrion.core.intervals.GenomicInterval, include_partial: bool = True) -> 'TranscriptsCollection'
+    save_to_bed12(self, file_path: Union[str, pathlib.Path]) -> None
+    save_to_json(self, file_path: Union[str, pathlib.Path]) -> None
+    summary(self) -> str
+    to_bed12_string(self) -> str
+    applied_biotypes -> bool
+    applied_gene_names -> bool
+    available_data_mappings -> List
+    gene_ids -> Set
+    genes -> List
+    has_gene_mapping -> bool
+MODULE pyrion.core.genes_auxiliary
+  FUNCTION build_annotated_regions(transcript, chrom_sizes: dict, flank_size: int = 5000) -> pyrion.core.intervals.AnnotatedIntervalSet
+  FUNCTION compute_flanks(transcript, flank_size: int, chrom_sizes: Dict[str, int]) -> Tuple[Optional[pyrion.core.intervals.GenomicInterval], Optional[pyrion.core.intervals.GenomicInterval]]
+  FUNCTION filter_transcripts_in_interval(transcripts_collection, interval: pyrion.core.intervals.GenomicInterval, include_partial: bool = True)
+  FUNCTION get_canonical_transcripts_from_collection(transcripts_collection, canonizer_func: Optional[Callable] = None, **kwargs)
+  FUNCTION get_canonical_transcripts_only_from_collection(transcripts_collection)
+  FUNCTION get_cds_blocks(transcript) -> numpy.ndarray
+  FUNCTION get_genes_with_canonical_transcripts_from_collection(transcripts_collection) -> List
+  FUNCTION get_left_utr_blocks(transcript) -> numpy.ndarray
+  FUNCTION get_right_utr_blocks(transcript) -> numpy.ndarray
+  FUNCTION get_transcript_cds_interval(transcript) -> Optional[pyrion.core.intervals.GenomicInterval]
+  FUNCTION get_transcript_interval(transcript) -> pyrion.core.intervals.GenomicInterval
+  FUNCTION get_utr3_blocks(transcript) -> numpy.ndarray
+  FUNCTION get_utr5_blocks(transcript) -> numpy.ndarray
+  FUNCTION set_canonical_transcripts_for_collection(transcripts_collection, canonizer_func: Optional[Callable] = None, **kwargs) -> None
+MODULE pyrion.core.genome_alignment
+  CLASS GenomeAlignment
+    __init__(self, chain_id: int, score: int, t_chrom: str, t_strand: int, t_size: int, q_chrom: str, q_strand: int, q_size: int, blocks: numpy.ndarray, child_id: Optional[int] = None) -> None
+    __init__(self, chain_id: int, score: int, t_chrom: str, t_strand: int, t_size: int, q_chrom: str, q_strand: int, q_size: int, blocks: numpy.ndarray, child_id: Optional[int] = None) -> None
+    __repr__(self) -> str
+    aligned_length(self) -> int
+    blocks_in_query(self) -> numpy.ndarray
+    blocks_in_target(self) -> numpy.ndarray
+    q_length(self) -> int
+    t_length(self) -> int
+  CLASS GenomeAlignmentsCollection
+    __init__(self, alignments: Optional[List[pyrion.core.genome_alignment.GenomeAlignment]] = None, source_file: Optional[str] = None)
+    __init__(self, alignments: Optional[List[pyrion.core.genome_alignment.GenomeAlignment]] = None, source_file: Optional[str] = None)
+    __repr__(self) -> str
+    __str__(self) -> str
+    from_json(file_path: Union[str, pathlib.Path]) -> 'GenomeAlignmentsCollection'
+    get_alignments_fully_contained(self, interval: 'GenomicInterval') -> List[pyrion.core.genome_alignment.GenomeAlignment]
+    get_alignments_in_interval(self, interval: 'GenomicInterval', include_partial: bool = True) -> List[pyrion.core.genome_alignment.GenomeAlignment]
+    get_alignments_overlapping_query_interval(self, interval: 'GenomicInterval', include_partial: bool = True) -> List[pyrion.core.genome_alignment.GenomeAlignment]
+    get_alignments_overlapping_target_interval(self, interval: 'GenomicInterval', include_partial: bool = True) -> List[pyrion.core.genome_alignment.GenomeAlignment]
+    get_by_chain_id(self, chain_id: int) -> Optional[pyrion.core.genome_alignment.GenomeAlignment]
+    get_by_query_chrom(self, chrom: str) -> List[pyrion.core.genome_alignment.GenomeAlignment]
+    get_by_target_chrom(self, chrom: str) -> List[pyrion.core.genome_alignment.GenomeAlignment]
+    get_chain_ids_by_query_chrom(self, chrom: str) -> List[int]
+    get_chain_ids_by_target_chrom(self, chrom: str) -> List[int]
+    get_query_chromosomes(self) -> List[str]
+    get_reference_chromosomes(self) -> List[str]
+    save_to_chain(self, file_path: Union[str, pathlib.Path]) -> None
+    save_to_json(self, file_path: Union[str, pathlib.Path]) -> None
+    sort_by_score(self, max_elems: Optional[int] = None) -> List[Tuple[int, int]]
+    summary(self) -> str
+MODULE pyrion.core.genome_alignment_auxiliary
+  FUNCTION sort_alignments_by_score(alignments_collection, max_elems: Optional[int] = None) -> List[Tuple[int, int]]
+MODULE pyrion.core.intervals
+  CLASS AnnotatedIntervalSet
+    __init__(self, intervals: numpy.ndarray, region_types: numpy.ndarray) -> None
+    __init__(self, intervals: numpy.ndarray, region_types: numpy.ndarray) -> None
+    __repr__(self) -> str
+  CLASS GenomicInterval
+    __init__(self, chrom: str, start: int, end: int, strand: pyrion.core.strand.Strand = <Strand.UNKNOWN: 0>, id: Optional[str] = None) -> None
+    __init__(self, chrom: str, start: int, end: int, strand: pyrion.core.strand.Strand = <Strand.UNKNOWN: 0>, id: Optional[str] = None) -> None
+    __repr__(self) -> str
+    __str__(self) -> str
+    contains(self, pos: int) -> bool
+    flip_strand(self) -> 'GenomicInterval'
+    from_string(interval_string: str, id: Optional[str] = None) -> 'GenomicInterval'
+    intersects(self, other: 'GenomicInterval') -> bool
+    length(self) -> int
+    overlap(self, other: 'GenomicInterval') -> int
+    to_bed6_string(self, score: int = 1000) -> str
+    union(self, other: 'GenomicInterval') -> Optional[ForwardRef('GenomicInterval')]
+  CLASS GenomicIntervalsCollection
+    __init__(self, chrom: str, strand: pyrion.core.strand.Strand, array: numpy.ndarray, ids: numpy.ndarray) -> None
+    __init__(self, chrom: str, strand: pyrion.core.strand.Strand, array: numpy.ndarray, ids: numpy.ndarray) -> None
+    __repr__(self) -> str
+    __str__(self) -> str
+    filter_by(self, predicate: Callable[[pyrion.core.intervals.GenomicInterval], bool]) -> 'GenomicIntervalsCollection'
+    from_array(array: numpy.ndarray, chrom: str, strand: Optional[pyrion.core.strand.Strand] = None, ids: Optional[List[str]] = None) -> 'GenomicIntervalsCollection'
+    from_intervals(intervals: List[pyrion.core.intervals.GenomicInterval]) -> 'GenomicIntervalsCollection'
+    from_strings(interval_strings, ids: Optional[List[str]] = None) -> Dict[Tuple[str, pyrion.core.strand.Strand], ForwardRef('GenomicIntervalsCollection')]
+    group_by_proximity(self, max_gap: int) -> List[ForwardRef('GenomicIntervalsCollection')]
+    intersect(self, other: Union[ForwardRef('GenomicIntervalsCollection'), pyrion.core.intervals.GenomicInterval]) -> 'GenomicIntervalsCollection'
+    is_empty(self) -> bool
+    merge_close(self, max_gap: int = 0) -> 'GenomicIntervalsCollection'
+    split_on_gaps(self, min_gap: int) -> List[ForwardRef('GenomicIntervalsCollection')]
+    to_bed6_string(self, score: int = 1000) -> str
+    to_intervals_list(self) -> List[pyrion.core.intervals.GenomicInterval]
+  CLASS RegionType
+    __init__(self, /, *args, **kwargs)
+MODULE pyrion.core.intervals_auxiliary
+  FUNCTION create_intervals_collections_from_strings(interval_strings, ids: Optional[List[str]] = None) -> Dict[Tuple[str, pyrion.core.strand.Strand], pyrion.core.intervals.GenomicIntervalsCollection]
+MODULE pyrion.core.nucleotide_sequences
+  CLASS NucleotideSequence
+    __init__(self, data: 'np.ndarray', is_rna: 'bool' = False, metadata: 'Optional[Metadata]' = None) -> None
+    __init__(self, data: 'np.ndarray', is_rna: 'bool' = False, metadata: 'Optional[Metadata]' = None) -> None
+    __repr__(self) -> 'str'
+    __str__(self) -> 'str'
+    complement(self) -> "'NucleotideSequence'"
+    from_string(sequence: 'str', is_rna: 'bool' = False, metadata: 'Optional[Metadata]' = None) -> "'NucleotideSequence'"
+    get_masked_positions(self) -> 'np.ndarray'
+    get_unmasked_positions(self) -> 'np.ndarray'
+    is_position_masked(self, position: 'int') -> 'bool'
+    mask(self, start: 'Optional[int]' = None, end: 'Optional[int]' = None) -> "'NucleotideSequence'"
+    merge(self, other: "'NucleotideSequence'") -> "'NucleotideSequence'"
+    remove_gaps(self) -> "'NucleotideSequence'"
+    reverse(self) -> "'NucleotideSequence'"
+    reverse_complement(self) -> "'NucleotideSequence'"
+    slice(self, start: 'int', end: 'int') -> "'NucleotideSequence'"
+    to_amino_acids(self, translation_table=None)
+    to_codons(self)
+    to_fasta_string(self, width: 'int' = 80, header: 'Optional[str]' = None) -> 'str'
+    to_string(self) -> 'str'
+    unmask(self, start: 'Optional[int]' = None, end: 'Optional[int]' = None) -> "'NucleotideSequence'"
+    masked_fraction -> float
+  CLASS SequenceType
+    __init__(self, /, *args, **kwargs)
+MODULE pyrion.core.sequences_auxiliary
+  FUNCTION mask_nucleotide_sequence_slice(sequence, start: Optional[int] = None, end: Optional[int] = None)
+  FUNCTION merge_nucleotide_sequences(sequence1, sequence2)
+  FUNCTION unmask_nucleotide_sequence_slice(sequence, start: Optional[int] = None, end: Optional[int] = None)
+MODULE pyrion.core.strand
+  CLASS Strand
+    __init__(self, /, *args, **kwargs)
+MODULE pyrion.core.translation
+  CLASS TranslationTable
+    __init__(self, table_id: int, name: str, codon_table: Dict[tuple, int], start_codons: set[tuple], stop_codons: set[tuple]) -> None
+    __init__(self, table_id: int, name: str, codon_table: Dict[tuple, int], start_codons: set[tuple], stop_codons: set[tuple]) -> None
+    __repr__(self) -> str
+    is_start_codon(self, codon_codes: Tuple[int, int, int]) -> bool
+    is_stop_codon(self, codon_codes: Tuple[int, int, int]) -> bool
+    mitochondrial() -> 'TranslationTable'
+    standard() -> 'TranslationTable'
+    translate_codon(self, codon_codes: Tuple[int, int, int]) -> int
+MODULE pyrion.core_types
+  CLASS ExonType
+    __init__(self, /, *args, **kwargs)
+MODULE pyrion.io
+MODULE pyrion.io.bed
+  FUNCTION read_bed12_file(file_path: Union[str, pathlib.Path]) -> pyrion.core.genes.TranscriptsCollection
+  FUNCTION read_narrow_bed_file(file_path: Union[str, pathlib.Path]) -> List[pyrion.core.intervals.GenomicInterval]
+MODULE pyrion.io.chain
+  FUNCTION read_chain_file(file_path: Union[str, pathlib.Path], min_score: Optional[int] = None) -> pyrion.core.genome_alignment.GenomeAlignmentsCollection
+MODULE pyrion.io.fai
+  FUNCTION create_fasta_index(fasta_file: 'Union[str, Path]', fai_file: 'Optional[Union[str, Path]]' = None) -> 'FaiStore'
+  FUNCTION get_or_create_fasta_index(fasta_file: 'Union[str, Path]', force_recreate: 'bool' = False) -> 'FaiStore'
+  FUNCTION load_fasta_index(fai_file: 'Union[str, Path]') -> 'FaiStore'
+MODULE pyrion.io.fasta
+  CLASS FastaAccessor
+    __init__(self, fasta_file: 'Union[str, Path]', fai_store: 'FaiStore')
+    __init__(self, fasta_file: 'Union[str, Path]', fai_store: 'FaiStore')
+    __repr__(self) -> 'str'
+    get_multiple_sequences(self, regions: 'List[GenomicInterval]', is_rna: 'bool' = False) -> 'Dict[str, NucleotideSequence]'
+    get_sequence(self, region: 'GenomicInterval', is_rna: 'bool' = False) -> 'NucleotideSequence'
+    get_sequence_length(self, sequence_name: 'str') -> 'int'
+    get_sequence_names(self) -> 'List[str]'
+    has_sequence(self, sequence_name: 'str') -> 'bool'
+  FUNCTION read_dna_fasta(filename: 'Union[str, Path]', **kwargs) -> 'Dict[str, NucleotideSequence]'
+  FUNCTION read_fasta(filename: 'Union[str, Path]', sequence_type: 'SequenceType', return_dict: 'bool' = True) -> 'Union[Dict[str, Union[NucleotideSequence, AminoAcidSequence]], List[Union[NucleotideSequence, AminoAcidSequence]]]'
+  FUNCTION read_protein_fasta(filename: 'Union[str, Path]', **kwargs) -> 'Dict[str, AminoAcidSequence]'
+  FUNCTION read_rna_fasta(filename: 'Union[str, Path]', **kwargs) -> 'Dict[str, NucleotideSequence]'
+  FUNCTION write_fasta(sequences: 'Union[Dict[str, NucleotideSequence], List[NucleotideSequence]]', filename: 'Union[str, Path]', line_width: 'int' = 80) -> 'None'
+MODULE pyrion.io.gene_data
+  FUNCTION read_gene_data(file_path: Union[str, pathlib.Path], gene_column: Union[int, str, NoneType] = None, transcript_id_column: Union[int, str, NoneType] = None, gene_name_column: Union[int, str, NoneType] = None, transcript_type_column: Union[int, str, NoneType] = None, separator: str = '\t', has_header: bool = True) -> pyrion.core.gene_data.GeneData
+  FUNCTION resolve_index(column_idx: Union[int, str], header: List[str]) -> int | None
+MODULE pyrion.io.genepred
+  FUNCTION read_genepred_file(file_path: Union[str, pathlib.Path], has_header: bool = False, extended: bool = False) -> pyrion.core.genes.TranscriptsCollection
+  FUNCTION read_refflat_file(file_path: Union[str, pathlib.Path], has_header: bool = False) -> pyrion.core.genes.TranscriptsCollection
+MODULE pyrion.io.gtf
+  CLASS GTFChunkReader
+    __init__(self, file_path: Union[str, pathlib.Path], chunk_size_mb: int = 512)
+    __init__(self, file_path: Union[str, pathlib.Path], chunk_size_mb: int = 512)
+    read_gene_chunks(self) -> Iterator[List[str]]
+  FUNCTION read_gtf(file_path: Union[str, pathlib.Path], chunk_size_mb: int = 512) -> pyrion.core.genes.TranscriptsCollection
+MODULE pyrion.io.twobit
+  CLASS TwoBitAccessor
+    __init__(self, file_path: str)
+    __init__(self, file_path: str)
+    __repr__(self) -> str
+    chrom_names(self) -> List[str]
+    chrom_sizes(self) -> Dict[str, int]
+    close(self)
+    fetch(self, chrom: str, start: int, end: int, strand: pyrion.core.strand.Strand = <Strand.PLUS: 1>) -> pyrion.core.nucleotide_sequences.NucleotideSequence
+    fetch_interval(self, interval: pyrion.core.intervals.GenomicInterval) -> pyrion.core.nucleotide_sequences.NucleotideSequence
+    list_chromosomes(self) -> None
+    validate_interval(self, chrom: str, start: int, end: int) -> bool
+MODULE pyrion.ops
+MODULE pyrion.ops.chain_serialization
+  FUNCTION genome_alignment_from_dict(data: Dict[str, Any]) -> pyrion.core.genome_alignment.GenomeAlignment
+  FUNCTION genome_alignment_to_chain_string(alignment: pyrion.core.genome_alignment.GenomeAlignment) -> str
+  FUNCTION genome_alignment_to_dict(alignment: pyrion.core.genome_alignment.GenomeAlignment) -> Dict[str, Any]
+  FUNCTION genome_alignments_collection_from_dict(data: Dict[str, Any]) -> pyrion.core.genome_alignment.GenomeAlignmentsCollection
+  FUNCTION genome_alignments_collection_summary_string(collection: pyrion.core.genome_alignment.GenomeAlignmentsCollection) -> str
+  FUNCTION genome_alignments_collection_to_chain_string(collection: pyrion.core.genome_alignment.GenomeAlignmentsCollection) -> str
+  FUNCTION genome_alignments_collection_to_dict(collection: pyrion.core.genome_alignment.GenomeAlignmentsCollection) -> Dict[str, Any]
+  FUNCTION load_genome_alignments_collection_from_json(file_path: Union[str, pathlib.Path]) -> pyrion.core.genome_alignment.GenomeAlignmentsCollection
+  FUNCTION save_genome_alignments_collection_to_chain(collection: pyrion.core.genome_alignment.GenomeAlignmentsCollection, file_path: Union[str, pathlib.Path]) -> None
+  FUNCTION save_genome_alignments_collection_to_json(collection: pyrion.core.genome_alignment.GenomeAlignmentsCollection, file_path: Union[str, pathlib.Path]) -> None
+MODULE pyrion.ops.chain_slicing
+  FUNCTION remove_chain_region_target_space(chain: pyrion.core.genome_alignment.GenomeAlignment, start: int, end: int, use_numba: bool = True) -> pyrion.core.genome_alignment.GenomeAlignment
+  FUNCTION slice_chain_query_space(chain: pyrion.core.genome_alignment.GenomeAlignment, start: int, end: int, use_numba: bool = True) -> pyrion.core.genome_alignment.GenomeAlignment
+  FUNCTION slice_chain_target_space(chain: pyrion.core.genome_alignment.GenomeAlignment, start: int, end: int, use_numba: bool = True) -> pyrion.core.genome_alignment.GenomeAlignment
+MODULE pyrion.ops.chains
+  FUNCTION get_chain_q_end(genome_alignment) -> int
+  FUNCTION get_chain_q_start(genome_alignment) -> int
+  FUNCTION get_chain_query_interval(genome_alignment) -> pyrion.core.intervals.GenomicInterval
+  FUNCTION get_chain_t_end(genome_alignment) -> int
+  FUNCTION get_chain_t_start(genome_alignment) -> int
+  FUNCTION get_chain_target_interval(genome_alignment) -> pyrion.core.intervals.GenomicInterval
+  FUNCTION project_intervals_through_chain(intervals: numpy.ndarray, chain_blocks: numpy.ndarray) -> List[numpy.ndarray]
+  FUNCTION project_intervals_through_genome_alignment(intervals: numpy.ndarray, genome_alignment) -> List[numpy.ndarray]
+  FUNCTION project_intervals_through_genome_alignment_to_intervals(intervals: numpy.ndarray, genome_alignment, target_chrom: Optional[str] = None, target_strand: Optional[pyrion.core.strand.Strand] = None) -> List[pyrion.core.intervals.GenomicInterval]
+  FUNCTION project_transcript_through_chain(transcript: pyrion.core.genes.Transcript, chain: pyrion.core.genome_alignment.GenomeAlignment, only_cds=False) -> pyrion.core.intervals.GenomicInterval | None
+  FUNCTION split_genome_alignment(chain: pyrion.core.genome_alignment.GenomeAlignment, intersected_transcripts: List[pyrion.core.genes.Transcript], window_size: int = 1000000, intergenic_margin: int = 10000) -> Tuple[List[pyrion.core.genome_alignment.GenomeAlignment], Dict[int, List[str]]]
+MODULE pyrion.ops.data_consistency
+  FUNCTION check_data_consistency(transcripts_collection: pyrion.core.genes.TranscriptsCollection, detailed: bool = False) -> str
+MODULE pyrion.ops.entity_ops
+  FUNCTION find_alignment_gaps(alignment: pyrion.core.genome_alignment.GenomeAlignment, space: str = 'target', use_numba: bool = True) -> numpy.ndarray
+  FUNCTION find_transcript_overlaps(transcript1: pyrion.core.genes.Transcript, transcript2: pyrion.core.genes.Transcript, region_type: str = 'exon', use_numba: bool = True) -> numpy.ndarray
+  FUNCTION get_transcript_cds_in_range(transcript: pyrion.core.genes.Transcript, start: int, end: int, use_numba: bool = True) -> numpy.ndarray
+  FUNCTION get_transcript_introns_in_range(transcript: pyrion.core.genes.Transcript, start: int, end: int, use_numba: bool = True) -> numpy.ndarray
+  FUNCTION get_transcript_utrs_in_range(transcript: pyrion.core.genes.Transcript, start: int, end: int, utr_type: str = 'both', use_numba: bool = True) -> numpy.ndarray
+  FUNCTION intersect_alignment_with_intervals(alignment: pyrion.core.genome_alignment.GenomeAlignment, intervals: numpy.ndarray, space: str = 'target', use_numba: bool = True) -> numpy.ndarray
+  FUNCTION merge_genome_alignments(alignments: List[pyrion.core.genome_alignment.GenomeAlignment], space: str = 'target', use_numba: bool = True) -> numpy.ndarray
+  FUNCTION merge_transcript_cds(transcripts: List[pyrion.core.genes.Transcript], use_numba: bool = True) -> numpy.ndarray
+  FUNCTION merge_transcript_utrs(transcripts: List[pyrion.core.genes.Transcript], utr_type: str = 'both', use_numba: bool = True) -> numpy.ndarray
+  FUNCTION subtract_transcript_regions(transcript: pyrion.core.genes.Transcript, subtract_regions: numpy.ndarray, region_type: str = 'exon', use_numba: bool = True) -> numpy.ndarray
+MODULE pyrion.ops.genes
+  CLASS SequenceAccessor
+    __init__(self, *args, **kwargs)
+    __init__(self, *args, **kwargs)
+    fetch(self, chrom: str, start: int, end: int, strand: pyrion.core.strand.Strand) -> pyrion.core.nucleotide_sequences.NucleotideSequence
+  FUNCTION extract_cds_sequence(transcript: pyrion.core.genes.Transcript, accessor: pyrion.ops.genes.SequenceAccessor) -> pyrion.core.nucleotide_sequences.NucleotideSequence
+  FUNCTION extract_exon_sequence(transcript: pyrion.core.genes.Transcript, accessor: pyrion.ops.genes.SequenceAccessor) -> pyrion.core.nucleotide_sequences.NucleotideSequence
+  FUNCTION extract_utr3_sequence(transcript: pyrion.core.genes.Transcript, accessor: pyrion.ops.genes.SequenceAccessor) -> pyrion.core.nucleotide_sequences.NucleotideSequence
+  FUNCTION extract_utr5_sequence(transcript: pyrion.core.genes.Transcript, accessor: pyrion.ops.genes.SequenceAccessor) -> pyrion.core.nucleotide_sequences.NucleotideSequence
+  FUNCTION merge_transcript_intervals(transcripts: List[pyrion.core.genes.Transcript], cds_only: bool = False, use_numba: bool = True) -> List[pyrion.core.intervals.GenomicInterval]
+MODULE pyrion.ops.interval_collection_ops
+  FUNCTION create_collections_from_mixed_intervals(intervals: List[pyrion.core.intervals.GenomicInterval], consider_strand: bool = False) -> List[pyrion.core.intervals.GenomicIntervalsCollection]
+  FUNCTION filter_collection(collection: pyrion.core.intervals.GenomicIntervalsCollection, predicate: Callable[[pyrion.core.intervals.GenomicInterval], bool]) -> pyrion.core.intervals.GenomicIntervalsCollection
+  FUNCTION group_intervals_by_proximity(collection: pyrion.core.intervals.GenomicIntervalsCollection, max_gap: int) -> List[pyrion.core.intervals.GenomicIntervalsCollection]
+  FUNCTION intersect_collections(collection: pyrion.core.intervals.GenomicIntervalsCollection, other: Union[pyrion.core.intervals.GenomicIntervalsCollection, pyrion.core.intervals.GenomicInterval]) -> pyrion.core.intervals.GenomicIntervalsCollection
+  FUNCTION merge_close_intervals(collection: pyrion.core.intervals.GenomicIntervalsCollection, max_gap: int = 0) -> pyrion.core.intervals.GenomicIntervalsCollection
+  FUNCTION split_intervals_on_gaps(collection: pyrion.core.intervals.GenomicIntervalsCollection, min_gap: int) -> List[pyrion.core.intervals.GenomicIntervalsCollection]
+MODULE pyrion.ops.interval_ops
+  FUNCTION intersect_intervals(intervals1: numpy.ndarray, intervals2: numpy.ndarray, use_numba: bool = True) -> numpy.ndarray
+  FUNCTION intervals_union(intervals_list: List[numpy.ndarray], use_numba: bool = True) -> numpy.ndarray
+  FUNCTION merge_intervals(intervals: numpy.ndarray, use_numba: bool = None) -> numpy.ndarray
+  FUNCTION subtract_intervals(intervals1: numpy.ndarray, intervals2: numpy.ndarray, use_numba: bool = True) -> numpy.ndarray
+MODULE pyrion.ops.interval_serialization
+  FUNCTION genomic_interval_to_bed6_string(interval: pyrion.core.intervals.GenomicInterval, score: int = 1000) -> str
+  FUNCTION genomic_intervals_to_bed6_string(intervals: List[pyrion.core.intervals.GenomicInterval], score: int = 1000) -> str
+  FUNCTION save_genomic_intervals_to_bed6(intervals: List[pyrion.core.intervals.GenomicInterval], file_path: Union[str, pathlib.Path], score: int = 1000) -> None
+MODULE pyrion.ops.interval_slicing
+  FUNCTION invert_intervals(intervals: numpy.ndarray, span_start: int, span_end: int, use_numba: bool = None) -> numpy.ndarray
+  FUNCTION remove_intervals(intervals: numpy.ndarray, remove_start: int, remove_end: int, use_numba: bool = None) -> numpy.ndarray
+  FUNCTION slice_intervals(intervals: numpy.ndarray, slice_start: int, slice_end: int, use_numba: bool = None) -> numpy.ndarray
+MODULE pyrion.ops.intervals
+  FUNCTION array_to_intervals(array: numpy.ndarray, chrom: str) -> List
+  FUNCTION chains_to_arrays(chains: List, for_q: bool = False) -> Tuple[numpy.ndarray, numpy.ndarray]
+  FUNCTION compute_overlap_size(start1: int, end1: int, start2: int, end2: int) -> int
+  FUNCTION find_intersections(arr1: numpy.ndarray, arr2: numpy.ndarray, ids1: Optional[List] = None, ids2: Optional[List] = None) -> Dict[Any, List]
+  FUNCTION intervals_to_array(intervals: List) -> numpy.ndarray
+  FUNCTION projected_intervals_to_genomic_intervals(projected_arrays: List[numpy.ndarray], target_chrom: str, target_strand: pyrion.core.strand.Strand = <Strand.UNKNOWN: 0>, ids: Optional[List[str]] = None) -> List[List[pyrion.core.intervals.GenomicInterval]]
+  FUNCTION transcripts_to_arrays(transcripts: List) -> Tuple[numpy.ndarray, numpy.ndarray]
+MODULE pyrion.ops.sequence_serialization
+  FUNCTION amino_acid_sequence_to_fasta_string(sequence: pyrion.core.amino_acid_sequences.AminoAcidSequence, width: int = 80, header: Optional[str] = None) -> str
+  FUNCTION codon_sequence_to_fasta_string(sequence: pyrion.core.codons.CodonSequence, width: int = 80, header: Optional[str] = None) -> str
+  FUNCTION format_fasta_sequence(sequence_string: str, width: int = 80) -> str
+  FUNCTION get_sequence_header(sequence: Any, index: Optional[int] = None) -> str
+  FUNCTION nucleotide_sequence_to_fasta_string(sequence: pyrion.core.nucleotide_sequences.NucleotideSequence, width: int = 80, header: Optional[str] = None) -> str
+  FUNCTION save_sequences_to_fasta(sequences: List[Any], file_path: Union[str, pathlib.Path], width: int = 80) -> None
+  FUNCTION sequence_to_fasta_string(sequence: Any, width: int = 80, header: Optional[str] = None) -> str
+  FUNCTION sequences_to_fasta_string(sequences: List[Any], width: int = 80) -> str
+MODULE pyrion.ops.transcript_serialization
+  FUNCTION load_transcripts_collection_from_json(file_path: Union[str, pathlib.Path]) -> pyrion.core.genes.TranscriptsCollection
+  FUNCTION save_transcripts_collection_to_bed12(collection: pyrion.core.genes.TranscriptsCollection, file_path: Union[str, pathlib.Path]) -> None
+  FUNCTION save_transcripts_collection_to_json(collection: pyrion.core.genes.TranscriptsCollection, file_path: Union[str, pathlib.Path]) -> None
+  FUNCTION transcript_from_dict(data: Dict[str, Any]) -> pyrion.core.genes.Transcript
+  FUNCTION transcript_to_bed12_string(transcript: pyrion.core.genes.Transcript) -> str
+  FUNCTION transcript_to_dict(transcript: pyrion.core.genes.Transcript) -> Dict[str, Any]
+  FUNCTION transcripts_collection_from_dict(data: Dict[str, Any]) -> pyrion.core.genes.TranscriptsCollection
+  FUNCTION transcripts_collection_summary_string(collection: pyrion.core.genes.TranscriptsCollection) -> str
+  FUNCTION transcripts_collection_to_bed12_string(collection: pyrion.core.genes.TranscriptsCollection) -> str
+  FUNCTION transcripts_collection_to_dict(collection: pyrion.core.genes.TranscriptsCollection) -> Dict[str, Any]
+MODULE pyrion.ops.transcript_slicing
+  FUNCTION get_transcript_introns(transcript: pyrion.core.genes.Transcript, use_numba: bool = True) -> numpy.ndarray
+  FUNCTION remove_transcript_region(transcript: pyrion.core.genes.Transcript, start: int, end: int, use_numba: bool = True) -> pyrion.core.genes.Transcript
+  FUNCTION slice_transcript(transcript: pyrion.core.genes.Transcript, start: int, end: int, use_numba: bool = True) -> pyrion.core.genes.Transcript
+MODULE pyrion.utils
+MODULE pyrion.utils.amino_acid_encoding
+  FUNCTION apply_masking_aa(encoded: numpy.ndarray) -> numpy.ndarray
+  FUNCTION decode_amino_acids(encoded: numpy.ndarray) -> str
+  FUNCTION encode_amino_acids(sequence: str) -> numpy.ndarray
+  FUNCTION get_masking_status_aa(encoded: numpy.ndarray) -> numpy.ndarray
+  FUNCTION is_gap(code: int) -> bool
+  FUNCTION is_masked(code: int) -> bool
+  FUNCTION is_stop(code: int) -> bool
+  FUNCTION is_unknown(code: int) -> bool
+  FUNCTION mask(code: int) -> int
+  FUNCTION remove_masking_aa(encoded: numpy.ndarray) -> numpy.ndarray
+  FUNCTION unmask(code: int) -> int
+MODULE pyrion.utils.encoding
+  FUNCTION apply_complement(encoded: numpy.ndarray) -> numpy.ndarray
+  FUNCTION apply_masking(encoded: numpy.ndarray) -> numpy.ndarray
+  FUNCTION complement(code: int) -> int
+  FUNCTION decode_nucleotides(encoded: numpy.ndarray, is_rna: bool = False) -> str
+  FUNCTION encode_nucleotides(sequence: str) -> numpy.ndarray
+  FUNCTION get_masking_status(encoded: numpy.ndarray) -> numpy.ndarray
+  FUNCTION is_frameshift(code: int) -> bool
+  FUNCTION is_gap(code: int) -> bool
+  FUNCTION is_masked(code: int) -> bool
+  FUNCTION mask(code: int) -> int
+  FUNCTION remove_masking(encoded: numpy.ndarray) -> numpy.ndarray
+  FUNCTION unmask(code: int) -> int
+MODULE pyrion.utils.numpy_utils
+MODULE pyrion.visualization
+  CLASS AlignmentFeature
+    __init__(self, alignment: pyrion.core.genome_alignment.GenomeAlignment)
+    __init__(self, alignment: pyrion.core.genome_alignment.GenomeAlignment)
+    end -> int
+    length -> int
+    start -> int
+  CLASS Band
+    __init__(self, index: int)
+    __init__(self, index: int)
+    add_feature(self, feature: pyrion.visualization.GenomicFeature)
+    can_add_feature(self, feature: pyrion.visualization.GenomicFeature) -> bool
+  CLASS GenomicFeature
+    __init__(self, /, *args, **kwargs)
+    end -> int
+    length -> int
+    start -> int
+  CLASS GenomicRuler
+    __init__(self, interval: pyrion.core.intervals.GenomicInterval, tick_count: int = 10, inverted: bool = False, height: float = 0.15)
+    __init__(self, interval: pyrion.core.intervals.GenomicInterval, tick_count: int = 10, inverted: bool = False, height: float = 0.15)
+    draw(self, ax, y: float = 0.0)
+  CLASS IntervalFeature
+    __init__(self, interval: pyrion.core.intervals.GenomicInterval)
+    __init__(self, interval: pyrion.core.intervals.GenomicInterval)
+    end -> int
+    length -> int
+    start -> int
+  CLASS LayoutManager
+    __init__(self)
+    __init__(self)
+    add_track(self, track: 'Track')
+    compute_layout(self)
+    get_total_bands(self) -> int
+  CLASS Level
+    __init__(self)
+    __init__(self)
+    add_features(self, features: List[pyrion.visualization.GenomicFeature])
+    compute_bands(self)
+  CLASS Track
+    __init__(self, name: str, features: List[pyrion.visualization.GenomicFeature], track_type: pyrion.visualization.TrackType)
+    __init__(self, name: str, features: List[pyrion.visualization.GenomicFeature], track_type: pyrion.visualization.TrackType)
+  CLASS TrackType
+    __init__(self, /, *args, **kwargs)
+  CLASS TranscriptFeature
+    __init__(self, transcript: pyrion.core.genes.Transcript)
+    __init__(self, transcript: pyrion.core.genes.Transcript)
+    end -> int
+    length -> int
+    start -> int
+  CLASS VisualizationWindow
+    __init__(self, interval: pyrion.core.intervals.GenomicInterval, height: Optional[float] = None, band_height: float = 0.35, band_spacing: float = 0.05, level_spacing: float = 0.2, ruler_height: float = 0.4, label_height: float = 0.15, show_labels: bool = True, left_padding_width: int = 15000, show_feature_labels: bool = True)
+    __init__(self, interval: pyrion.core.intervals.GenomicInterval, height: Optional[float] = None, band_height: float = 0.35, band_spacing: float = 0.05, level_spacing: float = 0.2, ruler_height: float = 0.4, label_height: float = 0.15, show_labels: bool = True, left_padding_width: int = 15000, show_feature_labels: bool = True)
+    add_track(self, track: pyrion.visualization.Track)
+    show(self, figsize: tuple = (12, 6))
+  FUNCTION create_alignment_track(name: str, alignments: List[pyrion.core.genome_alignment.GenomeAlignment]) -> pyrion.visualization.Track
+  FUNCTION create_interval_track(name: str, intervals: List[pyrion.core.intervals.GenomicInterval]) -> pyrion.visualization.Track
+  FUNCTION create_transcript_track(name: str, transcripts: List[pyrion.core.genes.Transcript]) -> pyrion.visualization.Track
+  FUNCTION create_window_for_region(chrom: str, start: int, end: int, **kwargs) -> pyrion.visualization.VisualizationWindow
+  FUNCTION visualize_alignments(alignments: List[pyrion.core.genome_alignment.GenomeAlignment], window_interval: pyrion.core.intervals.GenomicInterval = None, track_name: str = 'Alignments', band_height: float = 0.35, **kwargs)
+  FUNCTION visualize_intervals(intervals: List[pyrion.core.intervals.GenomicInterval], window_interval: pyrion.core.intervals.GenomicInterval = None, track_name: str = 'Intervals', band_height: float = 0.35, **kwargs)
+  FUNCTION visualize_transcripts(transcripts: List[pyrion.core.genes.Transcript], window_interval: pyrion.core.intervals.GenomicInterval = None, track_name: str = 'Transcripts', band_height: float = 0.35, **kwargs)
