@@ -2,7 +2,6 @@
 
 from typing import Union, Optional, List, Dict
 from pathlib import Path
-import polars as pl
 
 from ..core.gene_data import GeneData
 
