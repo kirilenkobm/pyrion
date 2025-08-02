@@ -12,7 +12,7 @@ if [ -f ".venv/bin/activate" ]; then
     source .venv/bin/activate
 else
     echo "⚠️  Virtual environment not found at .venv/"
-    echo "💡 Run 'python setup_dev.py' to set up the development environment"
+    echo "💡 Run 'python setup.py build_ext --inplace' to build C extensions"
     exit 1
 fi
 
