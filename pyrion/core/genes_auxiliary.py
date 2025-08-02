@@ -35,7 +35,7 @@ def get_transcript_cds_interval(transcript) -> Optional[GenomicInterval]:
     start = cds[0, 0]
     end = cds[-1, 1]
     return GenomicInterval(
-        chrom=transcript.chrom_name,
+        chrom=transcript.chrom,
         start=start,
         end=end,
         strand=transcript.strand,
@@ -52,7 +52,7 @@ def compute_flanks(
     if len(transcript.blocks) == 0:
         raise ValueError("Transcript has no blocks")
     
-    chrom_name = transcript.chrom_name
+    chrom_name = transcript.chrom
     if chrom_name not in chrom_sizes:
         return None, None
     

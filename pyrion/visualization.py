@@ -239,7 +239,7 @@ class VisualizationWindow:
                 chain_id = str(alignment.chain_id)
                 
                 # Get query chromosome name
-                q_chrom = getattr(alignment, 'q_chrom_name', 'unknown')
+                q_chrom = getattr(alignment, 'q_chrom', 'unknown')
                 
                 # Get query strand and choose direction arrow
                 q_strand = getattr(alignment, 'q_strand', 1)
@@ -736,7 +736,7 @@ def visualize_transcripts(transcripts: List[Transcript], window_interval: Genomi
             raise ValueError("No transcripts provided and no window_interval specified")
         min_start = min(int(transcript.blocks[0, 0]) for transcript in transcripts)
         max_end = max(int(transcript.blocks[-1, 1]) for transcript in transcripts)
-        chrom = transcripts[0].chrom_name
+        chrom = transcripts[0].chrom
         padding = (max_end - min_start) * 0.1
         window_interval = GenomicInterval(chrom,
                                         max(0, int(min_start - padding)),

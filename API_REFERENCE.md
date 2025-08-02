@@ -1,6 +1,6 @@
 # Pyrion API Reference
 
-**Generated:** 2025-08-02 20:43:29
+**Generated:** 2025-08-02 20:45:24
 
 Complete API reference with full docstrings and signatures.
 
