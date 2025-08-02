@@ -5,7 +5,6 @@ from typing import List, Union, Callable
 from numba import njit
 
 from ..core.intervals import GenomicInterval, GenomicIntervalsCollection
-from ..core.strand import Strand
 
 
 @njit

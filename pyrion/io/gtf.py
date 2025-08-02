@@ -2,11 +2,10 @@
 
 import gzip
 import re
-from typing import Union, Dict, List, Tuple, Iterator, Optional, TextIO
+from typing import Union, List, Iterator, Optional, TextIO
 from pathlib import Path
-from collections import defaultdict
 
-from ..core.genes import Transcript, TranscriptsCollection
+from ..core.genes import TranscriptsCollection
 from ..core.gene_data import GeneData
 from .._gtfparser import parse_gtf_chunk
 

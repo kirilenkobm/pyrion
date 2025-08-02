@@ -1,6 +1,6 @@
 """2bit file format support."""
 
-from typing import Dict, Optional, List
+from typing import Optional, List
 from pathlib import Path
 
 from ..core_types import Strand, ChromSizes

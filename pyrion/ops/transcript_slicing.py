@@ -2,7 +2,6 @@
 
 import numpy as np
 from ..core.genes import Transcript
-from ..core.strand import Strand
 from .interval_slicing import slice_intervals, remove_intervals, invert_intervals
 
 

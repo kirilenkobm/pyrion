@@ -339,7 +339,9 @@ def split_genome_alignment(
             q_chrom=chain.q_chrom,
             q_strand=chain.q_strand,
             blocks=new_blocks,
-            child_id=i
+            child_id=i,
+            t_size=chain.t_size,
+            q_size=chain.q_size,
         ))
 
         overlapping_transcripts = [

@@ -1,5 +1,5 @@
 PYRION API INDEX
-Generated: 2025-08-02 20:29:10
+Generated: 2025-08-02 20:43:29
 Concise reference with type signatures only.
 ============================================================
 

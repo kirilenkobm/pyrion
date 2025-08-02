@@ -3,7 +3,7 @@
 import json
 import numpy as np
 from pathlib import Path
-from typing import List, Dict, Any, Union
+from typing import Dict, Any, Union
 from ..core.genome_alignment import GenomeAlignment, GenomeAlignmentsCollection
 
 

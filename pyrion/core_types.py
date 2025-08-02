@@ -1,7 +1,7 @@
 """Shared types, enums, and protocols for pyrion."""
 
 from enum import Enum
-from typing import Protocol, Optional, Union, Dict, List, Any
+from typing import Dict, Any
 import numpy as np
 
 # Import Strand from its actual location for backwards compatibility

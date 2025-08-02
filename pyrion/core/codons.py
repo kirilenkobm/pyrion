@@ -4,14 +4,12 @@ import numpy as np
 from typing import List, Optional, Tuple
 from dataclasses import dataclass
 
-# Import encoding utilities (now using multiplicative semantics)
 from ..utils.encoding import (
     NUCLEOTIDE_DECODING, RNA_NUCLEOTIDE_DECODING,
     FRAMESHIFT_1, is_gap, is_frameshift
 )
 
-# Constants
-INVALID_CHARACTER = 0  # Same as GAP in new system
+INVALID_CHARACTER = 0
 
 
 @dataclass

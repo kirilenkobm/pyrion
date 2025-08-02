@@ -3,9 +3,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, Optional, Union, Iterator, TextIO
+from typing import Dict, Optional, Union
 from pathlib import Path
-import os
 
 
 @dataclass

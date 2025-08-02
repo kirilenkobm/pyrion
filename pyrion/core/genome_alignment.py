@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from functools import cached_property
-from typing import List, Optional, Dict, Union, Tuple, TYPE_CHECKING
+from typing import List, Optional, Dict, Union, Tuple
 import numpy as np
 from pathlib import Path
 

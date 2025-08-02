@@ -2,7 +2,7 @@
 
 import numpy as np
 from typing import Optional
-from ..utils.encoding import apply_masking, remove_masking, is_masked
+from ..utils.encoding import apply_masking, remove_masking
 
 
 def mask_nucleotide_sequence_slice(sequence, start: Optional[int] = None, end: Optional[int] = None):

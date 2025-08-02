@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 from functools import cached_property
-from typing import Optional, List, Dict, Set, Tuple, Union, Callable, TYPE_CHECKING
+from typing import Optional, List, Dict, Set, Tuple, Union, Callable
 import numpy as np
 from weakref import WeakKeyDictionary
 from pathlib import Path

@@ -3,7 +3,6 @@
 from dataclasses import dataclass
 from enum import IntEnum
 from typing import Optional, Union, List, Callable, Dict, Tuple
-from pathlib import Path
 
 import numpy as np
 

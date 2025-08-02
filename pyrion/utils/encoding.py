@@ -1,7 +1,7 @@
 """Encoding utilities for nucleotides using multiplicative semantics."""
 
 import numpy as np
-from typing import Dict, Union, Set
+from typing import Dict, Set
 
 # Unmasked nucleotides (uppercase)
 ADENINE = 1             # A = +1 (purine)

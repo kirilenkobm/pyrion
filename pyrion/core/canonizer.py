@@ -1,6 +1,6 @@
 """Canonizer functions for selecting canonical transcripts from transcript lists."""
 
-from typing import List, Callable, Optional
+from typing import List, Optional
 import numpy as np
 
 

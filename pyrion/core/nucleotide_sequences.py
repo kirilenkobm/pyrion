@@ -2,14 +2,12 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Dict, Union, Optional
-from pathlib import Path
+from dataclasses import dataclass
+from typing import Optional
 from enum import Enum
 import numpy as np
 
 from ..core_types import Metadata
-from .strand import Strand
 from ..utils.encoding import (
     encode_nucleotides, decode_nucleotides, apply_complement,
     is_masked, apply_masking, remove_masking, GAPS, is_gap

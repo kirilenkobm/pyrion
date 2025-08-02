@@ -2,10 +2,7 @@
 
 import numpy as np
 from typing import Dict
-from ..utils.amino_acid_encoding import (
-    AMINO_ACID_DECODING, UNKNOWN_AMINO_ACID, 
-    remove_masking_aa, is_gap, is_stop, decode_amino_acids
-)
+from ..utils.amino_acid_encoding import AMINO_ACID_DECODING, remove_masking_aa
 
 
 def count_amino_acids_in_sequence(sequence) -> Dict[str, int]:

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Dict, Union, List, Any
+from typing import Dict, Union, List
 from pathlib import Path
 from enum import IntEnum
 

@@ -1,10 +1,9 @@
 """GenePred format I/O support."""
 
-from typing import Union, List
+from typing import Union
 from pathlib import Path
 import numpy as np
 
-from .. import GenomicInterval
 from ..core.genes import Transcript, TranscriptsCollection
 from ..core.strand import Strand
 

@@ -3,7 +3,7 @@
 A cleaner architecture and improved visuals are planned for a future release."""
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import List, Dict, Optional, Union
+from typing import List, Dict, Optional
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines

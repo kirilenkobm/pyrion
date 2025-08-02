@@ -1,10 +1,9 @@
 """Entity-specific operations for Transcripts and GenomeAlignments using low-level interval operations."""
 
 import numpy as np
-from typing import List, Optional, Tuple, Dict
+from typing import List
 from ..core.genes import Transcript
 from ..core.genome_alignment import GenomeAlignment
-from ..core.strand import Strand
 from .interval_slicing import slice_intervals, invert_intervals
 from .interval_ops import merge_intervals, intersect_intervals, subtract_intervals
 

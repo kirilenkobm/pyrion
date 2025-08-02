@@ -1,6 +1,6 @@
 # Pyrion
 
-![PyPI version](https://img.shields.io/badge/version-0.1.0-blue)
+![PyPI version](https://img.shields.io/badge/version-0.1.2-blue)
 ![Python](https://img.shields.io/badge/python-3.9%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 

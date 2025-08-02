@@ -1,7 +1,7 @@
 """Additional low-level interval operations for merge, intersection, etc."""
 
 import numpy as np
-from typing import List, Tuple, Optional
+from typing import List
 from numba import njit
 
 

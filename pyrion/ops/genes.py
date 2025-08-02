@@ -1,8 +1,7 @@
 """Gene and transcript operations."""
 
 import numpy as np
-from typing import List, Union, Protocol
-from numba import njit
+from typing import List, Protocol
 
 from .interval_ops import merge_intervals
 from .. import Transcript

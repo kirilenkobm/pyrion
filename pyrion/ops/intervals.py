@@ -1,7 +1,7 @@
 """Interval operations for pyrion."""
 
 from collections import defaultdict
-from typing import Dict, List, Tuple, Any, Iterator, Optional
+from typing import Dict, List, Tuple, Any, Optional
 import numpy as np
 from numba import njit
 

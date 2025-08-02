@@ -2,9 +2,8 @@
 
 from dataclasses import dataclass
 from typing import Dict, Tuple
-import numpy as np
 
-from ..utils.encoding import encode_nucleotides, ADENINE, GUANINE, THYMINE, CYTOSINE, UNKNOWN
+from ..utils.encoding import ADENINE, GUANINE, THYMINE, CYTOSINE
 from ..utils.amino_acid_encoding import (
     ALANINE, ARGININE, ASPARAGINE, ASPARTIC_ACID, CYSTEINE,
     GLUTAMIC_ACID, GLUTAMINE, GLYCINE, HISTIDINE, ISOLEUCINE,

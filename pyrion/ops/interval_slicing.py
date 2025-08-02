@@ -1,7 +1,6 @@
 """Low-level interval slicing and manipulation operations."""
 
 import numpy as np
-from typing import Tuple, Optional, Union
 from numba import njit
 
 

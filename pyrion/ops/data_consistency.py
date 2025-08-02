@@ -1,6 +1,6 @@
 """Data consistency checking utilities."""
 
-from typing import List, Set
+from typing import List
 from ..core.genes import TranscriptsCollection
 
 
