@@ -40,6 +40,10 @@ class GenomicInterval:
     id: Optional[str] = None
     
     def __post_init__(self):
+        # Convert integer strand to Strand object if needed (for C parser compatibility)
+        if isinstance(self.strand, int):
+            object.__setattr__(self, 'strand', Strand.from_int(self.strand))
+        
         if self.start >= self.end:
             raise ValueError(f"Invalid interval: start {self.start} >= end {self.end}")
         if self.start < 0:

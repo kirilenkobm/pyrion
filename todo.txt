@@ -1,5 +1,3 @@
-[ ] GenomicInterval -> Transcript (like bed-6 -> bed-12 for compatibility with TOGA)
-
 [ ] SequencesAlignment class - wrapper for SequencesCollection
 
 [ ] visualization for sequences

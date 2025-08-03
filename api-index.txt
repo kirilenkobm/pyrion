@@ -1,5 +1,5 @@
 PYRION API INDEX
-Generated: 2025-08-02 20:45:24
+Generated: 2025-08-03 21:09:37
 Concise reference with type signatures only.
 ============================================================
 
@@ -472,6 +472,9 @@ MODULE pyrion.ops.transcript_slicing
   FUNCTION get_transcript_introns(transcript: pyrion.core.genes.Transcript, use_numba: bool = True) -> numpy.ndarray
   FUNCTION remove_transcript_region(transcript: pyrion.core.genes.Transcript, start: int, end: int, use_numba: bool = True) -> pyrion.core.genes.Transcript
   FUNCTION slice_transcript(transcript: pyrion.core.genes.Transcript, start: int, end: int, use_numba: bool = True) -> pyrion.core.genes.Transcript
+MODULE pyrion.ops.transformations
+  FUNCTION bed_to_transcripts(bed_file_path: str) -> pyrion.core.genes.TranscriptsCollection
+  FUNCTION intervals_to_transcripts(intervals: List[pyrion.core.intervals.GenomicInterval], source_file: Optional[str] = None) -> pyrion.core.genes.TranscriptsCollection
 MODULE pyrion.utils
 MODULE pyrion.utils.amino_acid_encoding
   FUNCTION apply_masking_aa(encoded: numpy.ndarray) -> numpy.ndarray

@@ -1,6 +1,6 @@
 # Pyrion API Reference
 
-**Generated:** 2025-08-02 20:45:24
+**Generated:** 2025-08-03 21:09:37
 
 Complete API reference with full docstrings and signatures.
 
@@ -2887,6 +2887,29 @@ Returns:
 **Signature:** `(transcript: pyrion.core.genes.Transcript, start: int, end: int, use_numba: bool = True) -> pyrion.core.genes.Transcript`
 
 Slice transcript to get only blocks that intersect with [start, end).
+
+
+---
+
+# pyrion.ops.transformations
+
+Data transformation utilities for converting between different genomic data types.
+
+
+## Functions
+
+### bed_to_transcripts
+
+**Signature:** `(bed_file_path: str) -> pyrion.core.genes.TranscriptsCollection`
+
+
+### intervals_to_transcripts
+
+**Signature:** `(intervals: List[pyrion.core.intervals.GenomicInterval], source_file: Optional[str] = None) -> pyrion.core.genes.TranscriptsCollection`
+
+Convert a list of GenomicInterval objects to a TranscriptsCollection.
+
+May be helpful if bed-6 formatted data is needed as is was bed-12.
 
 
 ---

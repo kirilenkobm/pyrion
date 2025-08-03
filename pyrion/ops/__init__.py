@@ -75,6 +75,10 @@ from .chain_serialization import (
     load_genome_alignments_collection_from_json,
     genome_alignments_collection_summary_string,
 )
+from .transformations import (
+    intervals_to_transcripts,
+    bed_to_transcripts,
+)
 
 __all__ = [
     # Original operations
@@ -161,4 +165,7 @@ __all__ = [
     "save_amino_acid_sequence_to_fasta",
     # Data consistency checking
     "check_data_consistency",
+    # Data transformations
+    "intervals_to_transcripts",
+    "bed_to_transcripts",
 ]
