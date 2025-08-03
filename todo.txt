@@ -1,0 +1,44 @@
+[ ] GenomicInterval -> Transcript (like bed-6 -> bed-12 for compatibility with TOGA)
+
+[ ] SequencesAlignment class - wrapper for SequencesCollection
+
+[ ] visualization for sequences
+
+[ ] revise metadata (what is helpful to add? Some API to work with metadata)
+
+[ ] verbosity and logging
+
+[ ] AlignerStrategy: SequencesCollection, AlignerName -> SequencesAlignment
+
+- list available aligners (like is mafft installed?)
+- for each - manage settings io/subprocess/parsing output
+- extension point for users
+- maybe built-in basic NW pairwise aligner
+
+[ ] revise tests and coverage - tests for some close-to-practice scenarios
+
+- fasta+fai does not seem to be tested at all
+- gtf parsing - need at least a small sample
+
+[ ] support gz-ed inputs
+
+[ ] Maf reader + respective Genome-Alignment-precursor structure (?)
+
+[ ] Better visuals
+
+[ ] gff3 reading (?)
+
+
+[ ] If need be - CLI wrapper for some very common operations
+
+[ ] Transcripts tokenizer
+
+[ ] Isoform graphs
+
+[ ] For my pet-project - matrix of all possible bindings in an RNA sequence
+
+[ ] low prio: some vcf support
+
+[ ] low prio: networks wrapper for trees
+
+[ ] add ambiguous nucleotide codes

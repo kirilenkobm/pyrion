@@ -22,6 +22,5 @@ test_data/hg38.chr22-M-X-Y.fa
 *.so
 *.o
 
-todo.txt
 toga_mini.py
 PYPI_UPLOAD.md
