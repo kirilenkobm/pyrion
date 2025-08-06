@@ -1,5 +1,5 @@
 PYRION API INDEX
-Generated: 2025-08-03 21:09:37
+Generated: 2025-08-06 19:03:54
 Concise reference with type signatures only.
 ============================================================
 
@@ -369,6 +369,9 @@ MODULE pyrion.io.twobit
     fetch_interval(self, interval: pyrion.core.intervals.GenomicInterval) -> pyrion.core.nucleotide_sequences.NucleotideSequence
     list_chromosomes(self) -> None
     validate_interval(self, chrom: str, start: int, end: int) -> bool
+MODULE pyrion.misc
+MODULE pyrion.misc.rna_basic_bpm
+  FUNCTION compute_rna_binding_potential_matrix(sequence: pyrion.core.nucleotide_sequences.NucleotideSequence, min_loop_size: int = 5, min_stem_size: int = 4) -> numpy.ndarray
 MODULE pyrion.ops
 MODULE pyrion.ops.chain_serialization
   FUNCTION genome_alignment_from_dict(data: Dict[str, Any]) -> pyrion.core.genome_alignment.GenomeAlignment

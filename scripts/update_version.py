@@ -46,8 +46,8 @@ def update_readme_badge(version: str) -> None:
     content = readme_file.read_text()
     
     # Update version badge
-    old_pattern = r'!\[version\]\(https://img\.shields\.io/badge/version-[^-]+-blue\)'
-    new_badge = f'![version](https://img.shields.io/badge/version-{version}-blue)'
+    old_pattern = r'!\[PyPI version\]\(https://img\.shields\.io/badge/version-[^-]+-blue\)'
+    new_badge = f'![PyPI version](https://img.shields.io/badge/version-{version}-blue)'
     
     updated_content = re.sub(old_pattern, new_badge, content)
     
@@ -173,10 +173,10 @@ def main():
         print(f"🎉 Version update complete: {new_version}")
         print("\nNext steps:")
         print("1. Test the package: python -c 'import pyrion; print(pyrion.__version__)'")
-        print("2. Commit changes: git add -A && git commit -mm39.chrM.2bit 'Bump version to {}'".format(new_version))
+        print("2. Commit changes: git add -A && git commit -m 'Bump version to {}'".format(new_version))
         print("3. Tag release: git tag v{}".format(new_version))
-        print("4. Build package: python -mm39.chrM.2bit build")
-        print("5. Upload to PyPI: python -mm39.chrM.2bit twine upload dist/*")
+        print("4. Build package: python -m build")
+        print("5. Upload to PyPI: python -m twine upload dist/*")
 
 
 if __name__ == "__main__":

@@ -18,14 +18,15 @@
 - fasta+fai does not seem to be tested at all
 - gtf parsing - need at least a small sample
 
-[ ] support gz-ed inputs
+[x] support gz-ed inputs
+
+[ ] support gz-ed inputs, but this time good
 
 [ ] Maf reader + respective Genome-Alignment-precursor structure (?)
 
 [ ] Better visuals
 
 [ ] gff3 reading (?)
-
 
 [ ] If need be - CLI wrapper for some very common operations
 

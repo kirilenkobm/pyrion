@@ -1,6 +1,6 @@
 # Pyrion API Reference
 
-**Generated:** 2025-08-03 21:09:37
+**Generated:** 2025-08-06 19:03:54
 
 Complete API reference with full docstrings and signatures.
 
@@ -1899,8 +1899,6 @@ Chain format I/O support.
 
 **Signature:** `(file_path: Union[str, pathlib.Path], min_score: Optional[int] = None) -> pyrion.core.genome_alignment.GenomeAlignmentsCollection`
 
-Read chain file and return GenomeAlignmentsCollection.
-
 
 ---
 
@@ -2197,6 +2195,29 @@ Return repr(self).
 
 *Signature:* `(self, chrom: str, start: int, end: int) -> bool`
 
+
+
+---
+
+# pyrion.misc
+
+Miscellaneous utilities for specialized analyses.
+
+
+---
+
+# pyrion.misc.rna_basic_bpm
+
+RNA basic binding potential matrix computation.
+
+
+## Functions
+
+### compute_rna_binding_potential_matrix
+
+**Signature:** `(sequence: pyrion.core.nucleotide_sequences.NucleotideSequence, min_loop_size: int = 5, min_stem_size: int = 4) -> numpy.ndarray`
+
+Compute RNA base pairing potential matrix.
 
 
 ---
