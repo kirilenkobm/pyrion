@@ -7,7 +7,10 @@
 Tools and abstractions for comparative genomics. Reliable, fast, and minimal-dependency tools 
 for common genomics tasks without unnecessary overhead.
 
-Work in progress.
+Pyrion includes tools for manipulating genomic intervals, genome alignments, and sequences.
+It handles common formats like BED (6 or 12), chain, 2bit, and FASTA, and can also parse genePred and GTF annotations.
+
+Work in progress: [plans](todo.txt).
 
 ## Installation
 
