@@ -4,6 +4,8 @@
 .venv/
 .build/
 
+test_outputs/*
+
 __pycache__/
 venv/
 pyrion.egg-info/*

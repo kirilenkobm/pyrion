@@ -18,10 +18,11 @@ slice and inteding - for codons too
 - extension point for users
 - maybe built-in basic NW pairwise aligner
 
-[ ] revise tests and coverage - tests for some close-to-practice scenarios
+[x] tests for fasta+fai
 
-- fasta+fai does not seem to be tested at all
-- gtf parsing - need at least a small sample
+[x] gtf parsing - need at least a small sample
+
+[ ] better gtf parsing test - compare with actual kent tools output
 
 [x] support gz-ed inputs
 
@@ -46,3 +47,7 @@ slice and inteding - for codons too
 [ ] low prio: networks wrapper for trees
 
 [ ] add ambiguous nucleotide codes
+
+[ ] for v1.0.0 - check that the codebase follows the "avoid unnecessary computations" principle.
+
+For instance, attaching data for TranscriptsCollection is an operation that changes Transcripts.
