@@ -17,10 +17,9 @@ build/
 htmlcov/
 dev/
 
-test_data/hg38.chr22-M-X-Y.fa
+uv.lock
 
 *.so
 *.o
 
-toga_mini.py
 PYPI_UPLOAD.md
