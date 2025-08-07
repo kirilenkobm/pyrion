@@ -50,13 +50,13 @@ class TestFixtures:
             Transcript(
                 blocks=np.array([[100, 200], [300, 400]], dtype=np.int64),
                 strand=Strand.PLUS,
-                chrom=b"chr1",
+                chrom="chr1",
                 id="transcript1"
             ),
             Transcript(
                 blocks=np.array([[1000, 1200]], dtype=np.int64),
                 strand=Strand.MINUS,
-                chrom=b"chr2", 
+                chrom="chr2", 
                 id="transcript2"
             )
         ]
@@ -66,13 +66,13 @@ class TestFixtures:
         """Sample genome alignments (chains) for testing."""
         return [
             GenomeAlignment(
-                chain_id=1, score=1000, t_chrom=b"chr1", t_strand=1, t_size=1000000,
-                q_chrom=b"chr2", q_strand=1, q_size=1000000,
+                chain_id=1, score=1000, t_chrom="chr1", t_strand=1, t_size=1000000,
+                q_chrom="chr2", q_strand=1, q_size=1000000,
                 blocks=np.array([[100, 200, 1000, 1100], [300, 400, 1200, 1300]], dtype=np.int64)
             ),
             GenomeAlignment(
-                chain_id=2, score=2000, t_chrom=b"chr3", t_strand=-1, t_size=2000000,
-                q_chrom=b"chr4", q_strand=-1, q_size=2000000,
+                chain_id=2, score=2000, t_chrom="chr3", t_strand=-1, t_size=2000000,
+                q_chrom="chr4", q_strand=-1, q_size=2000000,
                 blocks=np.array([[500, 700, 2000, 2200]], dtype=np.int64)
             )
         ]
@@ -484,5 +484,3 @@ class TestPerformanceAndEdgeCases(TestFixtures):
         assert intervals[0].start == 1000000000
 
 
-if __name__ == "__main__":
-    pytest.main([__file__, "-v"])

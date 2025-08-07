@@ -124,6 +124,19 @@ class Transcript:
                 yield (next_start, current_end)  # (acceptor, donor)
             else:
                 yield (current_end, next_start)  # (donor, acceptor)
+                
+    def get_introns(self, use_numba: bool = True) -> np.ndarray:
+        if len(self.blocks) <= 1:
+            return np.empty((0, 2), dtype=np.int32)
+        
+        intron_starts = self.blocks[:-1, 1]
+        intron_ends = self.blocks[1:, 0]
+        valid_mask = intron_starts < intron_ends
+        
+        if not np.any(valid_mask):
+            return np.empty((0, 2), dtype=np.int32)
+            
+        return np.column_stack((intron_starts[valid_mask], intron_ends[valid_mask]))
 
 
 class Gene:

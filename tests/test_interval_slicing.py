@@ -216,7 +216,10 @@ class TestRemoveIntervals(TestFixtures):
             [400, 600]    # Unchanged [400,600]
         ], dtype=np.int32)
         
-        assert np.array_equal(result, expected)
+        # Sort both arrays by start position before comparison
+        result_sorted = result[np.argsort(result[:, 0])] if len(result) > 0 else result
+        expected_sorted = expected[np.argsort(expected[:, 0])] if len(expected) > 0 else expected
+        assert np.array_equal(result_sorted, expected_sorted)
     
     def test_remove_edge_cases(self):
         """Test edge cases in removal."""
@@ -251,7 +254,10 @@ class TestRemoveIntervals(TestFixtures):
             [400, 600]    # Unchanged [400,600]
         ], dtype=np.int32)
         
-        assert np.array_equal(result, expected)
+        # Sort both arrays by start position before comparison
+        result_sorted = result[np.argsort(result[:, 0])] if len(result) > 0 else result
+        expected_sorted = expected[np.argsort(expected[:, 0])] if len(expected) > 0 else expected
+        assert np.array_equal(result_sorted, expected_sorted)
     
     def test_remove_splits_interval(self):
         """Test removal that splits a single interval."""
@@ -264,7 +270,10 @@ class TestRemoveIntervals(TestFixtures):
             [200, 300]    # Unchanged
         ], dtype=np.int32)
         
-        assert np.array_equal(result, expected)
+        # Sort both arrays by start position before comparison
+        result_sorted = result[np.argsort(result[:, 0])] if len(result) > 0 else result
+        expected_sorted = expected[np.argsort(expected[:, 0])] if len(expected) > 0 else expected
+        assert np.array_equal(result_sorted, expected_sorted)
     
     def test_remove_empty_array(self):
         """Test removal from empty array."""

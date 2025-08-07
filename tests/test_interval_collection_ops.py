@@ -95,10 +95,10 @@ class TestMergeCloseIntervals(TestFixtures):
         """Test merging with small gap tolerance."""
         result = merge_close_intervals(close_intervals_collection, max_gap=10)
         
-        # Should merge first two intervals (10bp gap)
-        assert len(result) == 3
-        expected_starts = [100, 315, 500]
-        expected_ends = [310, 415, 600]
+        # Should merge first three intervals (10bp and 5bp gaps both <= 10bp)
+        assert len(result) == 2
+        expected_starts = [100, 500]
+        expected_ends = [415, 600]
         
         for i, (start, end) in enumerate(result.array):
             assert start == expected_starts[i]
@@ -505,7 +505,7 @@ class TestDataTypeHandling(TestFixtures):
         
         # Test operations complete without error
         merged = merge_close_intervals(collection, max_gap=100)
-        assert merged.dtype == collection.array.dtype
+        assert merged.array.dtype == collection.array.dtype
         
         groups = group_intervals_by_proximity(collection, max_gap=1000)
         assert len(groups) >= 1

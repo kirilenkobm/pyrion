@@ -22,22 +22,21 @@ def chain_files(test_data_dir):
     """Available chain files for testing."""
     return {
         "large": test_data_dir / "chains" / "hg38.chr9.mm39.chr4.chain",
-        "sample": test_data_dir / "sample_toga_input" / "hg38.chr21.mm39.chr16.chain",
-        "chromM": test_data_dir / "chromM" / "hg38.chrM.mm39.chrM.chain"
+        "compressed": test_data_dir / "chains" / "hg38.chr9.mm39.chr4.chain.gz"
     }
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="session", autouse=True)  
 def check_test_data(test_data_dir):
     """Verify test data availability at session start."""
     if not test_data_dir.exists():
         pytest.skip("Test data directory not found")
     
-    required_files = [
+    # Check for at least one chain file
+    chain_files = [
         "chains/hg38.chr9.mm39.chr4.chain",
-        "sample_toga_input/hg38.chr21.mm39.chr16.chain"
+        "chains/hg38.chr9.mm39.chr4.chain.gz"
     ]
     
-    for file_path in required_files:
-        if not (test_data_dir / file_path).exists():
-            pytest.skip(f"Required test file not found: {file_path}")
+    if not any((test_data_dir / file_path).exists() for file_path in chain_files):
+        pytest.skip("No chain files found for testing")

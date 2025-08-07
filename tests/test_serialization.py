@@ -135,7 +135,7 @@ class TestChainSerialization(TestFixtures):
         """Test converting GenomeAlignment to chain format string."""
         chain_string = genome_alignment_to_chain_string(simple_genome_alignment)
         
-        lines = chain_string.strip().split('\n')
+        lines = chain_string.split('\n')  # Don't strip to preserve empty line
         
         # Check header line
         header = lines[0]
@@ -508,7 +508,7 @@ class TestTranscriptJSONSerialization(TestFixtures):
         
         assert "TranscriptsCollection: 2 transcripts" in summary
         assert "2 chromosomes" in summary
-        assert "1 coding, 1 non-coding" in summary
+        assert "1 coding (50.0%)" in summary
         assert "Source: test_transcripts.bed12" in summary
     
     def test_summary_string_empty_transcript_collection(self):

@@ -73,14 +73,15 @@ def transcript_to_dict(transcript: Transcript) -> Dict[str, Any]:
         'blocks': transcript.blocks.tolist(),
         'cds_start': transcript.cds_start,
         'cds_end': transcript.cds_end,
-        'is_coding': transcript.is_coding
+        'is_coding': transcript.is_coding,
+        'biotype': transcript.biotype
     }
 
 
 def transcript_from_dict(data: Dict[str, Any]) -> Transcript:
     blocks = np.array(data['blocks'], dtype=np.int32)
     strand = Strand(data['strand']) if isinstance(data['strand'], int) else data['strand']
-    chrom = data['chrom'].encode() if isinstance(data['chrom'], str) else data['chrom']
+    chrom = data['chrom']
     
     return Transcript(
         blocks=blocks,
@@ -88,7 +89,8 @@ def transcript_from_dict(data: Dict[str, Any]) -> Transcript:
         chrom=chrom,
         id=data['id'],
         cds_start=data.get('cds_start'),
-        cds_end=data.get('cds_end')
+        cds_end=data.get('cds_end'),
+        biotype=data.get('biotype')
     )
 
 

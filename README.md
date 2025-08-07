@@ -3,6 +3,7 @@
 ![PyPI version](https://img.shields.io/badge/version-0.1.5-blue)
 ![Python](https://img.shields.io/badge/python-3.9%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
+![Made with Cursor](https://img.shields.io/badge/Made%20with-Cursor-0066cc?style=flat&logo=cursor&logoColor=white)
 
 Tools and abstractions for comparative genomics. Reliable, fast, and minimal-dependency tools 
 for common genomics tasks without unnecessary overhead.

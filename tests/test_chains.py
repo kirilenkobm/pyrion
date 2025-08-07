@@ -8,7 +8,7 @@ from pyrion.core.intervals import GenomicInterval
 from pyrion.core.strand import Strand
 from pyrion.core.genes import Transcript
 from pyrion.core.genome_alignment import GenomeAlignment
-from pyrion.io.chain import read_chain_file_safe
+from pyrion.io.chain import read_chain_file
 from pyrion.ops.chains import (
     project_intervals_through_chain,
     _project_intervals_vectorized, 
@@ -38,12 +38,12 @@ class TestFixtures:
     @pytest.fixture(scope="class") 
     def sample_chain_file(self):
         """Path to smaller sample chain file."""
-        return Path("test_data/sample_toga_input/hg38.chr21.mm39.chr16.chain")
+        return Path("test_data/chains/hg38.chr9.mm39.chr4.chain")
     
     @pytest.fixture(scope="class")
     def loaded_chain(self, sample_chain_file):
         """Loaded GenomeAlignment from sample data."""
-        collection = read_chain_file_safe(sample_chain_file)
+        collection = read_chain_file(sample_chain_file)
         return collection.alignments[0]  # Use first alignment
     
     @pytest.fixture
@@ -61,10 +61,10 @@ class TestFixtures:
         return GenomeAlignment(
             chain_id=1,
             score=1000,
-            t_chrom=b"chr1",
+            t_chrom="chr1",
             t_strand=1,
             t_size=1000000,
-            q_chrom=b"chr2", 
+            q_chrom="chr2", 
             q_strand=1,
             q_size=1000000,
             blocks=simple_chain_blocks
@@ -89,13 +89,13 @@ class TestFixtures:
             Transcript(
                 blocks=np.array([[1000, 1200], [1300, 1500]], dtype=np.int64),
                 strand=Strand.PLUS,
-                chrom=b"chr1",
+                chrom="chr1",
                 id="transcript1"
             ),
             Transcript(
                 blocks=np.array([[2000, 2300]], dtype=np.int64),
                 strand=Strand.PLUS,
-                chrom=b"chr1", 
+                chrom="chr1", 
                 id="transcript2"
             )
         ]
@@ -244,8 +244,8 @@ class TestChainAccessors(TestFixtures):
     def test_empty_chain_raises_error(self):
         """Test that empty chains raise ValueError."""
         empty_chain = GenomeAlignment(
-            chain_id=1, score=0, t_chrom=b"chr1", t_strand=1, t_size=1000,
-            q_chrom=b"chr2", q_strand=1, q_size=1000,
+            chain_id=1, score=0, t_chrom="chr1", t_strand=1, t_size=1000,
+            q_chrom="chr2", q_strand=1, q_size=1000,
             blocks=np.array([], dtype=np.int64).reshape(0, 4)
         )
         
@@ -289,8 +289,8 @@ class TestSplitGenomeAlignment(TestFixtures):
         ], dtype=np.int64)
         
         large_chain = GenomeAlignment(
-            chain_id=2, score=2000, t_chrom=b"chr1", t_strand=1, t_size=10_000_000,
-            q_chrom=b"chr2", q_strand=1, q_size=10_000_000, blocks=large_blocks
+            chain_id=2, score=2000, t_chrom="chr1", t_strand=1, t_size=10_000_000,
+            q_chrom="chr2", q_strand=1, q_size=10_000_000, blocks=large_blocks
         )
         
         subchains, mapping = split_genome_alignment(
@@ -310,8 +310,8 @@ class TestSplitGenomeAlignment(TestFixtures):
         ], dtype=np.int64)
         
         large_chain = GenomeAlignment(
-            chain_id=3, score=3000, t_chrom=b"chr1", t_strand=1, t_size=10_000_000,
-            q_chrom=b"chr2", q_strand=1, q_size=10_000_000, blocks=large_blocks
+            chain_id=3, score=3000, t_chrom="chr1", t_strand=1, t_size=10_000_000,
+            q_chrom="chr2", q_strand=1, q_size=10_000_000, blocks=large_blocks
         )
         
         subchains, mapping = split_genome_alignment(
@@ -398,8 +398,8 @@ class TestEdgeCases(TestFixtures):
         # Negative strand chain
         neg_blocks = np.array([[100, 200, 1000, 1100]], dtype=np.int64)
         neg_chain = GenomeAlignment(
-            chain_id=4, score=1000, t_chrom=b"chr1", t_strand=-1, t_size=1000000,
-            q_chrom=b"chr2", q_strand=-1, q_size=1000000, blocks=neg_blocks
+            chain_id=4, score=1000, t_chrom="chr1", t_strand=-1, t_size=1000000,
+            q_chrom="chr2", q_strand=-1, q_size=1000000, blocks=neg_blocks
         )
         
         target = get_chain_target_interval(neg_chain)
@@ -420,5 +420,3 @@ class TestEdgeCases(TestFixtures):
         assert result[1] <= 1500  # Max bound
 
 
-if __name__ == "__main__":
-    pytest.main([__file__, "-v"])

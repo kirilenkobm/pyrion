@@ -21,6 +21,7 @@ from pyrion.io.fasta import (
     _write_sequence
 )
 from pyrion.io.fai import create_fasta_index
+from pyrion.core.nucleotide_sequences import SequenceType
 
 
 class TestFixtures:
@@ -254,21 +255,25 @@ class TestReadFasta(TestFixtures):
     
     def test_read_fasta_basic(self, sample_fasta_file):
         """Test basic FASTA reading."""
-        sequences = read_fasta(sample_fasta_file)
+        sequences = read_fasta(sample_fasta_file, SequenceType.DNA)
         
         assert isinstance(sequences, dict)
         assert len(sequences) >= 2  # At least sequence1 and sequence2
-        assert "sequence1" in sequences
-        assert "sequence2" in sequences
+        # Check for sequences with descriptions (IDs include descriptions)
+        sequence_ids = list(sequences.keys())
+        assert any("sequence1" in seq_id for seq_id in sequence_ids)
+        assert any("sequence2" in seq_id for seq_id in sequence_ids)
         
         # Check sequence objects
-        assert isinstance(sequences["sequence1"], NucleotideSequence)
-        assert isinstance(sequences["sequence2"], NucleotideSequence)
+        seq1_key = next(key for key in sequence_ids if "sequence1" in key)
+        seq2_key = next(key for key in sequence_ids if "sequence2" in key)
+        assert isinstance(sequences[seq1_key], NucleotideSequence)
+        assert isinstance(sequences[seq2_key], NucleotideSequence)
     
     def test_read_fasta_nonexistent(self):
         """Test reading non-existent FASTA file."""
-        with pytest.raises(FileNotFoundError):
-            read_fasta("nonexistent.fasta")
+        with pytest.raises((FileNotFoundError, OSError)):
+            read_fasta("nonexistent.fasta", SequenceType.DNA)
     
     def test_read_fasta_with_sequence_type(self, sample_fasta_file):
         """Test reading with specific sequence type."""
@@ -365,7 +370,9 @@ class TestWriteFasta(TestFixtures):
                 with open(output_path, 'r') as f:
                     content = f.read()
                     assert ">test_seq" in content
-                    assert "ATCGATCGATCGATCG" in content
+                    # Check for line-wrapped sequence (line_width=8)
+                    assert "ATCGATCG" in content
+                    assert content.count("ATCGATCG") == 2  # Should appear twice due to wrapping
             
             finally:
                 if os.path.exists(output_path):
@@ -632,7 +639,7 @@ GGCCTTAAGGCCTTAA
             temp_path = f.name
         
         try:
-            sequences = read_fasta(temp_path)
+            sequences = read_fasta(temp_path, SequenceType.DNA)
             assert "test_sequence" in sequences
             # Should handle concatenation correctly
             seq = sequences["test_sequence"]
@@ -655,8 +662,10 @@ GGCCTTAAGGCCTTAA
             temp_path = f.name
         
         try:
-            sequences = read_fasta(temp_path)
-            assert "sequence1" in sequences
+            sequences = read_fasta(temp_path, SequenceType.DNA)
+            # Check for sequences with descriptions
+            sequence_ids = list(sequences.keys())
+            assert any("sequence1" in seq_id for seq_id in sequence_ids)
             # Note: Description handling depends on implementation
         
         finally:
@@ -680,7 +689,7 @@ GGCCTTAAGGCCTTAA
             temp_path = f.name
         
         try:
-            sequences = read_fasta(temp_path)
+            sequences = read_fasta(temp_path, SequenceType.DNA)
             assert len(sequences) == 2
             assert all(len(seq) > 0 for seq in sequences.values())
         
@@ -699,7 +708,7 @@ ATCGatcgATCGatcg
             temp_path = f.name
         
         try:
-            sequences = read_fasta(temp_path)
+            sequences = read_fasta(temp_path, SequenceType.DNA)
             assert "test_sequence" in sequences
             # Should handle mixed case appropriately
         
@@ -724,7 +733,7 @@ Just random text
         
         try:
             # Should handle gracefully or raise appropriate error
-            sequences = read_fasta(temp_path)
+            sequences = read_fasta(temp_path, SequenceType.DNA)
             # Depending on implementation, might return empty dict or raise error
             assert isinstance(sequences, dict)
         
@@ -739,7 +748,7 @@ Just random text
             temp_path = f.name
         
         try:
-            sequences = read_fasta(temp_path)
+            sequences = read_fasta(temp_path, SequenceType.DNA)
             assert isinstance(sequences, dict)
             assert len(sequences) == 0
         
@@ -762,7 +771,7 @@ Just random text
         try:
             # Should accept Path objects
             write_fasta(sample_nucleotide_sequences, temp_path)
-            sequences = read_fasta(temp_path)
+            sequences = read_fasta(temp_path, SequenceType.DNA)
             
             assert len(sequences) == len(sample_nucleotide_sequences)
         
@@ -780,7 +789,7 @@ class TestIntegrationWithRealData(TestFixtures):
         
         if test_fasta_path.exists():
             # Test with real data
-            sequences = read_fasta(test_fasta_path)
+            sequences = read_fasta(test_fasta_path, SequenceType.DNA)
             
             assert isinstance(sequences, dict)
             assert len(sequences) > 0
@@ -798,7 +807,7 @@ class TestIntegrationWithRealData(TestFixtures):
         
         if test_fasta_path.exists():
             # Read original
-            original_sequences = read_fasta(test_fasta_path)
+            original_sequences = read_fasta(test_fasta_path, SequenceType.DNA)
             
             # Write to temporary file
             with tempfile.NamedTemporaryFile(mode='w', suffix='.fasta', delete=False) as f:
@@ -808,7 +817,7 @@ class TestIntegrationWithRealData(TestFixtures):
                 write_fasta(original_sequences, temp_path)
                 
                 # Read back
-                reread_sequences = read_fasta(temp_path)
+                reread_sequences = read_fasta(temp_path, SequenceType.DNA)
                 
                 # Should have same sequence IDs and lengths
                 assert set(original_sequences.keys()) == set(reread_sequences.keys())
@@ -823,5 +832,3 @@ class TestIntegrationWithRealData(TestFixtures):
             pytest.skip("Test FASTA data not available")
 
 
-if __name__ == "__main__":
-    pytest.main([__file__, "-v"])

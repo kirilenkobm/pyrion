@@ -272,8 +272,7 @@ static PyObject* transcript_builder_to_python(TranscriptBuilder* builder) {
     
     Py_DECREF(numpy);
     
-    // Create chromosome bytes object
-    PyObject* chrom_bytes = PyBytes_FromString(builder->chrom);
+    PyObject* chrom_bytes = PyUnicode_FromString(builder->chrom);
     if (!chrom_bytes) {
         Py_DECREF(transcript_class);
         Py_DECREF(strand_obj);

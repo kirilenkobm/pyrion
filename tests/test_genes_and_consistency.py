@@ -104,11 +104,11 @@ class TestFixtures:
     def mock_sequence_accessor(self):
         """Mock sequence accessor with predefined sequences."""
         sequences = {
-            "chr1:1000-1200": "ATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCG",  # 200bp
-            "chr1:1500-1700": "GCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAGCTAG",  # 200bp
-            "chr1:2000-2300": "TTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAATTAA",  # 300bp
-            "chr2:5000-5300": "CCCGGGAAATTTCCCGGGAAATTTCCCGGGAAATTTCCCGGGAAATTTCCCGGGAAATTTCCCGGGAAATTTCCCGGGAAATTTCCCGGGAAATTTCCCGGGAAATTTCCCGGGAAATTTCCCGGGAAATTTCCCGGGAAATTTCCCGGGAAATTTCCCGGGAAATTTCCCGGGAAATTTCCCGGGAAATTTCCCGGGAAATTTCCCGGGAAATTTCCCGGGAAATTTCCCGGGAAATTTCCCGGGAAATTTCCCGGGAAATTTCCCGGGAAATTTCCCGGGAAATTTCCCGGGAAATTT",  # 300bp
-            "chr2:5600-5800": "GGGGCCCCAAAAGGGGCCCCAAAAGGGGCCCCAAAAGGGGCCCCAAAAGGGGCCCCAAAAGGGGCCCCAAAAGGGGCCCCAAAAGGGGCCCCAAAAGGGGCCCCAAAAGGGGCCCCAAAAGGGGCCCCAAAAGGGGCCCCAAAAGGGGCCCCAAAAGGGGCCCCAAAAGGGGCCCCAAAAGGGGCCCCAAAAGGGGCCCCAAAAGGGGCCCCAAAAGGGGCCCCAAAAGGGGCCCCAAAA"  # 200bp
+            "chr1:1000-1200": "ATCGATCG" * 25,  # 8*25=200bp exactly
+            "chr1:1500-1700": "GCTAGCTA" * 25,  # 8*25=200bp exactly
+            "chr1:2000-2300": "TTAATTAA" * 37 + "TTAA",  # 8*37+4=300bp exactly  
+            "chr2:5000-5300": "CCCGGGAA" * 37 + "ATTT",  # 8*37+4=300bp exactly
+            "chr2:5600-5800": "GGGGCCCC" * 25,  # 8*25=200bp exactly
         }
         return MockSequenceAccessor(sequences)
 
@@ -132,13 +132,24 @@ class TestMergeTranscriptIntervals(TestFixtures):
     
     def test_merge_transcript_intervals_cds_only(self, overlapping_transcripts):
         """Test merging only CDS intervals."""
-        # Add CDS information to transcripts
+        # Add CDS information to transcripts (create new objects since Transcript is frozen)
+        modified_transcripts = []
         for i, transcript in enumerate(overlapping_transcripts):
             if i == 0:  # Make first transcript coding
-                transcript.cds_start = 150
-                transcript.cds_end = 650
+                modified_transcript = Transcript(
+                    blocks=transcript.blocks,
+                    strand=transcript.strand,
+                    chrom=transcript.chrom,
+                    id=transcript.id,
+                    cds_start=150,
+                    cds_end=650,
+                    biotype=transcript.biotype
+                )
+                modified_transcripts.append(modified_transcript)
+            else:
+                modified_transcripts.append(transcript)
         
-        result = merge_transcript_intervals(overlapping_transcripts, cds_only=True)
+        result = merge_transcript_intervals(modified_transcripts, cds_only=True)
         
         # Should only include CDS regions from coding transcripts
         if result:  # May be empty if no CDS regions

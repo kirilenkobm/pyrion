@@ -26,10 +26,14 @@ def genome_alignment_to_chain_string(alignment: GenomeAlignment) -> str:
     t_size = alignment.t_size
     q_size = alignment.q_size
     
-    t_start = int(alignment.t_span[0])
-    t_end = int(alignment.t_span[1])
-    q_start = int(alignment.q_span[0]) 
-    q_end = int(alignment.q_span[1])
+    # Handle empty blocks gracefully
+    if len(alignment.blocks) == 0:
+        t_start = t_end = q_start = q_end = 0
+    else:
+        t_start = int(alignment.t_span[0])
+        t_end = int(alignment.t_span[1])
+        q_start = int(alignment.q_span[0]) 
+        q_end = int(alignment.q_span[1])
     
     header = f"chain {score} {t_chrom} {t_size} {t_strand} {t_start} {t_end} {q_chrom} {q_size} {q_strand} {q_start} {q_end} {chain_id}"
     
@@ -103,8 +107,8 @@ def genome_alignment_to_dict(alignment: GenomeAlignment) -> Dict[str, Any]:
 
 def genome_alignment_from_dict(data: Dict[str, Any]) -> GenomeAlignment:
     blocks = np.array(data['blocks'], dtype=np.int32)
-    t_chrom = data['t_chrom'].encode() if isinstance(data['t_chrom'], str) else data['t_chrom']
-    q_chrom = data['q_chrom'].encode() if isinstance(data['q_chrom'], str) else data['q_chrom']
+    t_chrom = data['t_chrom']
+    q_chrom = data['q_chrom']
     
     return GenomeAlignment(
         chain_id=data['chain_id'],

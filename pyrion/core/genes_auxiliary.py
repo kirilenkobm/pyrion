@@ -100,7 +100,7 @@ def get_cds_blocks(transcript) -> np.ndarray:
 def get_left_utr_blocks(transcript) -> np.ndarray:
     """Get UTR blocks to the left of CDS (chromosomally before CDS start)."""
     if not transcript.is_coding:
-        return transcript.blocks.copy()
+        return np.empty((0, 2), dtype=np.int32)
 
     span_start = transcript.blocks[0, 0]
     if span_start >= transcript.cds_start:

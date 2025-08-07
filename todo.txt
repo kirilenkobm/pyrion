@@ -1,5 +1,10 @@
 [ ] SequencesAlignment class - wrapper for SequencesCollection
 
+[ ] CodonSequence:
+
+len - # codons, not # nucleotides
+slice and inteding - for codons too
+
 [ ] visualization for sequences
 
 [ ] revise metadata (what is helpful to add? Some API to work with metadata)

@@ -212,7 +212,7 @@ class TestSliceChainTargetSpace(TestFixtures):
         assert block[1] == 350  # t_end
         # Query coordinates proportionally adjusted
         assert block[2] == 150  # q_start (100 + 25% of 200)
-        assert block[3] == 200  # q_end (100 + 50% of 200)
+        assert block[3] == 250  # q_end (100 + 75% of 200)
     
     def test_slice_target_edge_boundaries(self, simple_positive_chain):
         """Test slicing at exact block boundaries."""
@@ -433,9 +433,10 @@ class TestHelperFunctions(TestFixtures):
         # Map middle 50% of target block on negative strand
         q_start, q_end = _map_target_to_query(block, 125, 175, q_strand=-1)
         
-        # Coordinates should be flipped for negative strand
-        assert q_start < q_end  # Should still be valid range
-        assert q_start >= 50 and q_end <= 150  # Within original range
+        # Coordinates are flipped for negative strand
+        assert q_start > q_end  # Start > end for negative strand
+        assert q_end >= 50 and q_start <= 150  # Within original range
+        assert q_start == 125 and q_end == 75  # Expected values
     
     def test_map_target_to_query_zero_length(self):
         """Test mapping with zero-length target block."""
@@ -504,12 +505,12 @@ class TestEdgeCases(TestFixtures):
     
     def test_slice_invalid_coordinates(self, simple_positive_chain):
         """Test slicing with invalid coordinates."""
-        # Start >= end should return empty chain (graceful handling)
-        result = slice_chain_target_space(simple_positive_chain, 300, 300)
-        assert len(result.blocks) == 0
+        # Start >= end should raise ValueError
+        with pytest.raises(ValueError, match="Invalid slice"):
+            slice_chain_target_space(simple_positive_chain, 300, 300)
         
-        result = slice_chain_target_space(simple_positive_chain, 400, 300)
-        assert len(result.blocks) == 0
+        with pytest.raises(ValueError, match="Invalid slice"):
+            slice_chain_target_space(simple_positive_chain, 400, 300)
     
     def test_very_small_slices(self, simple_positive_chain):
         """Test very small slice regions."""

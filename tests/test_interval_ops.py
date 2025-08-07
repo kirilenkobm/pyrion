@@ -562,5 +562,3 @@ class TestPerformanceBenchmarks(TestFixtures):
             assert np.array_equal(result_numba_sorted, result_numpy_sorted)
 
 
-if __name__ == "__main__":
-    pytest.main([__file__, "-v"])
