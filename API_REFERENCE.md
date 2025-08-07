@@ -1,6 +1,6 @@
 # Pyrion API Reference
 
-**Generated:** 2025-08-06 19:03:54
+**Generated:** 2025-08-07 19:13:36
 
 Complete API reference with full docstrings and signatures.
 
@@ -946,6 +946,11 @@ Return str(self).
 **get_annotated_regions**
 
 *Signature:* `(self, chrom_sizes: dict, flank_size: int = 5000) -> pyrion.core.intervals.AnnotatedIntervalSet`
+
+
+**get_introns**
+
+*Signature:* `(self, use_numba: bool = True) -> numpy.ndarray`
 
 
 **splice_junctions**
@@ -2195,29 +2200,6 @@ Return repr(self).
 
 *Signature:* `(self, chrom: str, start: int, end: int) -> bool`
 
-
-
----
-
-# pyrion.misc
-
-Miscellaneous utilities for specialized analyses.
-
-
----
-
-# pyrion.misc.rna_basic_bpm
-
-RNA basic binding potential matrix computation.
-
-
-## Functions
-
-### compute_rna_binding_potential_matrix
-
-**Signature:** `(sequence: pyrion.core.nucleotide_sequences.NucleotideSequence, min_loop_size: int = 5, min_stem_size: int = 4) -> numpy.ndarray`
-
-Compute RNA base pairing potential matrix.
 
 
 ---

@@ -1,5 +1,5 @@
 PYRION API INDEX
-Generated: 2025-08-06 19:03:54
+Generated: 2025-08-07 19:13:36
 Concise reference with type signatures only.
 ============================================================
 
@@ -158,6 +158,7 @@ MODULE pyrion.core.genes
     compute_flanks(self, flank_size: int, chrom_sizes: Dict[str, int]) -> Tuple[Optional[pyrion.core.intervals.GenomicInterval], Optional[pyrion.core.intervals.GenomicInterval]]
     contains_interval(self, interval: pyrion.core.intervals.GenomicInterval) -> bool
     get_annotated_regions(self, chrom_sizes: dict, flank_size: int = 5000) -> pyrion.core.intervals.AnnotatedIntervalSet
+    get_introns(self, use_numba: bool = True) -> numpy.ndarray
     splice_junctions(self)
     is_coding -> bool
   CLASS TranscriptsCollection
@@ -369,9 +370,6 @@ MODULE pyrion.io.twobit
     fetch_interval(self, interval: pyrion.core.intervals.GenomicInterval) -> pyrion.core.nucleotide_sequences.NucleotideSequence
     list_chromosomes(self) -> None
     validate_interval(self, chrom: str, start: int, end: int) -> bool
-MODULE pyrion.misc
-MODULE pyrion.misc.rna_basic_bpm
-  FUNCTION compute_rna_binding_potential_matrix(sequence: pyrion.core.nucleotide_sequences.NucleotideSequence, min_loop_size: int = 5, min_stem_size: int = 4) -> numpy.ndarray
 MODULE pyrion.ops
 MODULE pyrion.ops.chain_serialization
   FUNCTION genome_alignment_from_dict(data: Dict[str, Any]) -> pyrion.core.genome_alignment.GenomeAlignment
