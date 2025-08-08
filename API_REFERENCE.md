@@ -1,6 +1,6 @@
 # Pyrion API Reference
 
-**Generated:** 2025-08-08 12:46:12
+**Generated:** 2025-08-08 14:18:21
 
 Complete API reference with full docstrings and signatures.
 
@@ -1868,7 +1868,7 @@ D.keys() -> a set-like object providing a view on D's keys
 
 **pop**
 
-*Signature:* `(self, key, default=<object object at 0x1033a41a0>)`
+*Signature:* `(self, key, default=<object object at 0x100db81a0>)`
 
 D.pop(k[,d]) -> v, remove specified key and return the corresponding value.
 If key is not found, d is returned if given, otherwise KeyError is raised.
@@ -2054,12 +2054,21 @@ Read a narrow BED file with 3-9 fields and return a list of GenomicInterval obje
 
 Chain format I/O support.
 
+This reader streams large chain files and parses them in batches to avoid
+exceeding the C-extension limit on number of chunks per call and to reduce
+peak memory usage. The public API remains unchanged.
+
 
 ## Functions
 
 ### read_chain_file
 
 **Signature:** `(file_path: Union[str, pathlib.Path], min_score: Optional[int] = None) -> pyrion.core.genome_alignment.GenomeAlignmentsCollection`
+
+Read a .chain or .chain.gz file and return parsed alignments.
+
+Internally parses in batches (<= 1_000_000 chunks per call) to satisfy the
+C-extension limit and to keep memory bounded for very large files.
 
 
 ---
