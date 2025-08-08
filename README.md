@@ -11,7 +11,7 @@ for common genomics tasks without unnecessary overhead.
 Pyrion includes tools for manipulating genomic intervals, genome alignments, and sequences.
 It handles common formats like BED (6 or 12), chain, 2bit, and FASTA, and can also parse genePred and GTF annotations.
 
-Work in progress: [plans](todo.txt).
+Work in progress: [plans](TODO.md).
 
 ## Installation
 
