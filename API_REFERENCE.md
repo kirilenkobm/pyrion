@@ -1,6 +1,6 @@
 # Pyrion API Reference
 
-**Generated:** 2025-08-07 19:13:36
+**Generated:** 2025-08-08 12:46:12
 
 Complete API reference with full docstrings and signatures.
 
@@ -1772,6 +1772,163 @@ Auxiliary functions for sequences objects.
 
 ---
 
+# pyrion.core.sequences_collection
+
+SequencesCollection: a clean wrapper over a mapping of sequences.
+
+
+## Classes
+
+### SequencesCollection
+
+A MutableMapping is a generic container for associating
+key/value pairs.
+
+This class provides concrete generic implementations of all
+methods except for __getitem__, __setitem__, __delitem__,
+__iter__, and __len__.
+
+**Signature:** `(self, data: 'Optional[Mapping[str, SequenceLike]]' = None)`
+
+#### Methods
+
+**__init__**
+
+*Signature:* `(self, data: 'Optional[Mapping[str, SequenceLike]]' = None)`
+
+Initialize self.  See help(type(self)) for accurate signature.
+
+
+**add**
+
+*Signature:* `(self, key: 'str', value: 'SequenceLike', *, force: 'bool' = False) -> 'None'`
+
+Add a sequence. If key exists and force=False, raise; if force=True, overwrite.
+
+
+**as_alignment**
+
+*Signature:* `(self, *, inplace: 'bool' = False) -> "'SequencesCollection'"`
+
+Validate equal lengths and mark as alignment.
+
+If `inplace` is False (default), returns a new aligned collection.
+If `inplace` is True, sets the alignment flag on this instance and returns self.
+
+
+**clear**
+
+*Signature:* `(self)`
+
+D.clear() -> None.  Remove all items from D.
+
+
+**delete**
+
+*Signature:* `(self, key: 'str') -> 'None'`
+
+Remove a sequence by key.
+
+
+**from_dict**
+
+*Signature:* `(data: 'Mapping[str, SequenceLike]') -> "'SequencesCollection'"`
+
+
+**from_list**
+
+*Signature:* `(sequences: 'Iterable[SequenceLike]') -> "'SequencesCollection'"`
+
+
+**get**
+
+*Signature:* `(self, key, default=None)`
+
+D.get(k[,d]) -> D[k] if k in D, else d.  d defaults to None.
+
+
+**ids**
+
+*Signature:* `(self) -> 'List[str]'`
+
+
+**items**
+
+*Signature:* `(self)`
+
+D.items() -> a set-like object providing a view on D's items
+
+
+**keys**
+
+*Signature:* `(self)`
+
+D.keys() -> a set-like object providing a view on D's keys
+
+
+**pop**
+
+*Signature:* `(self, key, default=<object object at 0x1033a41a0>)`
+
+D.pop(k[,d]) -> v, remove specified key and return the corresponding value.
+If key is not found, d is returned if given, otherwise KeyError is raised.
+
+
+**popitem**
+
+*Signature:* `(self)`
+
+D.popitem() -> (k, v), remove and return some (key, value) pair
+as a 2-tuple; but raise KeyError if D is empty.
+
+
+**sequences**
+
+*Signature:* `(self) -> 'List[SequenceLike]'`
+
+
+**setdefault**
+
+*Signature:* `(self, key, default=None)`
+
+D.setdefault(k[,d]) -> D.get(k,d), also set D[k]=d if k not in D
+
+
+**slice**
+
+*Signature:* `(self, start: 'int', end: 'int') -> "'SequencesCollection'"`
+
+Slice all sequences consistently. Requires aligned collection.
+
+
+**update**
+
+*Signature:* `(self, other=(), /, **kwds)`
+
+D.update([E, ]**F) -> None.  Update D from mapping/iterable E and F.
+If E present and has a .keys() method, does:     for k in E: D[k] = E[k]
+If E present and lacks .keys() method, does:     for (k, v) in E: D[k] = v
+In either case, this is followed by: for k, v in F.items(): D[k] = v
+
+
+**values**
+
+*Signature:* `(self)`
+
+D.values() -> an object providing a view on D's values
+
+
+#### Properties
+
+**is_alignment** -> `bool`
+
+
+**sequence_type** -> `Optional[SequenceType]`
+
+
+
+---
+
 # pyrion.core.strand
 
 
@@ -1988,29 +2145,29 @@ Return repr(self).
 
 ### read_dna_fasta
 
-**Signature:** `(filename: 'Union[str, Path]', **kwargs) -> 'Dict[str, NucleotideSequence]'`
+**Signature:** `(filename: 'Union[str, Path]', **kwargs) -> 'SequencesCollection'`
 
 
 ### read_fasta
 
-**Signature:** `(filename: 'Union[str, Path]', sequence_type: 'SequenceType', return_dict: 'bool' = True) -> 'Union[Dict[str, Union[NucleotideSequence, AminoAcidSequence]], List[Union[NucleotideSequence, AminoAcidSequence]]]'`
+**Signature:** `(filename: 'Union[str, Path]', sequence_type: 'SequenceType', return_dict: 'bool' = True) -> 'Union[SequencesCollection, List[Union[NucleotideSequence, AminoAcidSequence]]]'`
 
 
 ### read_protein_fasta
 
-**Signature:** `(filename: 'Union[str, Path]', **kwargs) -> 'Dict[str, AminoAcidSequence]'`
+**Signature:** `(filename: 'Union[str, Path]', **kwargs) -> 'SequencesCollection'`
 
 Read protein sequences from FASTA file.
 
 
 ### read_rna_fasta
 
-**Signature:** `(filename: 'Union[str, Path]', **kwargs) -> 'Dict[str, NucleotideSequence]'`
+**Signature:** `(filename: 'Union[str, Path]', **kwargs) -> 'SequencesCollection'`
 
 
 ### write_fasta
 
-**Signature:** `(sequences: 'Union[Dict[str, NucleotideSequence], List[NucleotideSequence]]', filename: 'Union[str, Path]', line_width: 'int' = 80) -> 'None'`
+**Signature:** `(sequences: 'Union[Mapping[str, NucleotideSequence], List[NucleotideSequence]]', filename: 'Union[str, Path]', line_width: 'int' = 80) -> 'None'`
 
 
 ---

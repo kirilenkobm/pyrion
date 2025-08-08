@@ -13,11 +13,13 @@ from ..utils.encoding import (
     is_masked, apply_masking, remove_masking, GAPS, is_gap
 )
 
+
 class SequenceType(Enum):
     """Sequence type detection."""
     DNA = "dna"
     RNA = "rna"
     PROTEIN = "protein" 
+
 
 @dataclass(frozen=True)
 class NucleotideSequence:

@@ -1,5 +1,5 @@
 PYRION API INDEX
-Generated: 2025-08-07 19:13:36
+Generated: 2025-08-08 12:46:12
 Concise reference with type signatures only.
 ============================================================
 
@@ -305,6 +305,29 @@ MODULE pyrion.core.sequences_auxiliary
   FUNCTION mask_nucleotide_sequence_slice(sequence, start: Optional[int] = None, end: Optional[int] = None)
   FUNCTION merge_nucleotide_sequences(sequence1, sequence2)
   FUNCTION unmask_nucleotide_sequence_slice(sequence, start: Optional[int] = None, end: Optional[int] = None)
+MODULE pyrion.core.sequences_collection
+  CLASS SequencesCollection
+    __init__(self, data: 'Optional[Mapping[str, SequenceLike]]' = None)
+    __init__(self, data: 'Optional[Mapping[str, SequenceLike]]' = None)
+    add(self, key: 'str', value: 'SequenceLike', *, force: 'bool' = False) -> 'None'
+    as_alignment(self, *, inplace: 'bool' = False) -> "'SequencesCollection'"
+    clear(self)
+    delete(self, key: 'str') -> 'None'
+    from_dict(data: 'Mapping[str, SequenceLike]') -> "'SequencesCollection'"
+    from_list(sequences: 'Iterable[SequenceLike]') -> "'SequencesCollection'"
+    get(self, key, default=None)
+    ids(self) -> 'List[str]'
+    items(self)
+    keys(self)
+    pop(self, key, default=<object object at 0x1033a41a0>)
+    popitem(self)
+    sequences(self) -> 'List[SequenceLike]'
+    setdefault(self, key, default=None)
+    slice(self, start: 'int', end: 'int') -> "'SequencesCollection'"
+    update(self, other=(), /, **kwds)
+    values(self)
+    is_alignment -> bool
+    sequence_type -> Optional[SequenceType]
 MODULE pyrion.core.strand
   CLASS Strand
     __init__(self, /, *args, **kwargs)
@@ -341,11 +364,11 @@ MODULE pyrion.io.fasta
     get_sequence_length(self, sequence_name: 'str') -> 'int'
     get_sequence_names(self) -> 'List[str]'
     has_sequence(self, sequence_name: 'str') -> 'bool'
-  FUNCTION read_dna_fasta(filename: 'Union[str, Path]', **kwargs) -> 'Dict[str, NucleotideSequence]'
-  FUNCTION read_fasta(filename: 'Union[str, Path]', sequence_type: 'SequenceType', return_dict: 'bool' = True) -> 'Union[Dict[str, Union[NucleotideSequence, AminoAcidSequence]], List[Union[NucleotideSequence, AminoAcidSequence]]]'
-  FUNCTION read_protein_fasta(filename: 'Union[str, Path]', **kwargs) -> 'Dict[str, AminoAcidSequence]'
-  FUNCTION read_rna_fasta(filename: 'Union[str, Path]', **kwargs) -> 'Dict[str, NucleotideSequence]'
-  FUNCTION write_fasta(sequences: 'Union[Dict[str, NucleotideSequence], List[NucleotideSequence]]', filename: 'Union[str, Path]', line_width: 'int' = 80) -> 'None'
+  FUNCTION read_dna_fasta(filename: 'Union[str, Path]', **kwargs) -> 'SequencesCollection'
+  FUNCTION read_fasta(filename: 'Union[str, Path]', sequence_type: 'SequenceType', return_dict: 'bool' = True) -> 'Union[SequencesCollection, List[Union[NucleotideSequence, AminoAcidSequence]]]'
+  FUNCTION read_protein_fasta(filename: 'Union[str, Path]', **kwargs) -> 'SequencesCollection'
+  FUNCTION read_rna_fasta(filename: 'Union[str, Path]', **kwargs) -> 'SequencesCollection'
+  FUNCTION write_fasta(sequences: 'Union[Mapping[str, NucleotideSequence], List[NucleotideSequence]]', filename: 'Union[str, Path]', line_width: 'int' = 80) -> 'None'
 MODULE pyrion.io.gene_data
   FUNCTION read_gene_data(file_path: Union[str, pathlib.Path], gene_column: Union[int, str, NoneType] = None, transcript_id_column: Union[int, str, NoneType] = None, gene_name_column: Union[int, str, NoneType] = None, transcript_type_column: Union[int, str, NoneType] = None, separator: str = '\t', has_header: bool = True) -> pyrion.core.gene_data.GeneData
   FUNCTION resolve_index(column_idx: Union[int, str], header: List[str]) -> int | None

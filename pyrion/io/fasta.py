@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Dict, Union, List
+from typing import Dict, Union, List, Mapping
 from pathlib import Path
 from enum import IntEnum
 
@@ -11,6 +11,7 @@ from ..core.nucleotide_sequences import NucleotideSequence, SequenceType
 from ..core.amino_acid_sequences import AminoAcidSequence
 from ..core.fai import FaiStore
 from ..core.intervals import GenomicInterval
+from ..core.sequences_collection import SequencesCollection
 
 
 class _SequenceTypeMapping(IntEnum):
@@ -142,8 +143,7 @@ def read_fasta(
     filename: Union[str, Path], 
     sequence_type: SequenceType,
     return_dict: bool = True
-) -> Union[Dict[str, Union[NucleotideSequence, AminoAcidSequence]], 
-           List[Union[NucleotideSequence, AminoAcidSequence]]]:
+) -> Union[SequencesCollection, List[Union[NucleotideSequence, AminoAcidSequence]]]:
     filename = str(filename)
     type_mapping = {
         SequenceType.DNA: _SequenceTypeMapping.DNA,
@@ -157,8 +157,8 @@ def read_fasta(
     internal_type = type_mapping[sequence_type]
     
     raw_sequences = parse_fasta_fast(filename, internal_type)
-    sequences = {}
-    sequence_list = []
+    sequences = SequencesCollection()
+    sequence_list: List[Union[NucleotideSequence, AminoAcidSequence]] = []
     
     for header, encoded_array, seq_type in raw_sequences:
         seq_id = header.strip()
@@ -176,20 +176,20 @@ def read_fasta(
                 metadata={'sequence_id': seq_id, 'source_file': filename}
             )
         
-        sequences[seq_id] = sequence_obj
+        sequences.add(seq_id, sequence_obj, force=False)
         sequence_list.append(sequence_obj)
     
     return sequences if return_dict else sequence_list
 
 
 def write_fasta(
-    sequences: Union[Dict[str, NucleotideSequence], 
-                    List[NucleotideSequence]],
+    sequences: Union[Mapping[str, NucleotideSequence], List[NucleotideSequence]],
     filename: Union[str, Path],
     line_width: int = 80
 ) -> None:
     with open(filename, 'w') as file:
-        if isinstance(sequences, dict):
+        from collections.abc import Mapping as _Mapping
+        if isinstance(sequences, _Mapping):
             for seq_id, sequence in sequences.items():
                 _write_sequence(file, seq_id, sequence, line_width)
         else:
@@ -209,14 +209,14 @@ def _write_sequence(file, seq_id: str, sequence: NucleotideSequence, line_width:
         file.write(seq_str[i:i+line_width] + '\n')
 
 
-def read_dna_fasta(filename: Union[str, Path], **kwargs) -> Dict[str, NucleotideSequence]:
+def read_dna_fasta(filename: Union[str, Path], **kwargs) -> SequencesCollection:
     return read_fasta(filename, SequenceType.DNA, **kwargs)
 
 
-def read_rna_fasta(filename: Union[str, Path], **kwargs) -> Dict[str, NucleotideSequence]:
+def read_rna_fasta(filename: Union[str, Path], **kwargs) -> SequencesCollection:
     return read_fasta(filename, SequenceType.RNA, **kwargs)
 
 
-def read_protein_fasta(filename: Union[str, Path], **kwargs) -> Dict[str, AminoAcidSequence]:
+def read_protein_fasta(filename: Union[str, Path], **kwargs) -> SequencesCollection:
     """Read protein sequences from FASTA file."""
     return read_fasta(filename, SequenceType.PROTEIN, **kwargs)

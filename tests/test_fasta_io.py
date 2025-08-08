@@ -8,6 +8,7 @@ from typing import Dict
 
 from pyrion.core.nucleotide_sequences import NucleotideSequence, SequenceType
 from pyrion.core.amino_acid_sequences import AminoAcidSequence
+from pyrion.core.sequences_collection import SequencesCollection
 from pyrion.core.intervals import GenomicInterval
 from pyrion.core.strand import Strand
 from pyrion.core.fai import FaiStore, FaiEntry
@@ -257,7 +258,7 @@ class TestReadFasta(TestFixtures):
         """Test basic FASTA reading."""
         sequences = read_fasta(sample_fasta_file, SequenceType.DNA)
         
-        assert isinstance(sequences, dict)
+        assert isinstance(sequences, SequencesCollection)
         assert len(sequences) >= 2  # At least sequence1 and sequence2
         # Check for sequences with descriptions (IDs include descriptions)
         sequence_ids = list(sequences.keys())
@@ -279,12 +280,12 @@ class TestReadFasta(TestFixtures):
         """Test reading with specific sequence type."""
         # Test DNA sequences
         dna_sequences = read_fasta(sample_fasta_file, SequenceType.DNA)
-        assert isinstance(dna_sequences, dict)
+        assert isinstance(dna_sequences, SequencesCollection)
         assert len(dna_sequences) >= 2
         
         # Test RNA sequences  
         rna_sequences = read_fasta(sample_fasta_file, SequenceType.RNA)
-        assert isinstance(rna_sequences, dict)
+        assert isinstance(rna_sequences, SequencesCollection)
         assert len(rna_sequences) >= 2
 
 
@@ -386,7 +387,7 @@ class TestSpecializedReaders(TestFixtures):
         """Test DNA-specific FASTA reader."""
         sequences = read_dna_fasta(sample_fasta_file)
         
-        assert isinstance(sequences, dict)
+        assert isinstance(sequences, SequencesCollection)
         assert len(sequences) >= 2
         
         # All sequences should be DNA (not RNA)
@@ -398,7 +399,7 @@ class TestSpecializedReaders(TestFixtures):
         """Test RNA-specific FASTA reader."""
         sequences = read_rna_fasta(sample_fasta_file)
         
-        assert isinstance(sequences, dict)
+        assert isinstance(sequences, SequencesCollection)
         assert len(sequences) >= 2
         
         # All sequences should be RNA
@@ -425,7 +426,7 @@ class TestProteinSequenceSupport(TestFixtures):
         """Test basic protein FASTA reading."""
         sequences = read_protein_fasta(sample_protein_file)
         
-        assert isinstance(sequences, dict)
+        assert isinstance(sequences, SequencesCollection)
         assert len(sequences) >= 3
         assert "protein1" in sequences
         assert "protein2" in sequences
@@ -439,7 +440,7 @@ class TestProteinSequenceSupport(TestFixtures):
         """Test read_fasta with PROTEIN sequence type."""
         sequences = read_fasta(sample_protein_file, SequenceType.PROTEIN)
         
-        assert isinstance(sequences, dict)
+        assert isinstance(sequences, SequencesCollection)
         assert len(sequences) >= 3
         
         # Check all sequences are AminoAcidSequence
@@ -610,10 +611,10 @@ class TestSequenceTypeMapping(TestFixtures):
         """Test that return types match expected type hints."""
         # Test with return_dict=True (default)
         dna_dict = read_fasta(sample_fasta_file, SequenceType.DNA, return_dict=True)
-        assert isinstance(dna_dict, dict)
+        assert isinstance(dna_dict, SequencesCollection)
         
         protein_dict = read_fasta(sample_protein_file, SequenceType.PROTEIN, return_dict=True)
-        assert isinstance(protein_dict, dict)
+        assert isinstance(protein_dict, SequencesCollection)
         
         # Test with return_dict=False
         dna_list = read_fasta(sample_fasta_file, SequenceType.DNA, return_dict=False)
@@ -734,8 +735,8 @@ Just random text
         try:
             # Should handle gracefully or raise appropriate error
             sequences = read_fasta(temp_path, SequenceType.DNA)
-            # Depending on implementation, might return empty dict or raise error
-            assert isinstance(sequences, dict)
+            # Depending on implementation, might return empty mapping or raise error
+            assert isinstance(sequences, SequencesCollection)
         
         finally:
             if os.path.exists(temp_path):
@@ -749,7 +750,7 @@ Just random text
         
         try:
             sequences = read_fasta(temp_path, SequenceType.DNA)
-            assert isinstance(sequences, dict)
+            assert isinstance(sequences, SequencesCollection)
             assert len(sequences) == 0
         
         finally:
@@ -791,7 +792,7 @@ class TestIntegrationWithRealData(TestFixtures):
             # Test with real data
             sequences = read_fasta(test_fasta_path, SequenceType.DNA)
             
-            assert isinstance(sequences, dict)
+            assert isinstance(sequences, SequencesCollection)
             assert len(sequences) > 0
             
             # All values should be NucleotideSequence objects
