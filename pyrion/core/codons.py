@@ -1,13 +1,14 @@
 """Codon and codon sequence representations for genomic analysis."""
 
 import numpy as np
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Union
 from dataclasses import dataclass
 
 from ..utils.encoding import (
     NUCLEOTIDE_DECODING, RNA_NUCLEOTIDE_DECODING,
     FRAMESHIFT_1, is_gap, is_frameshift
 )
+from .nucleotide_sequences import NucleotideSequence
 
 INVALID_CHARACTER = 0
 
@@ -260,7 +261,22 @@ class CodonSequence:
         return AminoAcidSequence(data=aa_data)
     
     def __len__(self) -> int:
-        return len(self._data)
+        """Number of codons (including incomplete trailing codon if present)."""
+        return len(self.get_codons(preserve_gaps=True))
+
+    def __getitem__(self, index: Union[int, slice]) -> Union[Codon, 'CodonSequence']:
+        codons = self.get_codons(preserve_gaps=True)
+        if isinstance(index, int):
+            return codons[index]
+        # Slice -> build a new CodonSequence from selected codons
+        selected = codons[index]
+        if not selected:
+            # Empty slice returns empty CodonSequence
+            empty_nt = NucleotideSequence(data=np.array([], dtype=np.int8), is_rna=self.is_rna)
+            return CodonSequence(empty_nt)
+        concatenated = np.concatenate([c.symbols for c in selected]).astype(np.int8, copy=False)
+        new_nt = NucleotideSequence(data=concatenated, is_rna=self.is_rna)
+        return CodonSequence(new_nt)
     
     def __str__(self) -> str:
         def _symbol_to_char(val: int) -> str:
@@ -284,4 +300,4 @@ class CodonSequence:
             seq_preview = seq_preview[:27] + "..."
         
         seq_type = "RNA" if self.is_rna else "DNA"
-        return f"CodonSequence('{seq_preview}', len={len(self.nucleotide_sequence)}, type={seq_type})"
+        return f"CodonSequence('{seq_preview}', codons={len(self)}, type={seq_type})"

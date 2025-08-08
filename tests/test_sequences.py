@@ -142,8 +142,9 @@ class TestNucleotideSequence(TestFixtures):
         codon_seq = sample_nucleotide_sequence.to_codons()
         
         assert isinstance(codon_seq, CodonSequence)
-        # CodonSequence length returns nucleotide count
-        assert len(codon_seq) == len(sample_nucleotide_sequence)
+        # CodonSequence length returns codon count (including incomplete trailing codon)
+        expected_codons_total = len(sample_nucleotide_sequence) // 3 + (1 if len(sample_nucleotide_sequence) % 3 else 0)
+        assert len(codon_seq) == expected_codons_total
         # For complete codon count, filter out incomplete codons
         expected_codons = len(sample_nucleotide_sequence) // 3
         complete_codons = [c for c in codon_seq.get_codons() if c.is_complete()]
@@ -274,8 +275,9 @@ class TestCodonFunctionality(TestFixtures):
         codon_seq = CodonSequence(sample_nucleotide_sequence)
         
         assert isinstance(codon_seq, CodonSequence)
-        # CodonSequence length returns nucleotide count, not codon count
-        assert len(codon_seq) == len(sample_nucleotide_sequence)
+        # CodonSequence length returns codon count (including incomplete trailing codon)
+        expected_codons = len(sample_nucleotide_sequence) // 3 + (1 if len(sample_nucleotide_sequence) % 3 else 0)
+        assert len(codon_seq) == expected_codons
         # For complete codon count, filter out incomplete codons
         complete_codons = [c for c in codon_seq.get_codons() if c.is_complete()]
         assert len(complete_codons) == len(sample_nucleotide_sequence) // 3
@@ -329,8 +331,8 @@ class TestCodonFunctionality(TestFixtures):
         nt_seq = NucleotideSequence.from_string("ATGAAATAGG")
         codon_seq = CodonSequence(nt_seq)
         
-        # CodonSequence length is nucleotide count
-        assert len(codon_seq) == 10  # Nucleotide count
+        # CodonSequence length is codon count including incomplete last codon
+        assert len(codon_seq) == 4
         # Get complete codons (3 complete + 1 incomplete that gets dropped)
         complete_codons = [c for c in codon_seq.get_codons() if c.is_complete()]
         assert len(complete_codons) == 3  # Only complete codons

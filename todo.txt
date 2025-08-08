@@ -1,4 +1,4 @@
-[ ] CodonSequence:
+[x] CodonSequence:
 
 len - # codons, not # nucleotides
 slice and inteding - for codons too
