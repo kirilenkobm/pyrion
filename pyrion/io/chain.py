@@ -123,10 +123,15 @@ def _parse_chunks_in_batches(
     max_chunks_per_call: int,
     min_score: Optional[int],
 ) -> List:
+    # Limit by both chunk count and cumulative block count
+    MAX_BLOCKS_PER_CALL = 900_000  # headroom below native 1M limit
+
     batch: List[bytes] = []
+    batch_blocks: int = 0
     results: List = []
 
     def _flush_batch():
+        nonlocal batch_blocks
         if not batch:
             return
         if min_score is not None:
@@ -134,11 +139,52 @@ def _parse_chunks_in_batches(
         else:
             results.extend(parse_many_chain_chunks(batch))
         batch.clear()
+        batch_blocks = 0
 
     for chunk in chunk_iter:
-        batch.append(chunk)
-        if len(batch) >= max_chunks_per_call:
+        blocks = _estimate_block_count(chunk)
+
+        # If a single chunk would exceed the block limit in a batch, parse it alone
+        if blocks > MAX_BLOCKS_PER_CALL:
+            # Flush current batch first
             _flush_batch()
+            # Parse single-chain path
+            ga = parse_chain_chunk(chunk, min_score) if min_score is not None else parse_chain_chunk(chunk)
+            if ga is not None:
+                results.append(ga)
+            continue
+
+        # If adding this chunk would exceed either limit, flush
+        if (
+            len(batch) >= max_chunks_per_call
+            or batch_blocks + blocks > MAX_BLOCKS_PER_CALL
+        ):
+            _flush_batch()
+
+        # Add to batch
+        batch.append(chunk)
+        batch_blocks += blocks
 
     _flush_batch()
     return results
+
+
+def _estimate_block_count(chunk: bytes) -> int:
+    """Estimate number of alignment blocks in a chain chunk.
+
+    Counts numeric lines after the header; robust to trailing whitespace.
+    """
+    count = 0
+    first = True
+    for line in chunk.splitlines():
+        if first:
+            first = False
+            continue  # skip header
+        line = line.strip()
+        if not line:
+            continue
+        # Block lines start with a digit (size)
+        c0 = line[:1]
+        if c0 >= b"0" and c0 <= b"9":
+            count += 1
+    return count

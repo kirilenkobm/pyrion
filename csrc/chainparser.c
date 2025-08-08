@@ -81,8 +81,9 @@ static PyObject* parse_chain_chunk(PyObject* self, PyObject* args) {
         return NULL;
     }
     
-    if (input_len > 100000000) {  // 100MB limit
-        PyErr_SetString(PyExc_ValueError, "Input too large (>100MB)");
+    // Increase upper bound to accommodate extremely large chains (1GB)
+    if (input_len > 1073741824) {  // 1GB limit (safety guard)
+        PyErr_SetString(PyExc_ValueError, "Input too large (>1GB)");
         return NULL;
     }
 
@@ -122,10 +123,7 @@ static PyObject* parse_chain_chunk(PyObject* self, PyObject* args) {
         return NULL;
     }
     
-    if (n_blocks > 1000000) {  // Reasonable block limit
-        PyErr_Format(PyExc_ValueError, "Too many blocks: %ld (max 1M)", (long)n_blocks);
-        return NULL;
-    }
+    // Remove strict 1M block cap; allow very large chains. Numpy allocation may fail if too large.
 
     // 2. Parse header line (create temporary null-terminated copy on stack)
     char hdr_buf[10001];  // Stack allocated buffer

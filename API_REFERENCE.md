@@ -1,6 +1,6 @@
 # Pyrion API Reference
 
-**Generated:** 2025-08-08 14:18:21
+**Generated:** 2025-08-08 14:31:12
 
 Complete API reference with full docstrings and signatures.
 
@@ -1868,7 +1868,7 @@ D.keys() -> a set-like object providing a view on D's keys
 
 **pop**
 
-*Signature:* `(self, key, default=<object object at 0x100db81a0>)`
+*Signature:* `(self, key, default=<object object at 0x1004f41a0>)`
 
 D.pop(k[,d]) -> v, remove specified key and return the corresponding value.
 If key is not found, d is returned if given, otherwise KeyError is raised.
