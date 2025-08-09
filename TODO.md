@@ -4,6 +4,14 @@
 
 [ ] GeneData binding optimisation - compute anything only on request, lazy attachments
 
+[ ] Add optional ID field for NucleotideSequence to streamline "to_fasta" method
+
+[x] write fasta - if width = 0 - just one line - one seq
+
+[x] where is to_rna() method?
+
+[x] NucleotideSequence - some convenience method like nucleotide: count
+
 [x] CodonSequence:
 
 len - # codons, not # nucleotides

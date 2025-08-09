@@ -338,6 +338,34 @@ class TestWriteFasta(TestFixtures):
             if os.path.exists(output_path):
                 os.unlink(output_path)
     
+    def test_write_fasta_line_width_zero(self, sample_nucleotide_sequences):
+        """Test FASTA writing with line_width=0 (single line)."""
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.fasta', delete=False) as f:
+            output_path = f.name
+        
+        try:
+            # This should not crash and should write sequences on single lines
+            write_fasta(sample_nucleotide_sequences, output_path, line_width=0)
+            
+            with open(output_path, 'r') as f:
+                content = f.read()
+                lines = content.strip().split('\n')
+                
+                # Check that sequences are on single lines (no wrapping)
+                seq_lines = [line for line in lines if not line.startswith('>')]
+                
+                # Verify we have sequences and they are not wrapped
+                assert len(seq_lines) > 0
+                for line in seq_lines:
+                    if line.strip():  # Skip empty lines
+                        # Each sequence should be on a single line (no max length constraint)
+                        # We just verify they exist and contain valid nucleotides
+                        assert all(c in 'ATGCNRYSWKMBDHV-atgcnryswkmbdhv' for c in line.strip())
+        
+        finally:
+            if os.path.exists(output_path):
+                os.unlink(output_path)
+    
     def test_write_fasta_empty_dict(self):
         """Test writing empty sequence dictionary."""
         with tempfile.NamedTemporaryFile(mode='w', suffix='.fasta', delete=False) as f:

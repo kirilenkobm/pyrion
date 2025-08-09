@@ -1,8 +1,8 @@
 """Auxiliary functions for sequences objects."""
 
 import numpy as np
-from typing import Optional
-from ..utils.encoding import apply_masking, remove_masking
+from typing import Optional, Dict
+from ..utils.encoding import apply_masking, remove_masking, decode_nucleotides
 
 
 def mask_nucleotide_sequence_slice(sequence, start: Optional[int] = None, end: Optional[int] = None):
@@ -72,3 +72,26 @@ def merge_nucleotide_sequences(sequence1, sequence2):
         is_rna=sequence1.is_rna,
         metadata=merged_metadata
     )
+
+
+def get_nucleotide_composition(sequence, consider_masking: bool = False) -> Dict[str, int]:
+    if len(sequence.data) == 0:
+        return {}
+        
+    unique_codes, inverse_indices = np.unique(sequence.data, return_inverse=True)
+    counts_by_unique = np.bincount(inverse_indices)
+    
+    composition = {}
+    for code, count in zip(unique_codes, counts_by_unique):
+        if count == 0:
+            continue
+            
+        code_int = int(code)
+        char = decode_nucleotides(np.array([code_int], dtype=np.int8), is_rna=sequence.is_rna)[0]
+
+        if not consider_masking:
+            char = char.upper()
+        
+        composition[char] = composition.get(char, 0) + int(count)
+        
+    return composition

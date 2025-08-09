@@ -79,6 +79,15 @@ class NucleotideSequence:
             metadata=self.metadata
         )
     
+
+    def toggle_type(self) -> 'NucleotideSequence':
+        """Toggle between DNA and RNA (T <-> U)."""
+        return NucleotideSequence(
+            data=self.data.copy(),
+            is_rna=not self.is_rna,
+            metadata=self.metadata
+        )
+    
     def to_codons(self):
         from .codons import CodonSequence
         return CodonSequence(self)
@@ -128,3 +137,7 @@ class NucleotideSequence:
             return 0.0
         masked_count = sum(is_masked(nt) for nt in self.data)
         return masked_count / len(self.data)
+    
+    def nucleotide_composition(self, consider_masking: bool = False) -> dict[str, int]:
+        from .sequences_auxiliary import get_nucleotide_composition
+        return get_nucleotide_composition(self, consider_masking)

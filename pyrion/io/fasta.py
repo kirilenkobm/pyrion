@@ -205,8 +205,11 @@ def _write_sequence(file, seq_id: str, sequence: NucleotideSequence, line_width:
     file.write(f">{seq_id}\n")
     
     seq_str = str(sequence)
-    for i in range(0, len(seq_str), line_width):
-        file.write(seq_str[i:i+line_width] + '\n')
+    if line_width <= 0:
+        file.write(seq_str + '\n')
+    else:
+        for i in range(0, len(seq_str), line_width):
+            file.write(seq_str[i:i+line_width] + '\n')
 
 
 def read_dna_fasta(filename: Union[str, Path], **kwargs) -> SequencesCollection:

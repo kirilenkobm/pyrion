@@ -122,6 +122,218 @@ class TestNucleotideSequence(TestFixtures):
         
         assert str(rev) == "GCTA"
     
+    def test_sequence_toggle_type(self):
+        """Test toggling between DNA and RNA types."""
+        # Start with DNA
+        dna_seq = NucleotideSequence.from_string("ATGCGT", is_rna=False)
+        toggled = dna_seq.toggle_type()
+        
+        assert toggled.is_rna
+        assert not dna_seq.is_rna  # Original unchanged
+        assert str(toggled) == "AUGCGU"  # T -> U
+        assert str(dna_seq) == "ATGCGT"  # Original unchanged
+        
+        # Toggle back to DNA
+        toggled_back = toggled.toggle_type()
+        assert not toggled_back.is_rna
+        assert str(toggled_back) == "ATGCGT"  # U -> T
+        
+        # Start with RNA
+        rna_seq = NucleotideSequence.from_string("AUGCGU", is_rna=True)
+        toggled_rna = rna_seq.toggle_type()
+        
+        assert not toggled_rna.is_rna
+        assert str(toggled_rna) == "ATGCGT"  # U -> T
+    
+    def test_nucleotide_composition(self):
+        """Test nucleotide composition counting using numpy operations."""
+        # Test simple DNA sequence
+        dna_seq = NucleotideSequence.from_string("AATTGGCC")
+        comp = dna_seq.nucleotide_composition()
+        
+        expected = {'A': 2, 'T': 2, 'G': 2, 'C': 2}
+        assert comp == expected
+        
+        # Test RNA sequence
+        rna_seq = NucleotideSequence.from_string("AAUUGGCC", is_rna=True)
+        comp_rna = rna_seq.nucleotide_composition()
+        
+        expected_rna = {'A': 2, 'U': 2, 'G': 2, 'C': 2}
+        assert comp_rna == expected_rna
+        
+        # Test mixed case (masked) sequence - default behavior combines masking
+        mixed_seq = NucleotideSequence.from_string("AaTtGgCc")
+        comp_mixed = mixed_seq.nucleotide_composition()
+        
+        expected_mixed = {'A': 2, 'T': 2, 'G': 2, 'C': 2}  # Combines masked and unmasked
+        assert comp_mixed == expected_mixed
+        
+        # Test same sequence with consider_masking=True
+        comp_mixed_sep = mixed_seq.nucleotide_composition(consider_masking=True)
+        expected_mixed_sep = {'A': 1, 'a': 1, 'T': 1, 't': 1, 'G': 1, 'g': 1, 'C': 1, 'c': 1}
+        assert comp_mixed_sep == expected_mixed_sep
+        
+        # Test with gaps and unknown nucleotides
+        gap_seq = NucleotideSequence.from_string("ATG-N-CGA")
+        comp_gap = gap_seq.nucleotide_composition()
+        
+        expected_gap = {'A': 2, 'T': 1, 'G': 2, '-': 2, 'N': 1, 'C': 1}
+        assert comp_gap == expected_gap
+        
+        # Test empty sequence
+        empty_seq = NucleotideSequence.from_string("")
+        comp_empty = empty_seq.nucleotide_composition()
+        
+        assert comp_empty == {}
+    
+    def test_nucleotide_composition_edge_cases(self):
+        """Test nucleotide composition with complex edge cases."""
+        # Test sequence with multiple gaps and unknown nucleotides (default: combine masking)
+        complex_seq = NucleotideSequence.from_string("ATGN--NNcgatn---NNNAAATTT")
+        comp = complex_seq.nucleotide_composition()
+        
+        expected = {
+            'A': 5,    # 1 + 3 A's at end + 1 masked 'a'
+            'T': 5,    # 1 + 3 T's at end + 1 masked 't'  
+            'G': 2,    # 1 G in 'ATG' + 1 masked 'g'
+            'C': 1,    # 1 masked 'c'
+            'N': 7,    # 1 + 2 + 3 N's (uppercase) + 1 masked 'n'
+            '-': 5     # 2 + 3 gaps
+        }
+        assert comp == expected
+        
+        # Test same sequence with consider_masking=True
+        comp_sep = complex_seq.nucleotide_composition(consider_masking=True)
+        expected_sep = {
+            'A': 4,    # 1 + 3 A's at end
+            'T': 4,    # 1 + 3 T's at end  
+            'G': 1,    # 1 G in 'ATG'
+            'N': 6,    # 1 + 2 + 3 N's (uppercase)
+            '-': 5,    # 2 + 3 gaps
+            'c': 1,    # masked C
+            'g': 1,    # masked g in 'cgat' 
+            'a': 1,    # masked a in 'cgat'
+            't': 1,    # masked t in 'cgat'
+            'n': 1     # masked n after 'cgat'
+        }
+        assert comp_sep == expected_sep
+        
+        # Test RNA with mixed case and gaps (default: combine masking)
+        rna_complex = NucleotideSequence.from_string("AUGn--uugcN-AAA", is_rna=True)
+        comp_rna = rna_complex.nucleotide_composition()
+        
+        expected_rna = {
+            'A': 4,    # 1 + 3 A's at end
+            'U': 3,    # 1 uppercase U + 2 masked u's
+            'G': 2,    # 1 uppercase G + 1 masked g
+            'C': 1,    # 1 masked c
+            'N': 2,    # 1 unmasked N + 1 masked n
+            '-': 3     # gaps
+        }
+        assert comp_rna == expected_rna
+        
+        # Test same RNA with consider_masking=True
+        comp_rna_sep = rna_complex.nucleotide_composition(consider_masking=True)
+        expected_rna_sep = {
+            'A': 4,    # 1 + 3 A's at end
+            'U': 1,    # 1 uppercase U
+            'G': 1,    # 1 uppercase G  
+            'n': 1,    # masked n
+            '-': 3,    # gaps
+            'u': 2,    # masked u's (2 lowercase u's)
+            'g': 1,    # masked g
+            'c': 1,    # masked c
+            'N': 1     # unmasked N
+        }
+        assert comp_rna_sep == expected_rna_sep
+        
+        # Test sequence with only gaps
+        gap_only = NucleotideSequence.from_string("------")
+        comp_gap_only = gap_only.nucleotide_composition()
+        
+        expected_gap_only = {'-': 6}
+        assert comp_gap_only == expected_gap_only
+        
+        # Test sequence with only N's (mixed case) - default combines masking
+        n_only = NucleotideSequence.from_string("NNNnnn")
+        comp_n_only = n_only.nucleotide_composition()
+        
+        expected_n_only = {'N': 6}  # Combines masked and unmasked N's
+        assert comp_n_only == expected_n_only
+        
+        # Test same with consider_masking=True
+        comp_n_only_sep = n_only.nucleotide_composition(consider_masking=True)
+        expected_n_only_sep = {'N': 3, 'n': 3}
+        assert comp_n_only_sep == expected_n_only_sep
+        
+        # Test sequence with repeated patterns (default combines masking)
+        repeat_seq = NucleotideSequence.from_string("ATNATNATNatnATN")
+        comp_repeat = repeat_seq.nucleotide_composition()
+        
+        expected_repeat = {
+            'A': 5,    # 4 uppercase A's + 1 lowercase a
+            'T': 5,    # 4 uppercase T's + 1 lowercase t
+            'N': 5     # 4 uppercase N's + 1 lowercase n
+        }
+        assert comp_repeat == expected_repeat
+        
+        # Test same with consider_masking=True
+        comp_repeat_sep = repeat_seq.nucleotide_composition(consider_masking=True)
+        expected_repeat_sep = {
+            'A': 4,    # 4 uppercase A's
+            'T': 4,    # 4 uppercase T's
+            'N': 4,    # 4 uppercase N's
+            'a': 1,    # 1 lowercase a
+            't': 1,    # 1 lowercase t
+            'n': 1     # 1 lowercase n
+        }
+        assert comp_repeat_sep == expected_repeat_sep
+        
+        # Test very long sequence with all nucleotide types (default: combine masking)
+        long_seq = NucleotideSequence.from_string("ATGCN-atgcn-" * 1000)  # 12k nucleotides
+        comp_long = long_seq.nucleotide_composition()
+        
+        expected_long = {
+            'A': 2000, 'T': 2000, 'G': 2000, 'C': 2000, 'N': 2000,  # Combines masked + unmasked
+            '-': 2000
+        }
+        assert comp_long == expected_long
+        
+        # Test same long sequence with consider_masking=True
+        comp_long_sep = long_seq.nucleotide_composition(consider_masking=True)
+        expected_long_sep = {
+            'A': 1000, 'T': 1000, 'G': 1000, 'C': 1000, 'N': 1000,
+            'a': 1000, 't': 1000, 'g': 1000, 'c': 1000, 'n': 1000,
+            '-': 2000
+        }
+        assert comp_long_sep == expected_long_sep
+        
+    def test_nucleotide_composition_masking_flag(self):
+        """Test the consider_masking flag behavior specifically."""
+        # Test with simple mixed case sequence
+        seq = NucleotideSequence.from_string("AaGgTtCcNn")
+        
+        # Default behavior: combine masking
+        comp_combined = seq.nucleotide_composition(consider_masking=False)
+        expected_combined = {'A': 2, 'G': 2, 'T': 2, 'C': 2, 'N': 2}
+        assert comp_combined == expected_combined
+        
+        # Separate masking
+        comp_separate = seq.nucleotide_composition(consider_masking=True)
+        expected_separate = {'A': 1, 'a': 1, 'G': 1, 'g': 1, 'T': 1, 't': 1, 'C': 1, 'c': 1, 'N': 1, 'n': 1}
+        assert comp_separate == expected_separate
+        
+        # Test with RNA
+        rna_seq = NucleotideSequence.from_string("AaUuGgCc", is_rna=True)
+        
+        comp_rna_combined = rna_seq.nucleotide_composition(consider_masking=False)
+        expected_rna_combined = {'A': 2, 'U': 2, 'G': 2, 'C': 2}
+        assert comp_rna_combined == expected_rna_combined
+        
+        comp_rna_separate = rna_seq.nucleotide_composition(consider_masking=True)
+        expected_rna_separate = {'A': 1, 'a': 1, 'U': 1, 'u': 1, 'G': 1, 'g': 1, 'C': 1, 'c': 1}
+        assert comp_rna_separate == expected_rna_separate
+
     def test_mixed_case_masking(self, mixed_case_dna):
         """Test handling of mixed case (masking) sequences."""
         seq = NucleotideSequence.from_string(mixed_case_dna)
