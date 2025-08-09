@@ -35,6 +35,8 @@ class Transcript:
     @cached_property
     def transcript_span(self) -> np.ndarray:
         """Get genomic span of transcript (min start, max end) regardless of block order."""
+        if len(self.blocks) == 0:
+            raise ValueError("Cannot compute transcript span for transcript with no blocks")
         return np.array([self.blocks[:, 0].min(), self.blocks[:, 1].max()], dtype=np.int32)
 
     @cached_property

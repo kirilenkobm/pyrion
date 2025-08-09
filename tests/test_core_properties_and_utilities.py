@@ -236,8 +236,8 @@ class TestEdgeCasesAndErrorHandling:
     
     def test_empty_transcript_blocks_error(self):
         """Test transcript with empty blocks."""
-        with pytest.raises(IndexError):
-            # This should fail when trying to access blocks[0] in transcript_span
+        with pytest.raises(ValueError, match="Cannot compute transcript span for transcript with no blocks"):
+            # This should fail when trying to compute transcript_span with no blocks
             empty_transcript = Transcript(
                 blocks=np.empty((0, 2), dtype=np.int32),
                 strand=Strand.PLUS,
