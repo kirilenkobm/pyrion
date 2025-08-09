@@ -1,6 +1,6 @@
 # Pyrion API Reference
 
-**Generated:** 2025-08-08 14:31:12
+**Generated:** 2025-08-09 12:27:12
 
 Complete API reference with full docstrings and signatures.
 
@@ -1069,6 +1069,11 @@ Get Gene objects by gene name. Multiple genes can have the same name.
 *Signature:* `(self, interval: pyrion.core.intervals.GenomicInterval, include_partial: bool = True) -> 'TranscriptsCollection'`
 
 
+**save_biodata**
+
+*Signature:* `(self, tsv_path: Union[str, pathlib.Path], include_gene_transcript: bool = True, include_transcript_biotype: bool = True, include_gene_name: bool = True, separator: str = '\t') -> None`
+
+
 **save_to_bed12**
 
 *Signature:* `(self, file_path: Union[str, pathlib.Path]) -> None`
@@ -1868,7 +1873,7 @@ D.keys() -> a set-like object providing a view on D's keys
 
 **pop**
 
-*Signature:* `(self, key, default=<object object at 0x1004f41a0>)`
+*Signature:* `(self, key, default=<object object at 0x1026c81a0>)`
 
 D.pop(k[,d]) -> v, remove specified key and return the corresponding value.
 If key is not found, d is returned if given, otherwise KeyError is raised.
@@ -2194,50 +2199,15 @@ Gene data I/O support.
 
 Read gene data from TSV/CSV file and build mappings.
 
-Args:
-    file_path: Path to the data file
-    gene_column: Gene ID column index (1-based) or name. Optional.
-    transcript_id_column: Transcript ID column index (1-based) or name. Optional.
-    gene_name_column: Gene name column index (1-based) or name. Optional.
-    transcript_type_column: Transcript type/biotype column index (1-based) or name. Optional.
-    separator: Column separator. Default: ' ' (tab)
-    has_header: Whether file has header row. If False, only numeric column indices work.
-
-Returns:
-    GeneData object with available mappings built from the data
-
-Examples:
-    # Build all mappings from biomart TSV with header
-    gene_data = read_gene_data(
-        "transcripts.tsv",
-        gene_column="Gene stable ID",
-        transcript_id_column="Transcript stable ID", 
-        gene_name_column="Gene name",
-        transcript_type_column="Transcript type",
-        has_header=True
-    )
-    
-    # Build from file without header using column indices (1-based)
-    gene_data = read_gene_data(
-        "file.tsv",
-        gene_column=1,
-        transcript_id_column=2,
-        gene_name_column=5,
-        transcript_type_column=6,
-        has_header=False
-    )
-    
-    # Build only transcript-biotype mapping
-    gene_data = read_gene_data(
-        "file.tsv",
-        transcript_id_column="transcript_id",
-        transcript_type_column="biotype"
-    )
-
 
 ### resolve_index
 
 **Signature:** `(column_idx: Union[int, str], header: List[str]) -> int | None`
+
+
+### write_gene_data_tsv
+
+**Signature:** `(gene_data: pyrion.core.gene_data.GeneData, file_path: Union[str, pathlib.Path], include_gene_transcript: bool = True, include_transcript_biotype: bool = True, include_gene_name: bool = True, separator: str = '\t') -> None`
 
 
 ---

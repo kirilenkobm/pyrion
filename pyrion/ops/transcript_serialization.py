@@ -10,8 +10,10 @@ from ..core.strand import Strand
 
 def transcript_to_bed12_string(transcript: Transcript) -> str:
     chrom_name = transcript.chrom
-    chrom_start = int(transcript.blocks[0, 0])
-    chrom_end = int(transcript.blocks[-1, 1])
+    all_starts = transcript.blocks[:, 0]
+    all_ends = transcript.blocks[:, 1]
+    chrom_start = int(all_starts.min())
+    chrom_end = int(all_ends.max())
     name = transcript.id
     score = 1000  # Default score
     strand = '+' if transcript.strand == Strand.PLUS else '-' if transcript.strand == Strand.MINUS else '.'
@@ -22,10 +24,11 @@ def transcript_to_bed12_string(transcript: Transcript) -> str:
     item_rgb = "0"  # Default color
     block_count = len(transcript.blocks)
     
+    sorted_blocks = sorted(transcript.blocks, key=lambda x: x[0])
     block_sizes = []
     block_starts = []
     
-    for i, (start, end) in enumerate(transcript.blocks):
+    for i, (start, end) in enumerate(sorted_blocks):
         block_sizes.append(str(int(end - start)))
         block_starts.append(str(int(start - chrom_start)))
     

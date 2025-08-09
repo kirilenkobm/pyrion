@@ -29,48 +29,7 @@ def read_gene_data(
     separator: str = '\t',
     has_header: bool = True,
 ) -> GeneData:
-    """Read gene data from TSV/CSV file and build mappings.
-    
-    Args:
-        file_path: Path to the data file
-        gene_column: Gene ID column index (1-based) or name. Optional.
-        transcript_id_column: Transcript ID column index (1-based) or name. Optional.
-        gene_name_column: Gene name column index (1-based) or name. Optional.
-        transcript_type_column: Transcript type/biotype column index (1-based) or name. Optional.
-        separator: Column separator. Default: '\t' (tab)
-        has_header: Whether file has header row. If False, only numeric column indices work.
-
-    Returns:
-        GeneData object with available mappings built from the data
-
-    Examples:
-        # Build all mappings from biomart TSV with header
-        gene_data = read_gene_data(
-            "transcripts.tsv",
-            gene_column="Gene stable ID",
-            transcript_id_column="Transcript stable ID", 
-            gene_name_column="Gene name",
-            transcript_type_column="Transcript type",
-            has_header=True
-        )
-        
-        # Build from file without header using column indices (1-based)
-        gene_data = read_gene_data(
-            "file.tsv",
-            gene_column=1,
-            transcript_id_column=2,
-            gene_name_column=5,
-            transcript_type_column=6,
-            has_header=False
-        )
-        
-        # Build only transcript-biotype mapping
-        gene_data = read_gene_data(
-            "file.tsv",
-            transcript_id_column="transcript_id",
-            transcript_type_column="biotype"
-        )
-    """
+    """Read gene data from TSV/CSV file and build mappings."""
     file_path = Path(file_path)
 
     gene_data = GeneData(source_file=str(file_path))
@@ -108,3 +67,60 @@ def read_gene_data(
             gene_data.add_transcript_biotype(transcript_id, transcript_type)
 
     return gene_data
+
+
+def write_gene_data_tsv(
+    gene_data: GeneData,
+    file_path: Union[str, Path],
+    include_gene_transcript: bool = True,
+    include_transcript_biotype: bool = True,
+    include_gene_name: bool = True,
+    separator: str = '\t'
+) -> None:
+    file_path = Path(file_path)
+    has_gene_transcript = gene_data.has_gene_transcript_mapping() and include_gene_transcript
+    has_transcript_biotype = gene_data.has_biotype_mapping() and include_transcript_biotype
+    has_gene_name = gene_data.has_gene_name_mapping() and include_gene_name
+    
+    if not any([has_gene_transcript, has_transcript_biotype, has_gene_name]):
+        raise ValueError("No data mappings available to export")
+    
+    header = ["transcript_id"]
+    if has_gene_transcript:
+        header.append("gene_id")
+    if has_transcript_biotype:
+        header.append("transcript_biotype")
+    if has_gene_name:
+        header.append("gene_name")
+    
+    transcript_ids = set()
+    if has_gene_transcript:
+        transcript_ids.update(gene_data.transcript_ids)
+    if has_transcript_biotype:
+        transcript_ids.update(gene_data.transcript_ids)
+    
+    if not transcript_ids:
+        raise ValueError("No transcript data available to export")
+    
+    with open(file_path, 'w') as f:
+        f.write(separator.join(header) + '\n')
+
+        for transcript_id in sorted(transcript_ids):
+            row = [transcript_id]
+            
+            if has_gene_transcript:
+                gene_id = gene_data.get_gene(transcript_id) or ""
+                row.append(gene_id)
+            
+            if has_transcript_biotype:
+                biotype = gene_data.get_transcript_biotype(transcript_id) or ""
+                row.append(biotype)
+            
+            if has_gene_name:
+                gene_id = gene_data.get_gene(transcript_id) if has_gene_transcript else None
+                gene_name = ""
+                if gene_id:
+                    gene_name = gene_data.get_gene_name(gene_id) or ""
+                row.append(gene_name)
+            
+            f.write(separator.join(row) + '\n')

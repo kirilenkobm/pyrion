@@ -9,7 +9,7 @@ from .fasta import (
 from .fai import (
     create_fasta_index, load_fasta_index, get_or_create_fasta_index
 )
-from .gene_data import read_gene_data
+from .gene_data import read_gene_data, write_gene_data_tsv
 from .genepred import read_genepred_file, read_refflat_file
 from .gtf import read_gtf
 from .twobit import TwoBitAccessor
@@ -26,7 +26,7 @@ __all__ = [
     # 2bit format
     "TwoBitAccessor",
     # Gene data
-    "read_gene_data",
+    "read_gene_data", "write_gene_data_tsv",
     # FASTA format
     "read_fasta", "write_fasta", "read_dna_fasta", "read_rna_fasta", "read_protein_fasta", "FastaAccessor",
     # FASTA indexing

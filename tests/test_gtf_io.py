@@ -324,3 +324,55 @@ class TestGTFIntegration:
         assert transcript.id is not None
         assert isinstance(transcript.id, str)
         assert len(transcript.id) > 0
+    
+    def test_gtf_biotype_and_gene_name_extraction(self, sample_gtf_file):
+        """Test that GTF parsing extracts transcript biotypes and gene names."""
+        collection = read_gtf(str(sample_gtf_file))
+        
+        # Ensure gene data is bound
+        assert collection._gene_data is not None
+        gene_data = collection._gene_data
+        
+        # Check that biotype and gene name mappings are present
+        assert gene_data.has_biotype_mapping(), "No transcript biotype mappings found"
+        assert gene_data.has_gene_name_mapping(), "No gene name mappings found"
+        
+        # Verify mapping counts
+        assert gene_data.get_biotype_count() > 0, "No transcript biotypes extracted"
+        assert gene_data.get_gene_name_count() > 0, "No gene names extracted"
+        
+        # Test specific known transcripts from DDX11L16 gene
+        known_transcripts = [
+            "ENST00000832824.1",  # DDX11L16-260
+            "ENST00000832825.1",  # DDX11L16-261
+        ]
+        
+        for transcript_id in known_transcripts:
+            # Test gene mapping
+            gene_id = gene_data.get_gene(transcript_id)
+            assert gene_id is not None, f"No gene mapping found for {transcript_id}"
+            assert gene_id == "ENSG00000290825.2", f"Unexpected gene ID for {transcript_id}: {gene_id}"
+            
+            # Test biotype extraction
+            biotype = gene_data.get_transcript_biotype(transcript_id)
+            assert biotype is not None, f"No biotype found for {transcript_id}"
+            assert biotype == "lncRNA", f"Expected 'lncRNA' biotype for {transcript_id}, got '{biotype}'"
+            
+            # Test gene name extraction
+            gene_name = gene_data.get_gene_name(gene_id)
+            assert gene_name is not None, f"No gene name found for gene {gene_id}"
+            assert gene_name == "DDX11L16", f"Expected 'DDX11L16' gene name, got '{gene_name}'"
+        
+        # Test that all transcripts have biotypes
+        for transcript in collection.transcripts:
+            biotype = gene_data.get_transcript_biotype(transcript.id)
+            assert biotype is not None, f"Missing biotype for transcript {transcript.id}"
+            assert isinstance(biotype, str), f"Biotype should be string, got {type(biotype)}"
+            assert len(biotype) > 0, f"Empty biotype for transcript {transcript.id}"
+        
+        # Verify gene names are strings and non-empty
+        for gene_id in gene_data.gene_ids:
+            gene_name = gene_data.get_gene_name(gene_id)
+            if gene_name is not None:  # Gene names are optional
+                assert isinstance(gene_name, str), f"Gene name should be string, got {type(gene_name)}"
+                assert len(gene_name) > 0, f"Empty gene name for gene {gene_id}"

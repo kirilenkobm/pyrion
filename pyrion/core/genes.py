@@ -34,7 +34,8 @@ class Transcript:
 
     @cached_property
     def transcript_span(self) -> np.ndarray:
-        return np.array([self.blocks[0][0], self.blocks[-1][1]], dtype=np.int32)
+        """Get genomic span of transcript (min start, max end) regardless of block order."""
+        return np.array([self.blocks[:, 0].min(), self.blocks[:, 1].max()], dtype=np.int32)
 
     @cached_property
     def transcript_interval(self) -> GenomicInterval:
@@ -518,6 +519,27 @@ class TranscriptsCollection:
         from ..ops.transcript_serialization import transcripts_collection_summary_string
         return transcripts_collection_summary_string(self)
     
+    def save_biodata(
+        self, 
+        tsv_path: Union[str, Path],
+        include_gene_transcript: bool = True,
+        include_transcript_biotype: bool = True,
+        include_gene_name: bool = True,
+        separator: str = '\t'
+    ) -> None:
+        if self._gene_data is None:
+            raise ValueError("No GeneData bound to this collection. Call bind_gene_data() first or use read_gtf() to load data with gene information.")
+        
+        from ..io.gene_data import write_gene_data_tsv
+        write_gene_data_tsv(
+            self._gene_data,
+            tsv_path,
+            include_gene_transcript=include_gene_transcript,
+            include_transcript_biotype=include_transcript_biotype,
+            include_gene_name=include_gene_name,
+            separator=separator
+        )
+
     def __repr__(self) -> str:
         return f"<TranscriptsCollection: {self.summary()}>"
 

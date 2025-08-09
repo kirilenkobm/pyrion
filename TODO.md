@@ -1,5 +1,9 @@
 # Tier 1 – Core completeness & stability (v0.2–v0.3)
 
+[x] TranscriptsCollection method to save not only bed, but also GeneData to tsv
+
+[ ] GeneData binding optimisation - compute anything only on request, lazy attachments
+
 [x] CodonSequence:
 
 len - # codons, not # nucleotides
@@ -14,6 +18,8 @@ slice and inteding - for codons too
 [ ] support gz-ed inputs, but this time good
 
 [x] gtf parsing - need at least a small sample
+
+[x] gtf parsing - add biodata and geneName extraction 
 
 [x] better gtf parsing test - compare with actual kent tools output
 

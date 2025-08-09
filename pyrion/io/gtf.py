@@ -116,17 +116,30 @@ def read_gtf(file_path: Union[str, Path],
     all_gene_mapping = {}
     processed_genes = 0
     
+    all_transcript_biotypes = {}
+    all_gene_names = {}
+    
     for chunk_lines in reader.read_gene_chunks():
-        transcripts, gene_mapping = parse_gtf_chunk(chunk_lines)
+        parse_result = parse_gtf_chunk(chunk_lines)
+        transcripts, gene_mapping, transcript_biotypes, gene_names = parse_result
         
         all_transcripts.extend(transcripts)
         all_gene_mapping.update(gene_mapping)
+        all_transcript_biotypes.update(transcript_biotypes)
+        all_gene_names.update(gene_names)
         processed_genes += 1
 
     collection = TranscriptsCollection(transcripts=all_transcripts, source_file=str(file_path))
     gene_data = GeneData(source_file=str(file_path))
+    
     for transcript_id, gene_id in all_gene_mapping.items():
         gene_data.add_gene_transcript_mapping(gene_id, transcript_id)
+    
+    for transcript_id, biotype in all_transcript_biotypes.items():
+        gene_data.add_transcript_biotype(transcript_id, biotype)
+    
+    for gene_id, gene_name in all_gene_names.items():
+        gene_data.add_gene_name(gene_id, gene_name)
     
     collection.bind_gene_data(gene_data)
     

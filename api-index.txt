@@ -1,5 +1,5 @@
 PYRION API INDEX
-Generated: 2025-08-08 14:31:12
+Generated: 2025-08-09 12:27:12
 Concise reference with type signatures only.
 ============================================================
 
@@ -180,6 +180,7 @@ MODULE pyrion.core.genes
     get_genes_without_canonical_transcript(self) -> List[pyrion.core.genes.Gene]
     get_transcript_ids_by_chrom(self, chrom: str) -> List[str]
     get_transcripts_in_interval(self, interval: pyrion.core.intervals.GenomicInterval, include_partial: bool = True) -> 'TranscriptsCollection'
+    save_biodata(self, tsv_path: Union[str, pathlib.Path], include_gene_transcript: bool = True, include_transcript_biotype: bool = True, include_gene_name: bool = True, separator: str = '\t') -> None
     save_to_bed12(self, file_path: Union[str, pathlib.Path]) -> None
     save_to_json(self, file_path: Union[str, pathlib.Path]) -> None
     summary(self) -> str
@@ -319,7 +320,7 @@ MODULE pyrion.core.sequences_collection
     ids(self) -> 'List[str]'
     items(self)
     keys(self)
-    pop(self, key, default=<object object at 0x1004f41a0>)
+    pop(self, key, default=<object object at 0x1026c81a0>)
     popitem(self)
     sequences(self) -> 'List[SequenceLike]'
     setdefault(self, key, default=None)
@@ -372,6 +373,7 @@ MODULE pyrion.io.fasta
 MODULE pyrion.io.gene_data
   FUNCTION read_gene_data(file_path: Union[str, pathlib.Path], gene_column: Union[int, str, NoneType] = None, transcript_id_column: Union[int, str, NoneType] = None, gene_name_column: Union[int, str, NoneType] = None, transcript_type_column: Union[int, str, NoneType] = None, separator: str = '\t', has_header: bool = True) -> pyrion.core.gene_data.GeneData
   FUNCTION resolve_index(column_idx: Union[int, str], header: List[str]) -> int | None
+  FUNCTION write_gene_data_tsv(gene_data: pyrion.core.gene_data.GeneData, file_path: Union[str, pathlib.Path], include_gene_transcript: bool = True, include_transcript_biotype: bool = True, include_gene_name: bool = True, separator: str = '\t') -> None
 MODULE pyrion.io.genepred
   FUNCTION read_genepred_file(file_path: Union[str, pathlib.Path], has_header: bool = False, extended: bool = False) -> pyrion.core.genes.TranscriptsCollection
   FUNCTION read_refflat_file(file_path: Union[str, pathlib.Path], has_header: bool = False) -> pyrion.core.genes.TranscriptsCollection

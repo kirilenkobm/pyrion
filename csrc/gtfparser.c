@@ -77,6 +77,105 @@ static char* extract_transcript_id(const char* attributes) {
     return transcript_id;
 }
 
+// Extract gene_name from attributes string (flexible naming)
+static char* extract_gene_name(const char* attributes) {
+    // Try multiple common field name variants
+    const char* patterns[] = {
+        "gene_name \"",      // GENCODE/Ensembl standard
+        "geneName \"",       // UCSC variant
+        "Name \"",           // NCBI/GFF3 variant
+        "gene_symbol \"",    // Alternative naming
+        NULL
+    };
+    
+    int pattern_lengths[] = {11, 10, 6, 13};
+    
+    for (int i = 0; patterns[i] != NULL; i++) {
+        const char* gene_name_start = strstr(attributes, patterns[i]);
+        if (!gene_name_start) continue;
+        
+        gene_name_start += pattern_lengths[i];
+        const char* gene_name_end = strchr(gene_name_start, '"');
+        if (!gene_name_end) continue;
+        
+        size_t len = gene_name_end - gene_name_start;
+        char* gene_name = malloc(len + 1);
+        if (!gene_name) return NULL;
+        
+        strncpy(gene_name, gene_name_start, len);
+        gene_name[len] = '\0';
+        return gene_name;
+    }
+    
+    return NULL;
+}
+
+// Extract gene_type/gene_biotype from attributes string (flexible naming)
+static char* extract_gene_type(const char* attributes) {
+    // Try multiple common field name variants
+    const char* patterns[] = {
+        "gene_type \"",      // GENCODE/Ensembl standard
+        "gene_biotype \"",   // Alternative standard
+        "geneType \"",       // UCSC variant
+        "biotype \"",        // Simplified variant
+        NULL
+    };
+    
+    int pattern_lengths[] = {11, 14, 10, 9};
+    
+    for (int i = 0; patterns[i] != NULL; i++) {
+        const char* gene_type_start = strstr(attributes, patterns[i]);
+        if (!gene_type_start) continue;
+        
+        gene_type_start += pattern_lengths[i];
+        const char* gene_type_end = strchr(gene_type_start, '"');
+        if (!gene_type_end) continue;
+        
+        size_t len = gene_type_end - gene_type_start;
+        char* gene_type = malloc(len + 1);
+        if (!gene_type) return NULL;
+        
+        strncpy(gene_type, gene_type_start, len);
+        gene_type[len] = '\0';
+        return gene_type;
+    }
+    
+    return NULL;
+}
+
+// Extract transcript_type/transcript_biotype from attributes string (flexible naming)
+static char* extract_transcript_type(const char* attributes) {
+    // Try multiple common field name variants
+    const char* patterns[] = {
+        "transcript_type \"",      // GENCODE/Ensembl standard
+        "transcript_biotype \"",   // Alternative standard
+        "transcriptType \"",       // UCSC variant
+        "transcript_biotype \"",   // RefSeq variant
+        NULL
+    };
+    
+    int pattern_lengths[] = {17, 20, 16, 20};
+    
+    for (int i = 0; patterns[i] != NULL; i++) {
+        const char* transcript_type_start = strstr(attributes, patterns[i]);
+        if (!transcript_type_start) continue;
+        
+        transcript_type_start += pattern_lengths[i];
+        const char* transcript_type_end = strchr(transcript_type_start, '"');
+        if (!transcript_type_end) continue;
+        
+        size_t len = transcript_type_end - transcript_type_start;
+        char* transcript_type = malloc(len + 1);
+        if (!transcript_type) return NULL;
+        
+        strncpy(transcript_type, transcript_type_start, len);
+        transcript_type[len] = '\0';
+        return transcript_type;
+    }
+    
+    return NULL;
+}
+
 // Parse a single GTF line
 static int parse_gtf_line(const char* line, GTFLine* gtf_line) {
     if (!line || !gtf_line) return 0;
@@ -323,12 +422,23 @@ static PyObject* parse_gtf_chunk(PyObject* self, PyObject* args) {
     
     Py_ssize_t num_lines = PyList_Size(lines_list);
     if (num_lines == 0) {
-        return PyTuple_New(2); // Empty transcript list and empty mapping
+        // Return empty tuple with 4 elements: (transcripts, gene_mapping, transcript_biotypes, gene_names)
+        PyObject* result = PyTuple_New(4);
+        PyTuple_SetItem(result, 0, PyList_New(0));
+        PyTuple_SetItem(result, 1, PyDict_New());
+        PyTuple_SetItem(result, 2, PyDict_New());
+        PyTuple_SetItem(result, 3, PyDict_New());
+        return result;
     }
     
     // Hash map for transcript builders (transcript_id -> TranscriptBuilder*)
     PyObject* transcript_builders = PyDict_New();
     char* gene_id = NULL;
+    char* gene_name = NULL;
+    
+    // Mappings for biotype and gene name data
+    PyObject* transcript_biotypes = PyDict_New();
+    PyObject* gene_names = PyDict_New();
     
     // Process each line
     for (Py_ssize_t i = 0; i < num_lines; i++) {
@@ -353,6 +463,20 @@ static PyObject* parse_gtf_chunk(PyObject* self, PyObject* args) {
         // Store gene_id for mapping
         if (!gene_id) {
             gene_id = strdup(current_gene_id);
+        }
+        
+        // Extract additional attributes
+        char* current_gene_name = extract_gene_name(gtf_line.attributes);
+        char* transcript_type = extract_transcript_type(gtf_line.attributes);
+        
+        // Store gene name (first occurrence wins)
+        if (current_gene_name && !gene_name) {
+            gene_name = strdup(current_gene_name);
+        }
+        
+        // Store transcript biotype if we have transcript_id and transcript_type
+        if (transcript_id && transcript_type) {
+            PyDict_SetItemString(transcript_biotypes, transcript_id, PyUnicode_FromString(transcript_type));
         }
         
         // Process transcript and exon features
@@ -382,6 +506,8 @@ static PyObject* parse_gtf_chunk(PyObject* self, PyObject* args) {
         
         free(current_gene_id);
         free(transcript_id);
+        free(current_gene_name);
+        free(transcript_type);
         free_gtf_line(&gtf_line);
     }
     
@@ -408,12 +534,21 @@ static PyObject* parse_gtf_chunk(PyObject* self, PyObject* args) {
     }
     
     Py_DECREF(transcript_builders);
-    free(gene_id);
     
-    // Return tuple of (transcripts_list, gene_mapping_dict)
-    PyObject* result = PyTuple_New(2);
+    // Add gene name mapping if we have both gene_id and gene_name
+    if (gene_id && gene_name) {
+        PyDict_SetItemString(gene_names, gene_id, PyUnicode_FromString(gene_name));
+    }
+    
+    free(gene_id);
+    free(gene_name);
+    
+    // Return tuple of (transcripts_list, gene_mapping_dict, transcript_biotypes_dict, gene_names_dict)
+    PyObject* result = PyTuple_New(4);
     PyTuple_SetItem(result, 0, transcripts_list);
     PyTuple_SetItem(result, 1, gene_mapping);
+    PyTuple_SetItem(result, 2, transcript_biotypes);
+    PyTuple_SetItem(result, 3, gene_names);
     
     return result;
 }
