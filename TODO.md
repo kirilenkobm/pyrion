@@ -15,7 +15,7 @@ slice and inteding - for codons too
 
 [x] gtf parsing - need at least a small sample
 
-[ ] better gtf parsing test - compare with actual kent tools output
+[x] better gtf parsing test - compare with actual kent tools output
 
 [ ] gff3 reading
 
