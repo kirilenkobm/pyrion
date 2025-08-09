@@ -1,6 +1,6 @@
 # Pyrion API Reference
 
-**Generated:** 2025-08-09 12:27:12
+**Generated:** 2025-08-10 01:06:42
 
 Complete API reference with full docstrings and signatures.
 
@@ -1693,6 +1693,11 @@ Return str(self).
 *Signature:* `(self, other: "'NucleotideSequence'") -> "'NucleotideSequence'"`
 
 
+**nucleotide_composition**
+
+*Signature:* `(self, consider_masking: 'bool' = False) -> 'dict[str, int]'`
+
+
 **remove_gaps**
 
 *Signature:* `(self) -> "'NucleotideSequence'"`
@@ -1733,6 +1738,13 @@ Return str(self).
 *Signature:* `(self) -> 'str'`
 
 
+**toggle_type**
+
+*Signature:* `(self) -> "'NucleotideSequence'"`
+
+Toggle between DNA and RNA (T <-> U).
+
+
 **unmask**
 
 *Signature:* `(self, start: 'Optional[int]' = None, end: 'Optional[int]' = None) -> "'NucleotideSequence'"`
@@ -1759,6 +1771,11 @@ Auxiliary functions for sequences objects.
 
 
 ## Functions
+
+### get_nucleotide_composition
+
+**Signature:** `(sequence, consider_masking: bool = False) -> Dict[str, int]`
+
 
 ### mask_nucleotide_sequence_slice
 
@@ -1873,7 +1890,7 @@ D.keys() -> a set-like object providing a view on D's keys
 
 **pop**
 
-*Signature:* `(self, key, default=<object object at 0x1026c81a0>)`
+*Signature:* `(self, key, default=<object object at 0x1012301a0>)`
 
 D.pop(k[,d]) -> v, remove specified key and return the corresponding value.
 If key is not found, d is returned if given, otherwise KeyError is raised.

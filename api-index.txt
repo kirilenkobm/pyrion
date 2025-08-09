@@ -1,5 +1,5 @@
 PYRION API INDEX
-Generated: 2025-08-09 12:27:12
+Generated: 2025-08-10 01:06:42
 Concise reference with type signatures only.
 ============================================================
 
@@ -290,6 +290,7 @@ MODULE pyrion.core.nucleotide_sequences
     is_position_masked(self, position: 'int') -> 'bool'
     mask(self, start: 'Optional[int]' = None, end: 'Optional[int]' = None) -> "'NucleotideSequence'"
     merge(self, other: "'NucleotideSequence'") -> "'NucleotideSequence'"
+    nucleotide_composition(self, consider_masking: 'bool' = False) -> 'dict[str, int]'
     remove_gaps(self) -> "'NucleotideSequence'"
     reverse(self) -> "'NucleotideSequence'"
     reverse_complement(self) -> "'NucleotideSequence'"
@@ -298,11 +299,13 @@ MODULE pyrion.core.nucleotide_sequences
     to_codons(self)
     to_fasta_string(self, width: 'int' = 80, header: 'Optional[str]' = None) -> 'str'
     to_string(self) -> 'str'
+    toggle_type(self) -> "'NucleotideSequence'"
     unmask(self, start: 'Optional[int]' = None, end: 'Optional[int]' = None) -> "'NucleotideSequence'"
     masked_fraction -> float
   CLASS SequenceType
     __init__(self, /, *args, **kwargs)
 MODULE pyrion.core.sequences_auxiliary
+  FUNCTION get_nucleotide_composition(sequence, consider_masking: bool = False) -> Dict[str, int]
   FUNCTION mask_nucleotide_sequence_slice(sequence, start: Optional[int] = None, end: Optional[int] = None)
   FUNCTION merge_nucleotide_sequences(sequence1, sequence2)
   FUNCTION unmask_nucleotide_sequence_slice(sequence, start: Optional[int] = None, end: Optional[int] = None)
@@ -320,7 +323,7 @@ MODULE pyrion.core.sequences_collection
     ids(self) -> 'List[str]'
     items(self)
     keys(self)
-    pop(self, key, default=<object object at 0x1026c81a0>)
+    pop(self, key, default=<object object at 0x1012301a0>)
     popitem(self)
     sequences(self) -> 'List[SequenceLike]'
     setdefault(self, key, default=None)
