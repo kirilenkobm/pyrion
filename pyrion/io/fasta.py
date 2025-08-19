@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+import logging
 from typing import Dict, Union, List, Mapping
 from pathlib import Path
 from enum import IntEnum
+
+log = logging.getLogger("pyrion.io.fasta")
 
 from .._fastaparser import parse_fasta_fast
 from ..core.nucleotide_sequences import NucleotideSequence, SequenceType
@@ -29,6 +32,8 @@ class FastaAccessor:
         
         self.fai_store = fai_store
         self._file_handle = None
+        log.debug("Initialized FastaAccessor for %s with %d sequences", 
+                 self.fasta_file, len(fai_store))
     
     def __enter__(self):
         self._file_handle = open(self.fasta_file, 'rb')
@@ -44,6 +49,8 @@ class FastaAccessor:
                     is_rna: bool = False) -> NucleotideSequence:
         if region.chrom not in self.fai_store:
             raise KeyError(f"Sequence '{region.chrom}' not found in FASTA index")
+            
+        log.debug("Extracting sequence for region: %s", region)
         
         fai_entry = self.fai_store[region.chrom]
         start = region.start
@@ -118,6 +125,7 @@ class FastaAccessor:
     def get_multiple_sequences(self, 
                               regions: List[GenomicInterval],
                               is_rna: bool = False) -> Dict[str, NucleotideSequence]:
+        log.debug("Extracting %d sequences from regions", len(regions))
         results = {}
         
         for region in regions:
@@ -146,6 +154,7 @@ def read_fasta(
     return_dict: bool = True
 ) -> Union[SequencesCollection, List[Union[NucleotideSequence, AminoAcidSequence]]]:
     filename = str(filename)
+    log.debug("Reading FASTA file: %s (type: %s, return_dict: %s)", filename, sequence_type.value, return_dict)
     type_mapping = {
         SequenceType.DNA: _SequenceTypeMapping.DNA,
         SequenceType.RNA: _SequenceTypeMapping.RNA,
@@ -160,6 +169,8 @@ def read_fasta(
     raw_sequences = parse_fasta_fast(filename, internal_type)
     sequences = SequencesCollection()
     sequence_list: List[Union[NucleotideSequence, AminoAcidSequence]] = []
+    
+    log.debug("Parsed %d raw sequences from file", len(raw_sequences))
     
     for header, encoded_array, seq_type in raw_sequences:
         seq_id = header.strip()
@@ -182,6 +193,7 @@ def read_fasta(
         sequences.add(seq_id, sequence_obj, force=False)
         sequence_list.append(sequence_obj)
     
+    log.info("Successfully read %d sequences from %s", len(sequences), filename)
     return sequences if return_dict else sequence_list
 
 
@@ -190,18 +202,23 @@ def write_fasta(
     filename: Union[str, Path],
     line_width: int = 80
 ) -> None:
+    log.debug("Writing FASTA file: %s (line_width: %d)", filename, line_width)
     with open(filename, 'w') as file:
         from collections.abc import Mapping as _Mapping
         if isinstance(sequences, _Mapping):
+            log.debug("Writing %d sequences from mapping", len(sequences))
             for seq_id, sequence in sequences.items():
                 _write_sequence(file, seq_id, sequence, line_width)
         else:
+            log.debug("Writing %d sequences from list", len(sequences))
             for i, sequence in enumerate(sequences):
                 if sequence.metadata and 'sequence_id' in sequence.metadata:
                     seq_id = sequence.metadata['sequence_id']
                 else:
                     seq_id = f"sequence_{i+1}"
                 _write_sequence(file, seq_id, sequence, line_width)
+    
+    log.info("Successfully wrote FASTA file: %s", filename)
 
 
 def _write_sequence(file, seq_id: str, sequence: NucleotideSequence, line_width: int):

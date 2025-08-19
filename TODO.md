@@ -19,13 +19,16 @@ slice and inteding - for codons too
 
 [x] support gz-ed inputs
 
-[ ] support gz-ed inputs, but this time good
 
 [x] gtf parsing - need at least a small sample
 
 [x] gtf parsing - add biodata and geneName extraction 
 
 [x] better gtf parsing test - compare with actual kent tools output
+
+[x] add logger
+
+[ ] logging: add where necessary
 
 [ ] GeneData binding optimisation - compute anything only on request, lazy attachments
 
@@ -35,7 +38,7 @@ slice and inteding - for codons too
 
 [ ] Maf reader + respective Genome-Alignment-precursor structure (?)
 
-[ ] verbosity and logging system
+[ ] support gz-ed inputs, but this time good
 
 [ ] add ambiguous nucleotide codes
 

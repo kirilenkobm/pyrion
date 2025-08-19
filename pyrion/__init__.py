@@ -10,7 +10,7 @@ from .config import (
     get_available_cores, get_max_cores, set_max_cores,
     get_min_items_for_parallel, set_min_items_for_parallel,
     disable_parallel, enable_parallel, is_multiprocessing_available,
-    get_config_summary
+    get_config_summary, set_loglevel
 )
 
 # Core data structures
@@ -84,7 +84,7 @@ __all__ = [
     "get_available_cores", "get_max_cores", "set_max_cores",
     "get_min_items_for_parallel", "set_min_items_for_parallel", 
     "disable_parallel", "enable_parallel", "is_multiprocessing_available",
-    "get_config_summary",
+    "get_config_summary", "set_loglevel",
     
     # Utilities
     "quick_start", "get_version", "get_version_info"

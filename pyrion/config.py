@@ -1,8 +1,9 @@
 """Global configuration for pyrion library."""
 
+import logging
 import multiprocessing as mp
 import os
-from typing import Optional
+from typing import Optional, Union
 
 
 class PyrionConfig:
@@ -14,42 +15,25 @@ class PyrionConfig:
     def __init__(self):
         # Detect available cores at initialization
         self._available_cores = self._detect_available_cores()
-        
-        # Default to using all available cores, but with a reasonable upper limit
-        # This follows the existing pattern but makes it configurable
         self._max_cores = min(self._available_cores, 8)
-        
-        # Minimum items threshold for multiprocessing (configurable)
         self._min_items_for_parallel = 100
-        
-        # Whether multiprocessing is available
         self._multiprocessing_available = self._test_multiprocessing()
+        
+        # Logging configuration
+        self._logger_configured = False
+        self._setup_default_logging()
     
     def _detect_available_cores(self) -> int:
         """Detect the number of available CPU cores."""
         try:
-            # Try different methods to get CPU count
-            # 1. multiprocessing.cpu_count() - logical cores
-            logical_cores = mp.cpu_count()
-            
-            # 2. os.cpu_count() - may be different in some environments
-            os_cores = os.cpu_count()
-            
-            # Use the minimum of both (more conservative)
-            cores = min(logical_cores, os_cores) if os_cores is not None else logical_cores
-            
-            # Ensure we have at least 1 core
-            return max(1, cores)
+            return max(1, mp.cpu_count())
         except Exception:
-            # Fallback to 1 core if detection fails
             return 1
     
     def _test_multiprocessing(self) -> bool:
         """Test if multiprocessing is available and safe to use."""
         try:
-            # Test if we can create a pool (some environments disable this)
-            with mp.Pool(1) as test_pool:
-                pass
+            mp.cpu_count()  # Simple check if multiprocessing works
             return True
         except Exception:
             return False
@@ -66,21 +50,11 @@ class PyrionConfig:
     
     @max_cores.setter
     def max_cores(self, value: int) -> None:
-        """Set the maximum number of cores to use for parallel processing.
-        
-        Args:
-            value: Number of cores to use. Must be between 1 and available_cores.
-                  If 0 is provided, parallel processing will be disabled.
-        
-        Raises:
-            ValueError: If value is negative or greater than available cores.
-        """
+        """Set the maximum number of cores to use for parallel processing."""
         if value < 0:
             raise ValueError("max_cores must be non-negative")
-        
         if value > self._available_cores:
             raise ValueError(f"max_cores ({value}) cannot exceed available cores ({self._available_cores})")
-        
         self._max_cores = value
     
     @property
@@ -90,11 +64,7 @@ class PyrionConfig:
     
     @min_items_for_parallel.setter
     def min_items_for_parallel(self, value: int) -> None:
-        """Set the minimum number of items required to use parallel processing.
-        
-        Args:
-            value: Minimum number of items. Must be non-negative.
-        """
+        """Set the minimum number of items required to use parallel processing."""
         if value < 0:
             raise ValueError("min_items_for_parallel must be non-negative")
         self._min_items_for_parallel = value
@@ -109,47 +79,65 @@ class PyrionConfig:
         self._max_cores = 0
     
     def enable_parallel(self, max_cores: Optional[int] = None) -> None:
-        """Enable parallel processing.
-        
-        Args:
-            max_cores: Maximum cores to use. If None, uses default (min(available, 8)).
-        """
+        """Enable parallel processing."""
         if max_cores is None:
             self._max_cores = min(self._available_cores, 8)
         else:
-            self.max_cores = max_cores  # Use setter for validation
+            self.max_cores = max_cores
     
-    def get_optimal_processes(self, n_items: int, max_processes: Optional[int] = None) -> int:
-        """Determine optimal number of processes based on data size and configuration.
+    def _setup_default_logging(self) -> None:
+        """Set up default logging to silence all pyrion logs by default."""
+        pyrion_logger = logging.getLogger("pyrion")
+        if not pyrion_logger.handlers:
+            # Add NullHandler to silence logs by default
+            pyrion_logger.addHandler(logging.NullHandler())
+            pyrion_logger.setLevel(logging.DEBUG)  # Allow all levels, handler controls output
+    
+    def set_log_level(self, level: Union[str, int]) -> None:
+        """Configure logging for the pyrion package.
         
         Args:
-            n_items: Number of items to process
-            max_processes: Override max processes for this call
-        
-        Returns:
-            Optimal number of processes (0 means use sequential processing)
+            level: Logging level as string ("DEBUG", "INFO", "WARNING", "ERROR") 
+                  or int (logging.DEBUG, logging.INFO, etc.)
         """
-        # If parallel processing is disabled globally
-        if self._max_cores == 0:
-            return 0
+        # Convert string levels to int
+        if isinstance(level, str):
+            level = level.upper()
+            level_map = {
+                "DEBUG": logging.DEBUG,
+                "INFO": logging.INFO,
+                "WARNING": logging.WARNING,
+                "ERROR": logging.ERROR,
+                "CRITICAL": logging.CRITICAL
+            }
+            if level not in level_map:
+                raise ValueError(f"Invalid log level: {level}. Must be one of {list(level_map.keys())}")
+            level = level_map[level]
         
-        # If multiprocessing is not available
-        if not self._multiprocessing_available:
-            return 0
+        pyrion_logger = logging.getLogger("pyrion")
         
-        # If dataset is too small
-        if n_items < self._min_items_for_parallel:
-            return 0
+        # Remove existing handlers except NullHandler
+        for handler in pyrion_logger.handlers[:]:
+            if not isinstance(handler, logging.NullHandler):
+                pyrion_logger.removeHandler(handler)
         
-        # Determine effective max processes
-        effective_max = max_processes if max_processes is not None else self._max_cores
-        effective_max = min(effective_max, self._max_cores)  # Respect global limit
+        # If not already configured, add a StreamHandler
+        if not self._logger_configured:
+            handler = logging.StreamHandler()
+            formatter = logging.Formatter(
+                fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+                datefmt="%Y-%m-%d %H:%M:%S"
+            )
+            handler.setFormatter(formatter)
+            pyrion_logger.addHandler(handler)
+            self._logger_configured = True
         
-        # Don't use more processes than items (at least 10 items per process)
-        optimal = min(effective_max, n_items // 10)
-        
-        return max(0, optimal)
-    
+        # Set level on all handlers
+        pyrion_logger.setLevel(level)
+        for handler in pyrion_logger.handlers:
+            if not isinstance(handler, logging.NullHandler):
+                handler.setLevel(level)
+
     def summary(self) -> dict:
         """Get a summary of current configuration."""
         return {
@@ -157,15 +145,14 @@ class PyrionConfig:
             "max_cores": self._max_cores,
             "min_items_for_parallel": self._min_items_for_parallel,
             "multiprocessing_available": self._multiprocessing_available,
-            "parallel_enabled": self._max_cores > 0
+            "parallel_enabled": self._max_cores > 0,
+            "logging_configured": self._logger_configured
         }
 
 
 # Global configuration instance
 _config = PyrionConfig()
 
-
-# Public API functions
 def get_available_cores() -> int:
     """Get the number of available CPU cores."""
     return _config.available_cores
@@ -177,11 +164,7 @@ def get_max_cores() -> int:
 
 
 def set_max_cores(cores: int) -> None:
-    """Set the maximum number of cores to use for parallel processing.
-    
-    Args:
-        cores: Number of cores to use (1 to available_cores, or 0 to disable)
-    """
+    """Set the maximum number of cores to use for parallel processing."""
     _config.max_cores = cores
 
 
@@ -215,7 +198,13 @@ def get_config_summary() -> dict:
     return _config.summary()
 
 
-# Internal function for use by parallel utilities
-def _get_config() -> PyrionConfig:
-    """Get the global configuration instance (internal use)."""
-    return _config 
+def set_loglevel(level: Union[str, int]) -> None:
+    """Set logging level for the pyrion package.
+    
+    Examples:
+        >>> import pyrion
+        >>> pyrion.set_loglevel("INFO")     # Enable info-level logging
+        >>> pyrion.set_loglevel("DEBUG")    # Enable debug-level logging  
+        >>> pyrion.set_loglevel("WARNING")  # Enable warning+ only
+    """
+    _config.set_log_level(level)
