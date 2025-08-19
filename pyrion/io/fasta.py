@@ -66,7 +66,8 @@ class FastaAccessor:
                 'source_file': str(self.fasta_file),
                 'start': start,
                 'end': end
-            }
+            },
+            id=region.chrom
         )
 
     def get_sequence_length(self, sequence_name: str) -> int:
@@ -166,14 +167,16 @@ def read_fasta(
         if seq_type == _SequenceTypeMapping.PROTEIN:
             sequence_obj = AminoAcidSequence(
                 data=encoded_array,
-                metadata={'sequence_id': seq_id, 'source_file': filename}
+                metadata={'sequence_id': seq_id, 'source_file': filename},
+                id=seq_id
             )
         else:
             is_rna = (seq_type == _SequenceTypeMapping.RNA)
             sequence_obj = NucleotideSequence(
                 data=encoded_array,
                 is_rna=is_rna,
-                metadata={'sequence_id': seq_id, 'source_file': filename}
+                metadata={'sequence_id': seq_id, 'source_file': filename},
+                id=seq_id
             )
         
         sequences.add(seq_id, sequence_obj, force=False)

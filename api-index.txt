@@ -1,5 +1,5 @@
 PYRION API INDEX
-Generated: 2025-08-10 01:06:42
+Generated: 2025-08-20 00:49:28
 Concise reference with type signatures only.
 ============================================================
 
@@ -44,14 +44,14 @@ MODULE pyrion.core.amino_acid_auxiliary
   FUNCTION get_amino_acid_composition(sequence) -> Dict[str, float]
 MODULE pyrion.core.amino_acid_sequences
   CLASS AminoAcidSequence
-    __init__(self, data: 'np.ndarray', metadata: 'Optional[Metadata]' = None) -> None
-    __init__(self, data: 'np.ndarray', metadata: 'Optional[Metadata]' = None) -> None
+    __init__(self, data: 'np.ndarray', metadata: 'Optional[Metadata]' = None, id: 'Optional[str]' = None) -> None
+    __init__(self, data: 'np.ndarray', metadata: 'Optional[Metadata]' = None, id: 'Optional[str]' = None) -> None
     __repr__(self) -> 'str'
     __str__(self) -> 'str'
     apply_masking(self) -> "'AminoAcidSequence'"
     count_amino_acids(self) -> 'dict'
     find_stop_codons(self) -> 'np.ndarray'
-    from_string(sequence: 'str', metadata: 'Optional[Metadata]' = None) -> "'AminoAcidSequence'"
+    from_string(sequence: 'str', metadata: 'Optional[Metadata]' = None, id: 'Optional[str]' = None) -> "'AminoAcidSequence'"
     get_amino_acid_content(self) -> 'dict'
     get_gap_positions(self) -> 'np.ndarray'
     get_masked_positions(self) -> 'np.ndarray'
@@ -80,8 +80,8 @@ MODULE pyrion.core.codons
     to_string(self) -> str
     translate(self, translation_table=None) -> str
   CLASS CodonSequence
-    __init__(self, nucleotide_sequence)
-    __init__(self, nucleotide_sequence)
+    __init__(self, nucleotide_sequence, id: Optional[str] = None)
+    __init__(self, nucleotide_sequence, id: Optional[str] = None)
     __repr__(self) -> str
     __str__(self) -> str
     get_codons(self, preserve_gaps: bool = False) -> List[pyrion.core.codons.Codon]
@@ -279,12 +279,12 @@ MODULE pyrion.core.intervals_auxiliary
   FUNCTION create_intervals_collections_from_strings(interval_strings, ids: Optional[List[str]] = None) -> Dict[Tuple[str, pyrion.core.strand.Strand], pyrion.core.intervals.GenomicIntervalsCollection]
 MODULE pyrion.core.nucleotide_sequences
   CLASS NucleotideSequence
-    __init__(self, data: 'np.ndarray', is_rna: 'bool' = False, metadata: 'Optional[Metadata]' = None) -> None
-    __init__(self, data: 'np.ndarray', is_rna: 'bool' = False, metadata: 'Optional[Metadata]' = None) -> None
+    __init__(self, data: 'np.ndarray', is_rna: 'bool' = False, metadata: 'Optional[Metadata]' = None, id: 'Optional[str]' = None) -> None
+    __init__(self, data: 'np.ndarray', is_rna: 'bool' = False, metadata: 'Optional[Metadata]' = None, id: 'Optional[str]' = None) -> None
     __repr__(self) -> 'str'
     __str__(self) -> 'str'
     complement(self) -> "'NucleotideSequence'"
-    from_string(sequence: 'str', is_rna: 'bool' = False, metadata: 'Optional[Metadata]' = None) -> "'NucleotideSequence'"
+    from_string(sequence: 'str', is_rna: 'bool' = False, metadata: 'Optional[Metadata]' = None, id: 'Optional[str]' = None) -> "'NucleotideSequence'"
     get_masked_positions(self) -> 'np.ndarray'
     get_unmasked_positions(self) -> 'np.ndarray'
     is_position_masked(self, position: 'int') -> 'bool'
@@ -323,7 +323,7 @@ MODULE pyrion.core.sequences_collection
     ids(self) -> 'List[str]'
     items(self)
     keys(self)
-    pop(self, key, default=<object object at 0x1012301a0>)
+    pop(self, key, default=<object object at 0x1008b81a0>)
     popitem(self)
     sequences(self) -> 'List[SequenceLike]'
     setdefault(self, key, default=None)

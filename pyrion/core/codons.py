@@ -85,11 +85,12 @@ class Codon:
 
 class CodonSequence:
     """Codon sequence wrapper around NucleotideSequence with codon-wise operations."""
-    def __init__(self, nucleotide_sequence):
+    def __init__(self, nucleotide_sequence, id: Optional[str] = None):
         """Initialize from a NucleotideSequence object."""
         self.nucleotide_sequence = nucleotide_sequence
         self._data = nucleotide_sequence.data.copy()  # Work with a copy
         self.is_rna = getattr(nucleotide_sequence, 'is_rna', False)
+        self.id = id if id is not None else getattr(nucleotide_sequence, 'id', None)
     
     @property
     def data(self) -> np.ndarray:
@@ -258,7 +259,7 @@ class CodonSequence:
         aa_string = ''.join(aa_chars)
         aa_data = encode_amino_acids(aa_string)
         
-        return AminoAcidSequence(data=aa_data)
+        return AminoAcidSequence(data=aa_data, id=self.id)
     
     def __len__(self) -> int:
         """Number of codons (including incomplete trailing codon if present)."""
@@ -272,11 +273,11 @@ class CodonSequence:
         selected = codons[index]
         if not selected:
             # Empty slice returns empty CodonSequence
-            empty_nt = NucleotideSequence(data=np.array([], dtype=np.int8), is_rna=self.is_rna)
-            return CodonSequence(empty_nt)
+            empty_nt = NucleotideSequence(data=np.array([], dtype=np.int8), is_rna=self.is_rna, id=self.id)
+            return CodonSequence(empty_nt, id=self.id)
         concatenated = np.concatenate([c.symbols for c in selected]).astype(np.int8, copy=False)
-        new_nt = NucleotideSequence(data=concatenated, is_rna=self.is_rna)
-        return CodonSequence(new_nt)
+        new_nt = NucleotideSequence(data=concatenated, is_rna=self.is_rna, id=self.id)
+        return CodonSequence(new_nt, id=self.id)
     
     def __str__(self) -> str:
         def _symbol_to_char(val: int) -> str:
@@ -300,4 +301,5 @@ class CodonSequence:
             seq_preview = seq_preview[:27] + "..."
         
         seq_type = "RNA" if self.is_rna else "DNA"
-        return f"CodonSequence('{seq_preview}', codons={len(self)}, type={seq_type})"
+        id_info = f", id='{self.id}'" if self.id else ""
+        return f"CodonSequence('{seq_preview}', codons={len(self)}, type={seq_type}{id_info})"

@@ -2,9 +2,7 @@
 
 [x] TranscriptsCollection method to save not only bed, but also GeneData to tsv
 
-[ ] GeneData binding optimisation - compute anything only on request, lazy attachments
-
-[ ] Add optional ID field for NucleotideSequence to streamline "to_fasta" method
+[x] Add nullable ID field for NucleotideSequence
 
 [x] write fasta - if width = 0 - just one line - one seq
 
@@ -19,8 +17,6 @@ slice and inteding - for codons too
 
 [x] SequencesCollectionClass with "is_aligned" field.
 
-[ ] add ambiguous nucleotide codes
-
 [x] support gz-ed inputs
 
 [ ] support gz-ed inputs, but this time good
@@ -31,6 +27,8 @@ slice and inteding - for codons too
 
 [x] better gtf parsing test - compare with actual kent tools output
 
+[ ] GeneData binding optimisation - compute anything only on request, lazy attachments
+
 [ ] gff3 reading
 
 [ ] tests for gff3 vs kenttools output
@@ -38,6 +36,8 @@ slice and inteding - for codons too
 [ ] Maf reader + respective Genome-Alignment-precursor structure (?)
 
 [ ] verbosity and logging system
+
+[ ] add ambiguous nucleotide codes
 
 [ ] revise metadata (what is helpful to add? Some API to work with metadata)
 

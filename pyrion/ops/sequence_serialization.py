@@ -21,6 +21,10 @@ def format_fasta_sequence(sequence_string: str, width: int = 80) -> str:
 
 def get_sequence_header(sequence: Any, index: Optional[int] = None) -> str:
     """Extract or generate FASTA header for a sequence object."""
+    if sequence.id:
+        return sequence.id
+    
+    # Fallback to metadata for backwards compatibility
     if hasattr(sequence, 'metadata') and sequence.metadata:
         if isinstance(sequence.metadata, dict):
             seq_id = sequence.metadata.get('sequence_id')

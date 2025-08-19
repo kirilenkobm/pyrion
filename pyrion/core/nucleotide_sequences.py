@@ -26,11 +26,12 @@ class NucleotideSequence:
     data: np.ndarray  # int8 array with nucleotide codes (preserves masking)
     is_rna: bool = False
     metadata: Optional[Metadata] = None
+    id: Optional[str] = None
 
     @classmethod
-    def from_string(cls, sequence: str, is_rna: bool = False, metadata: Optional[Metadata] = None) -> 'NucleotideSequence':
+    def from_string(cls, sequence: str, is_rna: bool = False, metadata: Optional[Metadata] = None, id: Optional[str] = None) -> 'NucleotideSequence':
         data = encode_nucleotides(sequence)
-        return cls(data=data, is_rna=is_rna, metadata=metadata)
+        return cls(data=data, is_rna=is_rna, metadata=metadata, id=id)
     
     def to_string(self) -> str:
         return decode_nucleotides(self.data, is_rna=self.is_rna)
@@ -47,36 +48,41 @@ class NucleotideSequence:
             seq_preview = seq_preview[:47] + "..."
         
         seq_type = "RNA" if self.is_rna else "DNA"
+        id_info = f", id='{self.id}'" if self.id else ""
         metadata_info = f", metadata={bool(self.metadata)}" if self.metadata else ""
-        return f"NucleotideSequence('{seq_preview}', len={len(self)}, type={seq_type}{metadata_info})"
+        return f"NucleotideSequence('{seq_preview}', len={len(self)}, type={seq_type}{id_info}{metadata_info})"
     
     def remove_gaps(self) -> 'NucleotideSequence':
         mask = ~np.array([is_gap(x) for x in self.data])
         return NucleotideSequence(
             data=self.data[mask],
             is_rna=self.is_rna,
-            metadata=self.metadata
+            metadata=self.metadata,
+            id=self.id
         )
 
     def slice(self, start: int, end: int) -> 'NucleotideSequence':
         return NucleotideSequence(
             data=self.data[start:end],
             is_rna=self.is_rna,
-            metadata=self.metadata
+            metadata=self.metadata,
+            id=self.id
         )
     
     def reverse(self) -> 'NucleotideSequence':
         return NucleotideSequence(
             data=self.data[::-1],
             is_rna=self.is_rna,
-            metadata=self.metadata
+            metadata=self.metadata,
+            id=self.id
         )
     
     def complement(self) -> 'NucleotideSequence':
         return NucleotideSequence(
             data=apply_complement(self.data),
             is_rna=self.is_rna,
-            metadata=self.metadata
+            metadata=self.metadata,
+            id=self.id
         )
     
 
@@ -85,7 +91,8 @@ class NucleotideSequence:
         return NucleotideSequence(
             data=self.data.copy(),
             is_rna=not self.is_rna,
-            metadata=self.metadata
+            metadata=self.metadata,
+            id=self.id
         )
     
     def to_codons(self):
@@ -105,7 +112,8 @@ class NucleotideSequence:
         return NucleotideSequence(
             data=rc_data,
             is_rna=self.is_rna,
-            metadata=self.metadata
+            metadata=self.metadata,
+            id=self.id
         )
     
     def merge(self, other: 'NucleotideSequence') -> 'NucleotideSequence':

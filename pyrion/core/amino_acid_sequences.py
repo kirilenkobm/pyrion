@@ -17,11 +17,12 @@ from ..utils.amino_acid_encoding import (
 class AminoAcidSequence:    
     data: np.ndarray  # int8 array with amino acid codes (preserves masking)
     metadata: Optional[Metadata] = None
+    id: Optional[str] = None
 
     @classmethod
-    def from_string(cls, sequence: str, metadata: Optional[Metadata] = None) -> 'AminoAcidSequence':
+    def from_string(cls, sequence: str, metadata: Optional[Metadata] = None, id: Optional[str] = None) -> 'AminoAcidSequence':
         data = encode_amino_acids(sequence)
-        return cls(data=data, metadata=metadata)
+        return cls(data=data, metadata=metadata, id=id)
     
     def to_string(self) -> str:
         return decode_amino_acids(self.data)
@@ -37,32 +38,37 @@ class AminoAcidSequence:
         if len(seq_preview) > 30:
             seq_preview = seq_preview[:27] + "..."
         
+        id_info = f", id='{self.id}'" if self.id else ""
         metadata_info = f", metadata={bool(self.metadata)}" if self.metadata else ""
-        return f"AminoAcidSequence('{seq_preview}', len={len(self)}{metadata_info})"
+        return f"AminoAcidSequence('{seq_preview}', len={len(self)}{id_info}{metadata_info})"
     
     def remove_gaps(self) -> 'AminoAcidSequence':
         mask = ~np.array([is_gap(x) for x in self.data])
         return AminoAcidSequence(
             data=self.data[mask],
-            metadata=self.metadata
+            metadata=self.metadata,
+            id=self.id
         )
 
     def slice(self, start: int, end: int) -> 'AminoAcidSequence':
         return AminoAcidSequence(
             data=self.data[start:end],
-            metadata=self.metadata
+            metadata=self.metadata,
+            id=self.id
         )
     
     def reverse(self) -> 'AminoAcidSequence':
         return AminoAcidSequence(
             data=self.data[::-1],
-            metadata=self.metadata
+            metadata=self.metadata,
+            id=self.id
         )
     
     def apply_masking(self) -> 'AminoAcidSequence':
         return AminoAcidSequence(
             data=apply_masking_aa(self.data),
-            metadata=self.metadata
+            metadata=self.metadata,
+            id=self.id
         )
 
     def to_fasta_string(self, width: int = 80, header: Optional[str] = None) -> str:
@@ -72,7 +78,8 @@ class AminoAcidSequence:
     def remove_masking(self) -> 'AminoAcidSequence':
         return AminoAcidSequence(
             data=remove_masking_aa(self.data),
-            metadata=self.metadata
+            metadata=self.metadata,
+            id=self.id
         )
     
     def get_masked_positions(self) -> np.ndarray:

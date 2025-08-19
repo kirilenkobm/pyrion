@@ -1,6 +1,6 @@
 # Pyrion API Reference
 
-**Generated:** 2025-08-10 01:06:42
+**Generated:** 2025-08-20 00:49:28
 
 Complete API reference with full docstrings and signatures.
 
@@ -305,15 +305,15 @@ Amino acid sequence representations and storage.
 
 ### AminoAcidSequence
 
-AminoAcidSequence(data: 'np.ndarray', metadata: 'Optional[Metadata]' = None)
+AminoAcidSequence(data: 'np.ndarray', metadata: 'Optional[Metadata]' = None, id: 'Optional[str]' = None)
 
-**Signature:** `(self, data: 'np.ndarray', metadata: 'Optional[Metadata]' = None) -> None`
+**Signature:** `(self, data: 'np.ndarray', metadata: 'Optional[Metadata]' = None, id: 'Optional[str]' = None) -> None`
 
 #### Methods
 
 **__init__**
 
-*Signature:* `(self, data: 'np.ndarray', metadata: 'Optional[Metadata]' = None) -> None`
+*Signature:* `(self, data: 'np.ndarray', metadata: 'Optional[Metadata]' = None, id: 'Optional[str]' = None) -> None`
 
 Initialize self.  See help(type(self)) for accurate signature.
 
@@ -353,7 +353,7 @@ Find positions of stop codons in the sequence.
 
 **from_string**
 
-*Signature:* `(sequence: 'str', metadata: 'Optional[Metadata]' = None) -> "'AminoAcidSequence'"`
+*Signature:* `(sequence: 'str', metadata: 'Optional[Metadata]' = None, id: 'Optional[str]' = None) -> "'AminoAcidSequence'"`
 
 
 **get_amino_acid_content**
@@ -525,13 +525,13 @@ Check if codon has exactly 3 non-gap symbols.
 
 Codon sequence wrapper around NucleotideSequence with codon-wise operations.
 
-**Signature:** `(self, nucleotide_sequence)`
+**Signature:** `(self, nucleotide_sequence, id: Optional[str] = None)`
 
 #### Methods
 
 **__init__**
 
-*Signature:* `(self, nucleotide_sequence)`
+*Signature:* `(self, nucleotide_sequence, id: Optional[str] = None)`
 
 Initialize from a NucleotideSequence object.
 
@@ -1631,15 +1631,15 @@ Sequence representations and storage.
 
 ### NucleotideSequence
 
-NucleotideSequence(data: 'np.ndarray', is_rna: 'bool' = False, metadata: 'Optional[Metadata]' = None)
+NucleotideSequence(data: 'np.ndarray', is_rna: 'bool' = False, metadata: 'Optional[Metadata]' = None, id: 'Optional[str]' = None)
 
-**Signature:** `(self, data: 'np.ndarray', is_rna: 'bool' = False, metadata: 'Optional[Metadata]' = None) -> None`
+**Signature:** `(self, data: 'np.ndarray', is_rna: 'bool' = False, metadata: 'Optional[Metadata]' = None, id: 'Optional[str]' = None) -> None`
 
 #### Methods
 
 **__init__**
 
-*Signature:* `(self, data: 'np.ndarray', is_rna: 'bool' = False, metadata: 'Optional[Metadata]' = None) -> None`
+*Signature:* `(self, data: 'np.ndarray', is_rna: 'bool' = False, metadata: 'Optional[Metadata]' = None, id: 'Optional[str]' = None) -> None`
 
 Initialize self.  See help(type(self)) for accurate signature.
 
@@ -1665,7 +1665,7 @@ Return str(self).
 
 **from_string**
 
-*Signature:* `(sequence: 'str', is_rna: 'bool' = False, metadata: 'Optional[Metadata]' = None) -> "'NucleotideSequence'"`
+*Signature:* `(sequence: 'str', is_rna: 'bool' = False, metadata: 'Optional[Metadata]' = None, id: 'Optional[str]' = None) -> "'NucleotideSequence'"`
 
 
 **get_masked_positions**
@@ -1890,7 +1890,7 @@ D.keys() -> a set-like object providing a view on D's keys
 
 **pop**
 
-*Signature:* `(self, key, default=<object object at 0x1012301a0>)`
+*Signature:* `(self, key, default=<object object at 0x1008b81a0>)`
 
 D.pop(k[,d]) -> v, remove specified key and return the corresponding value.
 If key is not found, d is returned if given, otherwise KeyError is raised.
