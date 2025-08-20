@@ -277,26 +277,28 @@ class TranscriptsCollection:
         self._chrom_index: Optional[Dict[str, List[int]]] = None  # chrom → indices
         self._gene_data: Optional['GeneData'] = None
         self._genes_cache: Optional[Dict[str, Gene]] = None
-        self._applied_biotypes: bool = False
-        self._applied_gene_names: bool = False
 
     def __len__(self):
         return len(self.transcripts)
 
     def __getitem__(self, idx: int) -> Transcript:
-        return self.transcripts[idx]
+        transcript = self.transcripts[idx]
+        return self._enrich_transcript(transcript)
 
     def get_by_id(self, transcript_id: str) -> Optional[Transcript]:
         if self._id_index is None:
             self._build_id_index()
         idx = self._id_index.get(transcript_id)
-        return self.transcripts[idx] if idx is not None else None
+        if idx is not None:
+            transcript = self.transcripts[idx]
+            return self._enrich_transcript(transcript)
+        return None
 
     def get_by_chrom(self, chrom: str) -> List[Transcript]:
         if self._chrom_index is None:
             self._build_chrom_index()
         indices = self._chrom_index.get(chrom, [])
-        return [self.transcripts[i] for i in indices]
+        return [self._enrich_transcript(self.transcripts[i]) for i in indices]
 
     def get_all_chromosomes(self) -> List[str]:
         if self._chrom_index is None:
@@ -326,42 +328,30 @@ class TranscriptsCollection:
     def bind_gene_data(self, gene_data: 'GeneData') -> None:
         self._gene_data = gene_data
         self._genes_cache = None  # Clear cache when binding new data
-        self._applied_biotypes = False
-        self._applied_gene_names = False
-        
-        # Apply transcript biotypes if available
-        if gene_data.has_biotype_mapping():
-            self._apply_transcript_biotypes()
-        
-        # Apply gene names if we have gene-transcript mapping and gene names
-        if gene_data.has_gene_transcript_mapping() and gene_data.has_gene_name_mapping():
-            self._applied_gene_names = True  # Will be applied when building genes cache
 
-    def _apply_transcript_biotypes(self) -> None:
-        if self._gene_data is None or not self._gene_data.has_biotype_mapping():
-            return
+    def _enrich_transcript(self, transcript: Transcript) -> Transcript:
+        """Apply gene data to a single transcript (lazy evaluation)."""
+        if self._gene_data is None:
+            return transcript
         
-        updated_transcripts = []
-        for transcript in self.transcripts:
+        # Apply biotype if available and not already set
+        biotype = transcript.biotype
+        if biotype is None and self._gene_data.has_biotype_mapping():
             biotype = self._gene_data.get_transcript_biotype(transcript.id)
-            if biotype is not None and transcript.biotype is None:
-                updated_transcript = Transcript(
-                    blocks=transcript.blocks,
-                    strand=transcript.strand,
-                    chrom=transcript.chrom,
-                    id=transcript.id,
-                    cds_start=transcript.cds_start,
-                    cds_end=transcript.cds_end,
-                    biotype=biotype
-                )
-                updated_transcripts.append(updated_transcript)
-            else:
-                updated_transcripts.append(transcript)
         
-        self.transcripts = updated_transcripts
-        self._applied_biotypes = True
-        self._id_index = None
-        self._chrom_index = None
+        # Only create new transcript if we have changes
+        if biotype is not None and biotype != transcript.biotype:
+            return Transcript(
+                blocks=transcript.blocks,
+                strand=transcript.strand,
+                chrom=transcript.chrom,
+                id=transcript.id,
+                cds_start=transcript.cds_start,
+                cds_end=transcript.cds_end,
+                biotype=biotype
+            )
+        
+        return transcript
 
     def _build_genes_cache(self):
         if not self.has_gene_mapping:
@@ -384,7 +374,7 @@ class TranscriptsCollection:
             
             if gene_transcripts:
                 gene_name = None
-                if self._applied_gene_names and self._gene_data.has_gene_name_mapping():
+                if self._gene_data.has_gene_name_mapping():
                     gene_name = self._gene_data.get_gene_name(gene_id)
                 
                 genes_dict[gene_id] = Gene(gene_id, gene_transcripts, gene_name=gene_name)
@@ -466,13 +456,15 @@ class TranscriptsCollection:
             mappings.append("gene-name")
         return mappings
     
-    @property 
+    @property
     def applied_biotypes(self) -> bool:
-        return self._applied_biotypes
+        return getattr(self, '_applied_biotypes', False)
     
     @property
     def applied_gene_names(self) -> bool:
-        return self._applied_gene_names
+        return getattr(self, '_applied_gene_names', False)
+    
+
 
     def canonize_transcripts(self, canonizer_func: Optional[Callable] = None, **kwargs) -> None:
         from .genes_auxiliary import set_canonical_transcripts_for_collection

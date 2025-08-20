@@ -1,6 +1,6 @@
 # Pyrion API Reference
 
-**Generated:** 2025-08-20 00:49:28
+**Generated:** 2025-08-20 16:51:39
 
 Complete API reference with full docstrings and signatures.
 
@@ -138,22 +138,16 @@ Disable all parallel processing by setting max_cores to 0.
 
 Enable parallel processing.
 
-Args:
-    max_cores: Maximum cores to use. If None, uses default (min(available, 8)).
 
+**set_log_level**
 
-**get_optimal_processes**
+*Signature:* `(self, level: Union[str, int]) -> None`
 
-*Signature:* `(self, n_items: int, max_processes: Optional[int] = None) -> int`
-
-Determine optimal number of processes based on data size and configuration.
+Configure logging for the pyrion package.
 
 Args:
-    n_items: Number of items to process
-    max_processes: Override max processes for this call
-
-Returns:
-    Optimal number of processes (0 means use sequential processing)
+    level: Logging level as string ("DEBUG", "INFO", "WARNING", "ERROR") 
+          or int (logging.DEBUG, logging.INFO, etc.)
 
 
 **summary**
@@ -237,14 +231,24 @@ Get the minimum number of items required for parallel processing.
 Check if multiprocessing is available.
 
 
+### set_loglevel
+
+**Signature:** `(level: Union[str, int]) -> None`
+
+Set logging level for the pyrion package.
+
+Examples:
+    >>> import pyrion
+    >>> pyrion.set_loglevel("INFO")     # Enable info-level logging
+    >>> pyrion.set_loglevel("DEBUG")    # Enable debug-level logging  
+    >>> pyrion.set_loglevel("WARNING")  # Enable warning+ only
+
+
 ### set_max_cores
 
 **Signature:** `(cores: int) -> None`
 
 Set the maximum number of cores to use for parallel processing.
-
-Args:
-    cores: Number of cores to use (1 to available_cores, or 0 to disable)
 
 
 ### set_min_items_for_parallel
@@ -1760,6 +1764,9 @@ Toggle between DNA and RNA (T <-> U).
 
 Sequence type detection.
 
+Uses integer values for efficient C function calls while maintaining
+string compatibility through the string_value property.
+
 **Signature:** `(self, /, *args, **kwargs)`
 
 
@@ -1890,7 +1897,7 @@ D.keys() -> a set-like object providing a view on D's keys
 
 **pop**
 
-*Signature:* `(self, key, default=<object object at 0x1008b81a0>)`
+*Signature:* `(self, key, default=<object object at 0x102e001a0>)`
 
 D.pop(k[,d]) -> v, remove specified key and return the corresponding value.
 If key is not found, d is returned if given, otherwise KeyError is raised.

@@ -497,9 +497,9 @@ class TestProteinSequenceSupport(TestFixtures):
         assert hasattr(SequenceType, 'RNA') 
         assert hasattr(SequenceType, 'PROTEIN')
         
-        assert SequenceType.DNA.value == "dna"
-        assert SequenceType.RNA.value == "rna"
-        assert SequenceType.PROTEIN.value == "protein"
+        assert SequenceType.DNA.string_value == "dna"
+        assert SequenceType.RNA.string_value == "rna"
+        assert SequenceType.PROTEIN.string_value == "protein"
     
     def test_protein_fasta_with_mixed_content(self):
         """Test protein FASTA with various amino acid characters."""

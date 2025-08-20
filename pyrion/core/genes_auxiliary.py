@@ -189,27 +189,36 @@ def filter_transcripts_in_interval(transcripts_collection, interval: GenomicInte
     
     if not chrom_transcripts:
         from .genes import TranscriptsCollection
-        return TranscriptsCollection(
+        empty_collection = TranscriptsCollection(
             transcripts=[], 
             source_file=transcripts_collection.source_file
         )
+        if transcripts_collection._gene_data is not None:
+            empty_collection.bind_gene_data(transcripts_collection._gene_data)
+        return empty_collection
     
     for transcript in chrom_transcripts:
         transcript_interval = transcript.transcript_interval
         
         if include_partial:
             if transcript_interval.intersects(interval):
-                filtered_transcripts.append(transcript)
+                enriched_transcript = transcripts_collection._enrich_transcript(transcript)
+                filtered_transcripts.append(enriched_transcript)
         else:
             if (transcript_interval.start >= interval.start and
                 transcript_interval.end <= interval.end):
-                filtered_transcripts.append(transcript)
+                enriched_transcript = transcripts_collection._enrich_transcript(transcript)
+                filtered_transcripts.append(enriched_transcript)
     
     from .genes import TranscriptsCollection
-    return TranscriptsCollection(
+    subcollection = TranscriptsCollection(
         transcripts=filtered_transcripts, 
         source_file=transcripts_collection.source_file
     )
+
+    if transcripts_collection._gene_data is not None:
+        subcollection.bind_gene_data(transcripts_collection._gene_data)
+    return subcollection
 
 
 def set_canonical_transcripts_for_collection(transcripts_collection, canonizer_func: Optional[Callable] = None, **kwargs) -> None:
@@ -244,10 +253,14 @@ def get_canonical_transcripts_from_collection(transcripts_collection, canonizer_
             canonical_transcripts.append(canonical_transcript)
     
     from .genes import TranscriptsCollection
-    return TranscriptsCollection(
+    canonical_collection = TranscriptsCollection(
         transcripts=canonical_transcripts,
         source_file=transcripts_collection.source_file
     )
+
+    if transcripts_collection._gene_data is not None:
+        canonical_collection.bind_gene_data(transcripts_collection._gene_data)
+    return canonical_collection
 
 
 def get_canonical_transcripts_only_from_collection(transcripts_collection):

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Optional
-from enum import Enum
+from enum import IntEnum
 import numpy as np
 
 from ..core_types import Metadata
@@ -14,11 +14,24 @@ from ..utils.encoding import (
 )
 
 
-class SequenceType(Enum):
-    """Sequence type detection."""
-    DNA = "dna"
-    RNA = "rna"
-    PROTEIN = "protein" 
+class SequenceType(IntEnum):
+    """Sequence type detection.
+    
+    Uses integer values for efficient C function calls while maintaining
+    string compatibility through the string_value property.
+    """
+    DNA = 0
+    RNA = 1  
+    PROTEIN = 2
+    
+    @property
+    def string_value(self) -> str:
+        """Return string representation for compatibility."""
+        return {
+            SequenceType.DNA: "dna",
+            SequenceType.RNA: "rna", 
+            SequenceType.PROTEIN: "protein"
+        }[self] 
 
 
 @dataclass(frozen=True)

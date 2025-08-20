@@ -1,5 +1,5 @@
 PYRION API INDEX
-Generated: 2025-08-20 00:49:28
+Generated: 2025-08-20 16:51:39
 Concise reference with type signatures only.
 ============================================================
 
@@ -21,7 +21,7 @@ MODULE pyrion.config
     __init__(self)
     disable_parallel(self) -> None
     enable_parallel(self, max_cores: Optional[int] = None) -> None
-    get_optimal_processes(self, n_items: int, max_processes: Optional[int] = None) -> int
+    set_log_level(self, level: Union[str, int]) -> None
     summary(self) -> dict
     available_cores -> int
     max_cores -> int
@@ -34,6 +34,7 @@ MODULE pyrion.config
   FUNCTION get_max_cores() -> int
   FUNCTION get_min_items_for_parallel() -> int
   FUNCTION is_multiprocessing_available() -> bool
+  FUNCTION set_loglevel(level: Union[str, int]) -> None
   FUNCTION set_max_cores(cores: int) -> None
   FUNCTION set_min_items_for_parallel(items: int) -> None
 MODULE pyrion.constants
@@ -323,7 +324,7 @@ MODULE pyrion.core.sequences_collection
     ids(self) -> 'List[str]'
     items(self)
     keys(self)
-    pop(self, key, default=<object object at 0x1008b81a0>)
+    pop(self, key, default=<object object at 0x102e001a0>)
     popitem(self)
     sequences(self) -> 'List[SequenceLike]'
     setdefault(self, key, default=None)

@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from typing import Dict, Union, List, Mapping
 from pathlib import Path
-from enum import IntEnum
+# IntEnum no longer needed - using SequenceType directly
 
 log = logging.getLogger("pyrion.io.fasta")
 
@@ -15,13 +15,6 @@ from ..core.amino_acid_sequences import AminoAcidSequence
 from ..core.fai import FaiStore
 from ..core.intervals import GenomicInterval
 from ..core.sequences_collection import SequencesCollection
-
-
-class _SequenceTypeMapping(IntEnum):
-    DNA = 0
-    RNA = 1
-    PROTEIN = 2
-
 
 class FastaAccessor:
     def __init__(self, fasta_file: Union[str, Path], fai_store: FaiStore):
@@ -154,19 +147,13 @@ def read_fasta(
     return_dict: bool = True
 ) -> Union[SequencesCollection, List[Union[NucleotideSequence, AminoAcidSequence]]]:
     filename = str(filename)
-    log.debug("Reading FASTA file: %s (type: %s, return_dict: %s)", filename, sequence_type.value, return_dict)
-    type_mapping = {
-        SequenceType.DNA: _SequenceTypeMapping.DNA,
-        SequenceType.RNA: _SequenceTypeMapping.RNA,
-        SequenceType.PROTEIN: _SequenceTypeMapping.PROTEIN
-    }
     
-    if sequence_type not in type_mapping:
+    if not isinstance(sequence_type, SequenceType):
         raise ValueError(f"Invalid sequence_type: {sequence_type}")
     
-    internal_type = type_mapping[sequence_type]
+    log.debug("Reading FASTA file: %s (type: %s, return_dict: %s)", filename, sequence_type.string_value, return_dict)
     
-    raw_sequences = parse_fasta_fast(filename, internal_type)
+    raw_sequences = parse_fasta_fast(filename, sequence_type)
     sequences = SequencesCollection()
     sequence_list: List[Union[NucleotideSequence, AminoAcidSequence]] = []
     
@@ -175,14 +162,14 @@ def read_fasta(
     for header, encoded_array, seq_type in raw_sequences:
         seq_id = header.strip()
         
-        if seq_type == _SequenceTypeMapping.PROTEIN:
+        if seq_type == SequenceType.PROTEIN:
             sequence_obj = AminoAcidSequence(
                 data=encoded_array,
                 metadata={'sequence_id': seq_id, 'source_file': filename},
                 id=seq_id
             )
         else:
-            is_rna = (seq_type == _SequenceTypeMapping.RNA)
+            is_rna = (seq_type == SequenceType.RNA)
             sequence_obj = NucleotideSequence(
                 data=encoded_array,
                 is_rna=is_rna,
