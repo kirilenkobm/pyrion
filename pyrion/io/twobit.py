@@ -60,7 +60,7 @@ class TwoBitAccessor:
                              f"Chromosome size: {chrom_size}")
         
         try:
-            seq_str = self._backend.sequence(chrom, start, end)
+            seq_str = self._backend.sequence(chrom, int(start), int(end))
         except Exception as e:
             raise RuntimeError(f"Failed to fetch {chrom}:{start}-{end} from {self.file_path}: {e}") from e
         

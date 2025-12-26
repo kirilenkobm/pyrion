@@ -24,6 +24,7 @@ class Transcript:
     cds_start: Optional[int] = None
     cds_end: Optional[int] = None
     biotype: Optional[str] = None
+    # TODO: just start and end too @cached_property
 
     @property
     def is_coding(self) -> bool:
@@ -46,6 +47,9 @@ class Transcript:
     @cached_property
     def transcript_cds_interval(self) -> GenomicInterval:
         return genes_auxiliary.get_transcript_cds_interval(self)
+
+    def exons(self) -> np.ndarray:
+        return self.blocks
 
     @cached_property
     def cds_blocks(self) -> np.ndarray:

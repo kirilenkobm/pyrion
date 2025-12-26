@@ -53,7 +53,7 @@ Use everywhere.
 
 [ ] revise metadata (what is helpful to add? Some API to work with metadata)
 
- Metadata as Mapping[str, Any] + namespaces (sample:…, aligner:…). JSON sidecar.
+Metadata as Mapping[str, Any] + namespaces (sample:…, aligner:…). JSON sidecar.
 
 # Tier 2 – “Batteries included” operations (v0.4–v0.6)
 
