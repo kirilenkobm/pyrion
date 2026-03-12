@@ -3,15 +3,8 @@
 from typing import List, Optional, Tuple, Dict
 import numpy as np
 
-from pyrion import GenomicInterval
-
-try:
-    import numba
-    HAS_NUMBA = True
-except ImportError:
-    HAS_NUMBA = False
-
 from .. import GenomeAlignment, Transcript
+from ..config import HAS_NUMBA, njit
 from ..core.intervals import GenomicInterval
 from ..core.strand import Strand
 
@@ -34,7 +27,7 @@ def _project_intervals_vectorized(intervals: np.ndarray, chain_blocks: np.ndarra
         return _project_intervals_numpy(intervals, chain_blocks)
 
 
-@numba.njit if HAS_NUMBA else lambda f: f
+@njit
 def _project_intervals_numba(intervals: np.ndarray, chain_blocks: np.ndarray) -> List[np.ndarray]:
     results = []
     

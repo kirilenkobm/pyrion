@@ -1,7 +1,7 @@
 """Low-level interval slicing and manipulation operations."""
 
 import numpy as np
-from numba import njit
+from ..config import njit
 
 
 @njit

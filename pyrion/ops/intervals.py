@@ -3,7 +3,7 @@
 from collections import defaultdict
 from typing import Dict, List, Tuple, Any, Optional
 import numpy as np
-from numba import njit
+from ..config import njit
 
 from ..core.intervals import GenomicInterval
 from ..core.strand import Strand

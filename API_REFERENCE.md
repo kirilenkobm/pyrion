@@ -1,6 +1,6 @@
 # Pyrion API Reference
 
-**Generated:** 2025-08-20 16:51:39
+**Generated:** 2026-03-12 15:53:37
 
 Complete API reference with full docstrings and signatures.
 
@@ -229,6 +229,13 @@ Get the minimum number of items required for parallel processing.
 **Signature:** `() -> bool`
 
 Check if multiprocessing is available.
+
+
+### njit
+
+**Signature:** `(func)`
+
+No-op decorator used as njit fallback when numba is unavailable.
 
 
 ### set_loglevel
@@ -947,6 +954,22 @@ Return str(self).
 *Signature:* `(self, interval: pyrion.core.intervals.GenomicInterval) -> bool`
 
 
+**exons**
+
+*Signature:* `(self) -> numpy.ndarray`
+
+
+**from_intervals_collection**
+
+*Signature:* `(collection: pyrion.core.intervals.GenomicIntervalsCollection, transcript_id: str, cds_start: Optional[int] = None, cds_end: Optional[int] = None, biotype: Optional[str] = None) -> 'Transcript'`
+
+Create a Transcript from a GenomicIntervalsCollection.
+
+The collection already guarantees same chrom, same strand, and
+sorted-by-start blocks. This method additionally validates that
+blocks do not overlap.
+
+
 **get_annotated_regions**
 
 *Signature:* `(self, chrom_sizes: dict, flank_size: int = 5000) -> pyrion.core.intervals.AnnotatedIntervalSet`
@@ -1016,6 +1039,35 @@ gene_to_canonical: Dictionary mapping gene IDs to canonical transcript IDs
 *Signature:* `(self, canonizer_func: Optional[Callable] = None, **kwargs) -> None`
 
 
+**copy_with_remapped_ids**
+
+*Signature:* `(self, id_mapping: Union[Dict[str, str], Callable[[str], str]], source_file: Optional[str] = None) -> 'TranscriptsCollection'`
+
+Return a new collection with the same transcripts but different IDs.
+
+IDs are immutable on Transcript, so this creates new Transcript copies
+with the requested IDs. See pyrion.ops.transformations.remap_transcript_ids.
+
+
+**filter_by_biotype**
+
+*Signature:* `(self, biotype: Union[str, List[str], Set[str]]) -> 'TranscriptsCollection'`
+
+Return a new collection containing only transcripts with the given biotype(s).
+
+Accepts a single biotype string or a collection of biotype strings.
+Uses bound GeneData for biotype when transcript.biotype is not set.
+
+
+**filter_by_chroms**
+
+*Signature:* `(self, chroms: Union[str, List[str], Set[str]]) -> 'TranscriptsCollection'`
+
+Return a new subcollection containing only transcripts on the given chromosome(s).
+
+Carries over bound GeneData and source_file from the parent collection.
+
+
 **from_json**
 
 *Signature:* `(file_path: Union[str, pathlib.Path]) -> 'TranscriptsCollection'`
@@ -1024,6 +1076,13 @@ gene_to_canonical: Dictionary mapping gene IDs to canonical transcript IDs
 **get_all_chromosomes**
 
 *Signature:* `(self) -> List[str]`
+
+
+**get_by_biotype**
+
+*Signature:* `(self, biotype: Union[str, List[str], Set[str]]) -> 'TranscriptsCollection'`
+
+Alias for filter_by_biotype.
 
 
 **get_by_chrom**
@@ -1138,6 +1197,16 @@ Auxiliary functions for gene and transcript objects.
 **Signature:** `(transcript, flank_size: int, chrom_sizes: Dict[str, int]) -> Tuple[Optional[pyrion.core.intervals.GenomicInterval], Optional[pyrion.core.intervals.GenomicInterval]]`
 
 Get flanking regions of specified size around a transcript.
+
+
+### filter_transcripts_by_biotype
+
+**Signature:** `(transcripts_collection, biotypes)`
+
+Return a new TranscriptsCollection with only transcripts matching the given biotype(s).
+
+Args:
+    biotypes: A set of biotype strings to keep.
 
 
 ### filter_transcripts_in_interval
@@ -1603,9 +1672,25 @@ Create collection from list of GenomicInterval objects.
 
 ### RegionType
 
-An enumeration.
+Enum where members are also (and must be) ints
 
-**Signature:** `(self, /, *args, **kwargs)`
+**Signature:** `(self, *args, **kwds)`
+
+#### Methods
+
+**__init__**
+
+*Signature:* `(self, *args, **kwds)`
+
+Initialize self.  See help(type(self)) for accurate signature.
+
+
+**__repr__**
+
+*Signature:* `(self)`
+
+Return repr(self).
+
 
 
 ---
@@ -1767,7 +1852,23 @@ Sequence type detection.
 Uses integer values for efficient C function calls while maintaining
 string compatibility through the string_value property.
 
-**Signature:** `(self, /, *args, **kwargs)`
+**Signature:** `(self, *args, **kwds)`
+
+#### Methods
+
+**__init__**
+
+*Signature:* `(self, *args, **kwds)`
+
+Initialize self.  See help(type(self)) for accurate signature.
+
+
+**__repr__**
+
+*Signature:* `(self)`
+
+Return repr(self).
+
 
 
 ---
@@ -1897,7 +1998,7 @@ D.keys() -> a set-like object providing a view on D's keys
 
 **pop**
 
-*Signature:* `(self, key, default=<object object at 0x102e001a0>)`
+*Signature:* `(self, key, default=<object object at 0x1037181d0>)`
 
 D.pop(k[,d]) -> v, remove specified key and return the corresponding value.
 If key is not found, d is returned if given, otherwise KeyError is raised.
@@ -1935,7 +2036,7 @@ Slice all sequences consistently. Requires aligned collection.
 *Signature:* `(self, other=(), /, **kwds)`
 
 D.update([E, ]**F) -> None.  Update D from mapping/iterable E and F.
-If E present and has a .keys() method, does:     for k in E: D[k] = E[k]
+If E present and has a .keys() method, does:     for k in E.keys(): D[k] = E[k]
 If E present and lacks .keys() method, does:     for (k, v) in E: D[k] = v
 In either case, this is followed by: for k, v in F.items(): D[k] = v
 
@@ -1965,9 +2066,32 @@ D.values() -> an object providing a view on D's values
 
 ### Strand
 
-An enumeration.
+Enum where members are also (and must be) ints
 
-**Signature:** `(self, /, *args, **kwargs)`
+**Signature:** `(self, *args, **kwds)`
+
+#### Methods
+
+**__init__**
+
+*Signature:* `(self, *args, **kwds)`
+
+Initialize self.  See help(type(self)) for accurate signature.
+
+
+**__repr__**
+
+*Signature:* `(self)`
+
+Return repr(self).
+
+
+**__str__**
+
+*Signature:* `(self) -> str`
+
+Return repr(self).
+
 
 
 ---
@@ -2044,7 +2168,7 @@ Shared types, enums, and protocols for pyrion.
 
 Enumeration for exon types in genomic annotations.
 
-**Signature:** `(self, /, *args, **kwargs)`
+**Signature:** `(self, *args, **kwds)`
 
 
 ---
@@ -2343,7 +2467,7 @@ Return repr(self).
 
 **fetch**
 
-*Signature:* `(self, chrom: str, start: int, end: int, strand: pyrion.core.strand.Strand = <Strand.PLUS: 1>) -> pyrion.core.nucleotide_sequences.NucleotideSequence`
+*Signature:* `(self, chrom: str, start: Optional[int] = None, end: Optional[int] = None, strand: pyrion.core.strand.Strand = <Strand.PLUS: 1>) -> pyrion.core.nucleotide_sequences.NucleotideSequence`
 
 
 **fetch_interval**
@@ -2867,6 +2991,11 @@ Convert 2D numpy array of [start, end] pairs to list of GenomicInterval objects.
 **Signature:** `(chains: List, for_q: bool = False) -> Tuple[numpy.ndarray, numpy.ndarray]`
 
 
+### compute_intersections_core
+
+**Signature:** `(sorted1, sorted2, sorted_idx1, sorted_idx2)`
+
+
 ### compute_overlap_size
 
 **Signature:** `(start1: int, end1: int, start2: int, end2: int) -> int`
@@ -3073,6 +3202,34 @@ Data transformation utilities for converting between different genomic data type
 Convert a list of GenomicInterval objects to a TranscriptsCollection.
 
 May be helpful if bed-6 formatted data is needed as is was bed-12.
+
+
+### remap_transcript_ids
+
+**Signature:** `(collection: pyrion.core.genes.TranscriptsCollection, id_mapping: Union[Dict[str, str], Callable[[str], str]], source_file: Optional[str] = None) -> pyrion.core.genes.TranscriptsCollection`
+
+Build a new TranscriptsCollection with the same transcripts but new IDs.
+
+Transcript IDs are immutable (Transcript is a frozen dataclass), so this
+creates new Transcript instances that are copies except for the id field,
+and returns a new collection containing them.
+
+Args:
+    collection: The source TranscriptsCollection.
+    id_mapping: Either a dict (old_id -> new_id) or a callable that takes
+        the old transcript id and returns the new one.
+    source_file: Optional source_file for the new collection. If None,
+        the original collection's source_file is not carried over.
+
+Returns:
+    A new TranscriptsCollection with the same transcripts and remapped IDs.
+
+Example:
+    # Prefix every ID
+    new_coll = remap_transcript_ids(coll, lambda tid: f"custom_{tid}")
+
+    # Explicit mapping
+    new_coll = remap_transcript_ids(coll, {"ENST1": "my_ENST1", "ENST2": "my_ENST2"})
 
 
 ---
@@ -3487,9 +3644,44 @@ Initialize self.  See help(type(self)) for accurate signature.
 
 ### TrackType
 
-An enumeration.
+Create a collection of name/value pairs.
 
-**Signature:** `(self, /, *args, **kwargs)`
+Example enumeration:
+
+>>> class Color(Enum):
+...     RED = 1
+...     BLUE = 2
+...     GREEN = 3
+
+Access them by:
+
+- attribute access:
+
+  >>> Color.RED
+  <Color.RED: 1>
+
+- value lookup:
+
+  >>> Color(1)
+  <Color.RED: 1>
+
+- name lookup:
+
+  >>> Color['RED']
+  <Color.RED: 1>
+
+Enumerations can be iterated over, and know how many members they have:
+
+>>> len(Color)
+3
+
+>>> list(Color)
+[<Color.RED: 1>, <Color.BLUE: 2>, <Color.GREEN: 3>]
+
+Methods can be added to enumerations, and members can have their own
+attributes -- see the documentation for details.
+
+**Signature:** `(self, *args, **kwds)`
 
 
 ### TranscriptFeature

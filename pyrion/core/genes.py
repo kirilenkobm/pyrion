@@ -9,7 +9,7 @@ from pathlib import Path
 
 from .genes_auxiliary import build_annotated_regions
 from .strand import Strand
-from .intervals import GenomicInterval, AnnotatedIntervalSet
+from .intervals import GenomicInterval, GenomicIntervalsCollection, AnnotatedIntervalSet
 from . import genes_auxiliary
 
 _region_cache = WeakKeyDictionary()
@@ -24,7 +24,45 @@ class Transcript:
     cds_start: Optional[int] = None
     cds_end: Optional[int] = None
     biotype: Optional[str] = None
-    # TODO: just start and end too @cached_property
+
+    @classmethod
+    def from_intervals_collection(
+        cls,
+        collection: GenomicIntervalsCollection,
+        transcript_id: str,
+        cds_start: Optional[int] = None,
+        cds_end: Optional[int] = None,
+        biotype: Optional[str] = None,
+    ) -> 'Transcript':
+        """Create a Transcript from a GenomicIntervalsCollection.
+
+        The collection already guarantees same chrom, same strand, and
+        sorted-by-start blocks. This method additionally validates that
+        blocks do not overlap.
+        """
+        if collection.is_empty():
+            raise ValueError("Cannot create Transcript from empty collection")
+
+        blocks = collection.array
+        if len(blocks) > 1:
+            ends = blocks[:-1, 1]
+            next_starts = blocks[1:, 0]
+            if np.any(ends > next_starts):
+                first = int(np.argmax(ends > next_starts))
+                raise ValueError(
+                    f"Overlapping blocks: block {first} ends at {blocks[first, 1]} "
+                    f"but block {first + 1} starts at {blocks[first + 1, 0]}"
+                )
+
+        return cls(
+            blocks=blocks.copy(),
+            strand=collection.strand,
+            chrom=collection.chrom,
+            id=transcript_id,
+            cds_start=cds_start,
+            cds_end=cds_end,
+            biotype=biotype,
+        )
 
     @property
     def is_coding(self) -> bool:
@@ -39,6 +77,14 @@ class Transcript:
         if len(self.blocks) == 0:
             raise ValueError("Cannot compute transcript span for transcript with no blocks")
         return np.array([self.blocks[:, 0].min(), self.blocks[:, 1].max()], dtype=np.int32)
+
+    @cached_property
+    def start(self) -> int:
+        return int(self.transcript_span[0])
+
+    @cached_property
+    def end(self) -> int:
+        return int(self.transcript_span[1])
 
     @cached_property
     def transcript_interval(self) -> GenomicInterval:
@@ -285,6 +331,11 @@ class TranscriptsCollection:
     def __len__(self):
         return len(self.transcripts)
 
+    def __iter__(self):
+        """Iterate over transcripts with bound metadata applied (biotype, etc.)."""
+        for i in range(len(self.transcripts)):
+            yield self._enrich_transcript(self.transcripts[i])
+
     def __getitem__(self, idx: int) -> Transcript:
         transcript = self.transcripts[idx]
         return self._enrich_transcript(transcript)
@@ -304,6 +355,47 @@ class TranscriptsCollection:
         indices = self._chrom_index.get(chrom, [])
         return [self._enrich_transcript(self.transcripts[i]) for i in indices]
 
+    def filter_by_chroms(self, chroms: Union[str, List[str], Set[str]]) -> 'TranscriptsCollection':
+        """Return a new subcollection containing only transcripts on the given chromosome(s).
+
+        Carries over bound GeneData and source_file from the parent collection.
+        """
+        if isinstance(chroms, str):
+            chroms = {chroms}
+        else:
+            chroms = set(chroms)
+
+        if self._chrom_index is None:
+            self._build_chrom_index()
+
+        indices = []
+        for chrom in chroms:
+            indices.extend(self._chrom_index.get(chrom, []))
+        indices.sort()
+
+        filtered = [self.transcripts[i] for i in indices]
+        new_collection = TranscriptsCollection(transcripts=filtered, source_file=self.source_file)
+        if self._gene_data is not None:
+            new_collection.bind_gene_data(self._gene_data)
+        return new_collection
+
+    def filter_by_biotype(self, biotype: Union[str, List[str], Set[str]]) -> 'TranscriptsCollection':
+        """Return a new collection containing only transcripts with the given biotype(s).
+
+        Accepts a single biotype string or a collection of biotype strings.
+        Uses bound GeneData for biotype when transcript.biotype is not set.
+        """
+        from .genes_auxiliary import filter_transcripts_by_biotype
+        if isinstance(biotype, str):
+            biotype = {biotype}
+        else:
+            biotype = set(biotype)
+        return filter_transcripts_by_biotype(self, biotype)
+
+    def get_by_biotype(self, biotype: Union[str, List[str], Set[str]]) -> 'TranscriptsCollection':
+        """Alias for filter_by_biotype."""
+        return self.filter_by_biotype(biotype)
+
     def get_all_chromosomes(self) -> List[str]:
         if self._chrom_index is None:
             self._build_chrom_index()
@@ -318,6 +410,19 @@ class TranscriptsCollection:
     def get_transcripts_in_interval(self, interval: GenomicInterval, include_partial: bool = True) -> 'TranscriptsCollection':
         from .genes_auxiliary import filter_transcripts_in_interval
         return filter_transcripts_in_interval(self, interval, include_partial)
+
+    def copy_with_remapped_ids(
+        self,
+        id_mapping: Union[Dict[str, str], Callable[[str], str]],
+        source_file: Optional[str] = None,
+    ) -> 'TranscriptsCollection':
+        """Return a new collection with the same transcripts but different IDs.
+
+        IDs are immutable on Transcript, so this creates new Transcript copies
+        with the requested IDs. See pyrion.ops.transformations.remap_transcript_ids.
+        """
+        from ..ops.transformations import remap_transcript_ids
+        return remap_transcript_ids(self, id_mapping, source_file=source_file)
 
     def _build_id_index(self):
         self._id_index = {t.id: i for i, t in enumerate(self.transcripts)}

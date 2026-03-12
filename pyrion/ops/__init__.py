@@ -78,6 +78,7 @@ from .chain_serialization import (
 from .transformations import (
     intervals_to_transcripts,
     bed_to_transcripts,
+    remap_transcript_ids,
 )
 
 __all__ = [
@@ -168,4 +169,5 @@ __all__ = [
     # Data transformations
     "intervals_to_transcripts",
     "bed_to_transcripts",
+    "remap_transcript_ids",
 ]

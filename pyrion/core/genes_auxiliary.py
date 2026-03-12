@@ -221,6 +221,27 @@ def filter_transcripts_in_interval(transcripts_collection, interval: GenomicInte
     return subcollection
 
 
+def filter_transcripts_by_biotype(transcripts_collection, biotypes):
+    """Return a new TranscriptsCollection with only transcripts matching the given biotype(s).
+
+    Args:
+        biotypes: A set of biotype strings to keep.
+    """
+    from .genes import TranscriptsCollection
+    filtered = []
+    for i in range(len(transcripts_collection.transcripts)):
+        t = transcripts_collection._enrich_transcript(transcripts_collection.transcripts[i])
+        if t.biotype in biotypes:
+            filtered.append(transcripts_collection.transcripts[i])
+    subcollection = TranscriptsCollection(
+        transcripts=filtered,
+        source_file=transcripts_collection.source_file,
+    )
+    if transcripts_collection._gene_data is not None:
+        subcollection.bind_gene_data(transcripts_collection._gene_data)
+    return subcollection
+
+
 def set_canonical_transcripts_for_collection(transcripts_collection, canonizer_func: Optional[Callable] = None, **kwargs) -> None:
     """Set canonical transcripts for all genes in a collection using a canonizer function."""
     if not transcripts_collection.has_gene_mapping:

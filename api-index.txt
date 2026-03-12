@@ -1,5 +1,5 @@
 PYRION API INDEX
-Generated: 2025-08-20 16:51:39
+Generated: 2026-03-12 15:53:37
 Concise reference with type signatures only.
 ============================================================
 
@@ -34,6 +34,7 @@ MODULE pyrion.config
   FUNCTION get_max_cores() -> int
   FUNCTION get_min_items_for_parallel() -> int
   FUNCTION is_multiprocessing_available() -> bool
+  FUNCTION njit(func)
   FUNCTION set_loglevel(level: Union[str, int]) -> None
   FUNCTION set_max_cores(cores: int) -> None
   FUNCTION set_min_items_for_parallel(items: int) -> None
@@ -158,6 +159,8 @@ MODULE pyrion.core.genes
     __str__(self) -> str
     compute_flanks(self, flank_size: int, chrom_sizes: Dict[str, int]) -> Tuple[Optional[pyrion.core.intervals.GenomicInterval], Optional[pyrion.core.intervals.GenomicInterval]]
     contains_interval(self, interval: pyrion.core.intervals.GenomicInterval) -> bool
+    exons(self) -> numpy.ndarray
+    from_intervals_collection(collection: pyrion.core.intervals.GenomicIntervalsCollection, transcript_id: str, cds_start: Optional[int] = None, cds_end: Optional[int] = None, biotype: Optional[str] = None) -> 'Transcript'
     get_annotated_regions(self, chrom_sizes: dict, flank_size: int = 5000) -> pyrion.core.intervals.AnnotatedIntervalSet
     get_introns(self, use_numba: bool = True) -> numpy.ndarray
     splice_junctions(self)
@@ -170,8 +173,12 @@ MODULE pyrion.core.genes
     apply_gene_canonical_mapping(self, gene_to_canonical: Dict[str, str]) -> None
     bind_gene_data(self, gene_data: 'GeneData') -> None
     canonize_transcripts(self, canonizer_func: Optional[Callable] = None, **kwargs) -> None
+    copy_with_remapped_ids(self, id_mapping: Union[Dict[str, str], Callable[[str], str]], source_file: Optional[str] = None) -> 'TranscriptsCollection'
+    filter_by_biotype(self, biotype: Union[str, List[str], Set[str]]) -> 'TranscriptsCollection'
+    filter_by_chroms(self, chroms: Union[str, List[str], Set[str]]) -> 'TranscriptsCollection'
     from_json(file_path: Union[str, pathlib.Path]) -> 'TranscriptsCollection'
     get_all_chromosomes(self) -> List[str]
+    get_by_biotype(self, biotype: Union[str, List[str], Set[str]]) -> 'TranscriptsCollection'
     get_by_chrom(self, chrom: str) -> List[pyrion.core.genes.Transcript]
     get_by_gene_name(self, gene_name: str) -> List[pyrion.core.genes.Gene]
     get_by_id(self, transcript_id: str) -> Optional[pyrion.core.genes.Transcript]
@@ -195,6 +202,7 @@ MODULE pyrion.core.genes
 MODULE pyrion.core.genes_auxiliary
   FUNCTION build_annotated_regions(transcript, chrom_sizes: dict, flank_size: int = 5000) -> pyrion.core.intervals.AnnotatedIntervalSet
   FUNCTION compute_flanks(transcript, flank_size: int, chrom_sizes: Dict[str, int]) -> Tuple[Optional[pyrion.core.intervals.GenomicInterval], Optional[pyrion.core.intervals.GenomicInterval]]
+  FUNCTION filter_transcripts_by_biotype(transcripts_collection, biotypes)
   FUNCTION filter_transcripts_in_interval(transcripts_collection, interval: pyrion.core.intervals.GenomicInterval, include_partial: bool = True)
   FUNCTION get_canonical_transcripts_from_collection(transcripts_collection, canonizer_func: Optional[Callable] = None, **kwargs)
   FUNCTION get_canonical_transcripts_only_from_collection(transcripts_collection)
@@ -275,7 +283,9 @@ MODULE pyrion.core.intervals
     to_bed6_string(self, score: int = 1000) -> str
     to_intervals_list(self) -> List[pyrion.core.intervals.GenomicInterval]
   CLASS RegionType
-    __init__(self, /, *args, **kwargs)
+    __init__(self, *args, **kwds)
+    __init__(self, *args, **kwds)
+    __repr__(self)
 MODULE pyrion.core.intervals_auxiliary
   FUNCTION create_intervals_collections_from_strings(interval_strings, ids: Optional[List[str]] = None) -> Dict[Tuple[str, pyrion.core.strand.Strand], pyrion.core.intervals.GenomicIntervalsCollection]
 MODULE pyrion.core.nucleotide_sequences
@@ -304,7 +314,9 @@ MODULE pyrion.core.nucleotide_sequences
     unmask(self, start: 'Optional[int]' = None, end: 'Optional[int]' = None) -> "'NucleotideSequence'"
     masked_fraction -> float
   CLASS SequenceType
-    __init__(self, /, *args, **kwargs)
+    __init__(self, *args, **kwds)
+    __init__(self, *args, **kwds)
+    __repr__(self)
 MODULE pyrion.core.sequences_auxiliary
   FUNCTION get_nucleotide_composition(sequence, consider_masking: bool = False) -> Dict[str, int]
   FUNCTION mask_nucleotide_sequence_slice(sequence, start: Optional[int] = None, end: Optional[int] = None)
@@ -324,7 +336,7 @@ MODULE pyrion.core.sequences_collection
     ids(self) -> 'List[str]'
     items(self)
     keys(self)
-    pop(self, key, default=<object object at 0x102e001a0>)
+    pop(self, key, default=<object object at 0x1037181d0>)
     popitem(self)
     sequences(self) -> 'List[SequenceLike]'
     setdefault(self, key, default=None)
@@ -335,7 +347,10 @@ MODULE pyrion.core.sequences_collection
     sequence_type -> Optional[SequenceType]
 MODULE pyrion.core.strand
   CLASS Strand
-    __init__(self, /, *args, **kwargs)
+    __init__(self, *args, **kwds)
+    __init__(self, *args, **kwds)
+    __repr__(self)
+    __str__(self) -> str
 MODULE pyrion.core.translation
   CLASS TranslationTable
     __init__(self, table_id: int, name: str, codon_table: Dict[tuple, int], start_codons: set[tuple], stop_codons: set[tuple]) -> None
@@ -348,7 +363,7 @@ MODULE pyrion.core.translation
     translate_codon(self, codon_codes: Tuple[int, int, int]) -> int
 MODULE pyrion.core_types
   CLASS ExonType
-    __init__(self, /, *args, **kwargs)
+    __init__(self, *args, **kwds)
 MODULE pyrion.io
 MODULE pyrion.io.bed
   FUNCTION read_bed12_file(file_path: Union[str, pathlib.Path]) -> pyrion.core.genes.TranscriptsCollection
@@ -395,7 +410,7 @@ MODULE pyrion.io.twobit
     chrom_names(self) -> List[str]
     chrom_sizes(self) -> Dict[str, int]
     close(self)
-    fetch(self, chrom: str, start: int, end: int, strand: pyrion.core.strand.Strand = <Strand.PLUS: 1>) -> pyrion.core.nucleotide_sequences.NucleotideSequence
+    fetch(self, chrom: str, start: Optional[int] = None, end: Optional[int] = None, strand: pyrion.core.strand.Strand = <Strand.PLUS: 1>) -> pyrion.core.nucleotide_sequences.NucleotideSequence
     fetch_interval(self, interval: pyrion.core.intervals.GenomicInterval) -> pyrion.core.nucleotide_sequences.NucleotideSequence
     list_chromosomes(self) -> None
     validate_interval(self, chrom: str, start: int, end: int) -> bool
@@ -473,6 +488,7 @@ MODULE pyrion.ops.interval_slicing
 MODULE pyrion.ops.intervals
   FUNCTION array_to_intervals(array: numpy.ndarray, chrom: str) -> List
   FUNCTION chains_to_arrays(chains: List, for_q: bool = False) -> Tuple[numpy.ndarray, numpy.ndarray]
+  FUNCTION compute_intersections_core(sorted1, sorted2, sorted_idx1, sorted_idx2)
   FUNCTION compute_overlap_size(start1: int, end1: int, start2: int, end2: int) -> int
   FUNCTION find_intersections(arr1: numpy.ndarray, arr2: numpy.ndarray, ids1: Optional[List] = None, ids2: Optional[List] = None) -> Dict[Any, List]
   FUNCTION intervals_to_array(intervals: List) -> numpy.ndarray
@@ -505,6 +521,7 @@ MODULE pyrion.ops.transcript_slicing
 MODULE pyrion.ops.transformations
   FUNCTION bed_to_transcripts(bed_file_path: str) -> pyrion.core.genes.TranscriptsCollection
   FUNCTION intervals_to_transcripts(intervals: List[pyrion.core.intervals.GenomicInterval], source_file: Optional[str] = None) -> pyrion.core.genes.TranscriptsCollection
+  FUNCTION remap_transcript_ids(collection: pyrion.core.genes.TranscriptsCollection, id_mapping: Union[Dict[str, str], Callable[[str], str]], source_file: Optional[str] = None) -> pyrion.core.genes.TranscriptsCollection
 MODULE pyrion.utils
 MODULE pyrion.utils.amino_acid_encoding
   FUNCTION apply_masking_aa(encoded: numpy.ndarray) -> numpy.ndarray
@@ -574,7 +591,7 @@ MODULE pyrion.visualization
     __init__(self, name: str, features: List[pyrion.visualization.GenomicFeature], track_type: pyrion.visualization.TrackType)
     __init__(self, name: str, features: List[pyrion.visualization.GenomicFeature], track_type: pyrion.visualization.TrackType)
   CLASS TrackType
-    __init__(self, /, *args, **kwargs)
+    __init__(self, *args, **kwds)
   CLASS TranscriptFeature
     __init__(self, transcript: pyrion.core.genes.Transcript)
     __init__(self, transcript: pyrion.core.genes.Transcript)

@@ -2,7 +2,7 @@
 
 import numpy as np
 from typing import List
-from numba import njit
+from ..config import njit
 
 
 @njit

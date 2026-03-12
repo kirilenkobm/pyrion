@@ -1,36 +1,21 @@
 # Tier 1 – Core completeness & stability (v0.2–v0.3)
 
-[x] TranscriptsCollection method to save not only bed, but also GeneData to tsv
+[ ] exon union method for transcripts collection/ gene
 
-[x] Add nullable ID field for NucleotideSequence
-
-[x] write fasta - if width = 0 - just one line - one seq
-
-[x] where is to_rna() method?
-
-[x] NucleotideSequence - some convenience method like nucleotide: count
-
-[x] SequencesCollectionClass with "is_aligned" field.
-
-[x] support gz-ed inputs
-
-[x] gtf parsing - need at least a small sample
-
-[x] gtf parsing - add biodata and geneName extraction 
-
-[x] better gtf parsing test - compare with actual kent tools output
-
-[x] add logger
-
-[x] GeneData binding optimisation - compute anything only on request, lazy attachments
+[ ] more convenient gene metadata parsting
 
 [ ] logging: add where necessary
+
+[x] transcript: before merging many intervals, check if they don't intersect, otherwise may cause wrong bed output
+
+[x] 2bit: extract whole chromosome
+
+[x] don't use numba if incompatible numpy version
 
 (a) I/O (open/closed file, format, # entries)
 (b) parsing (# valid / skipped lines)
 (c) heavy ops (timings, cache-hits)
 (d) Warnings about questionable things.
-
 
 [ ] gff3 reading
 

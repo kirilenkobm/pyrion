@@ -208,3 +208,22 @@ def set_loglevel(level: Union[str, int]) -> None:
         >>> pyrion.set_loglevel("WARNING")  # Enable warning+ only
     """
     _config.set_log_level(level)
+
+
+# ---------------------------------------------------------------------------
+# Numba availability
+# ---------------------------------------------------------------------------
+
+def _identity_decorator(func):
+    """No-op decorator used as njit fallback when numba is unavailable."""
+    return func
+
+
+try:
+    from numba import njit as _njit
+    _njit(lambda: None)  # force-compile a trivial function to catch incompatibility
+    HAS_NUMBA = True
+    njit = _njit
+except Exception:
+    HAS_NUMBA = False
+    njit = _identity_decorator

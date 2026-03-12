@@ -48,14 +48,20 @@ class TwoBitAccessor:
         except Exception:
             return f"TwoBitAccessor('{self.file_path}')"
     
-    def fetch(self, chrom: str, start: int, end: int, strand: Strand = Strand.PLUS) -> NucleotideSequence:
+    def fetch(self, chrom: str, start: Optional[int] = None, end: Optional[int] = None,
+              strand: Strand = Strand.PLUS) -> NucleotideSequence:
         available_chroms = self.chrom_names()
         if chrom not in available_chroms:
             raise ValueError(f"Chromosome '{chrom}' not found in {self.file_path}. "
                              f"Available: {sorted(available_chroms)}")
 
+        chrom_size = self.chrom_sizes()[chrom]
+        if start is None:
+            start = 0
+        if end is None:
+            end = chrom_size
+
         if not self.validate_interval(chrom, start, end):
-            chrom_size = self.chrom_sizes()[chrom]
             raise ValueError(f"Invalid coordinates {chrom}:{start}-{end}. "
                              f"Chromosome size: {chrom_size}")
         

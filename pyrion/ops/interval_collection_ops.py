@@ -2,7 +2,7 @@
 
 import numpy as np
 from typing import List, Union, Callable
-from numba import njit
+from ..config import njit
 
 from ..core.intervals import GenomicInterval, GenomicIntervalsCollection
 
