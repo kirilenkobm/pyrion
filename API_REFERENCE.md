@@ -1,6 +1,6 @@
 # Pyrion API Reference
 
-**Generated:** 2026-03-12 15:53:37
+**Generated:** 2026-03-12 16:06:07
 
 Complete API reference with full docstrings and signatures.
 
@@ -806,6 +806,13 @@ Return repr(self).
 *Signature:* `(self, transcript_id: str) -> bool`
 
 
+**subset**
+
+*Signature:* `(self, transcript_ids: Set[str]) -> 'GeneData'`
+
+Return a new GeneData containing only entries relevant to the given transcript IDs.
+
+
 **summary**
 
 *Signature:* `(self) -> str`
@@ -1022,6 +1029,13 @@ Return repr(self).
 Return str(self).
 
 
+**append**
+
+*Signature:* `(self, transcript: pyrion.core.genes.Transcript) -> None`
+
+Append a single transcript to the collection.
+
+
 **apply_gene_canonical_mapping**
 
 *Signature:* `(self, gene_to_canonical: Dict[str, str]) -> None`
@@ -1047,6 +1061,13 @@ Return a new collection with the same transcripts but different IDs.
 
 IDs are immutable on Transcript, so this creates new Transcript copies
 with the requested IDs. See pyrion.ops.transformations.remap_transcript_ids.
+
+
+**extend**
+
+*Signature:* `(self, other: Union[List[pyrion.core.genes.Transcript], ForwardRef('TranscriptsCollection')]) -> None`
+
+Extend this collection with transcripts from a list or another collection.
 
 
 **filter_by_biotype**
@@ -1132,9 +1153,16 @@ Get Gene objects by gene name. Multiple genes can have the same name.
 *Signature:* `(self, interval: pyrion.core.intervals.GenomicInterval, include_partial: bool = True) -> 'TranscriptsCollection'`
 
 
+**get_trimmed_gene_data**
+
+*Signature:* `(self) -> 'GeneData'`
+
+Return a copy of bound GeneData containing only entries for transcripts in this collection.
+
+
 **save_biodata**
 
-*Signature:* `(self, tsv_path: Union[str, pathlib.Path], include_gene_transcript: bool = True, include_transcript_biotype: bool = True, include_gene_name: bool = True, separator: str = '\t') -> None`
+*Signature:* `(self, tsv_path: Union[str, pathlib.Path], include_gene_transcript: bool = True, include_transcript_biotype: bool = True, include_gene_name: bool = True, separator: str = '\t', trim: bool = True) -> None`
 
 
 **save_to_bed12**
@@ -1371,6 +1399,23 @@ Return repr(self).
 *Signature:* `(self) -> str`
 
 String representation with summary.
+
+
+**filter**
+
+*Signature:* `(self, t_chrom: Union[str, List[str], NoneType] = None, q_chrom: Union[str, List[str], NoneType] = None, min_score: Optional[int] = None, max_score: Optional[int] = None, min_aligned_length: Optional[int] = None) -> 'GenomeAlignmentsCollection'`
+
+Filter alignments by target/query chromosomes, score, and aligned length.
+
+All criteria are combined with AND logic. None means no filter on that field.
+Chromosome arguments accept a single string or a list/set of strings.
+
+Equivalent to UCSC chainFilter:
+    chainFilter -t=chr11,chrX -q=chr19,chr7 -minScore=15000 in.chain
+becomes:
+    collection.filter(t_chrom=["chr11", "chrX"],
+                      q_chrom=["chr19", "chr7"],
+                      min_score=15000)
 
 
 **from_json**
@@ -1998,7 +2043,7 @@ D.keys() -> a set-like object providing a view on D's keys
 
 **pop**
 
-*Signature:* `(self, key, default=<object object at 0x1037181d0>)`
+*Signature:* `(self, key, default=<object object at 0x1035941d0>)`
 
 D.pop(k[,d]) -> v, remove specified key and return the corresponding value.
 If key is not found, d is returned if given, otherwise KeyError is raised.

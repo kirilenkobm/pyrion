@@ -328,6 +328,41 @@ class TranscriptsCollection:
         self._gene_data: Optional['GeneData'] = None
         self._genes_cache: Optional[Dict[str, Gene]] = None
 
+    def _invalidate_indices(self):
+        self._id_index = None
+        self._chrom_index = None
+        self._genes_cache = None
+
+    def append(self, transcript: Transcript) -> None:
+        """Append a single transcript to the collection."""
+        self.transcripts.append(transcript)
+        self._invalidate_indices()
+
+    def extend(self, other: Union[List[Transcript], 'TranscriptsCollection']) -> None:
+        """Extend this collection with transcripts from a list or another collection."""
+        if isinstance(other, TranscriptsCollection):
+            self.transcripts.extend(other.transcripts)
+        else:
+            self.transcripts.extend(other)
+        self._invalidate_indices()
+
+    def __add__(self, other: 'TranscriptsCollection') -> 'TranscriptsCollection':
+        """Return a new collection combining transcripts from both collections."""
+        combined = TranscriptsCollection(
+            transcripts=self.transcripts + other.transcripts,
+            source_file=self.source_file,
+        )
+        if self._gene_data is not None:
+            combined.bind_gene_data(self._gene_data)
+        elif other._gene_data is not None:
+            combined.bind_gene_data(other._gene_data)
+        return combined
+
+    def __iadd__(self, other: 'TranscriptsCollection') -> 'TranscriptsCollection':
+        """In-place extend with another collection (+=)."""
+        self.extend(other)
+        return self
+
     def __len__(self):
         return len(self.transcripts)
 
@@ -622,20 +657,30 @@ class TranscriptsCollection:
         from ..ops.transcript_serialization import transcripts_collection_summary_string
         return transcripts_collection_summary_string(self)
     
+    def get_trimmed_gene_data(self) -> 'GeneData':
+        """Return a copy of bound GeneData containing only entries for transcripts in this collection."""
+        if self._gene_data is None:
+            raise ValueError("No GeneData bound to this collection. Call bind_gene_data() first.")
+        transcript_ids = {t.id for t in self.transcripts}
+        return self._gene_data.subset(transcript_ids)
+
     def save_biodata(
         self, 
         tsv_path: Union[str, Path],
         include_gene_transcript: bool = True,
         include_transcript_biotype: bool = True,
         include_gene_name: bool = True,
-        separator: str = '\t'
+        separator: str = '\t',
+        trim: bool = True,
     ) -> None:
         if self._gene_data is None:
             raise ValueError("No GeneData bound to this collection. Call bind_gene_data() first or use read_gtf() to load data with gene information.")
-        
+
+        gene_data = self.get_trimmed_gene_data() if trim else self._gene_data
+
         from ..io.gene_data import write_gene_data_tsv
         write_gene_data_tsv(
-            self._gene_data,
+            gene_data,
             tsv_path,
             include_gene_transcript=include_gene_transcript,
             include_transcript_biotype=include_transcript_biotype,

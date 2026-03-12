@@ -104,5 +104,23 @@ class GeneData:
         source_info = f" from {self.source_file}" if self.source_file else ""
         return f"GeneData: {', '.join(mappings)}{source_info}"
     
+    def subset(self, transcript_ids: Set[str]) -> 'GeneData':
+        """Return a new GeneData containing only entries relevant to the given transcript IDs."""
+        sub = GeneData(source_file=self.source_file)
+
+        for tid in transcript_ids:
+            gene_id = self._transcript_to_gene.get(tid)
+            if gene_id is not None:
+                sub.add_gene_transcript_mapping(gene_id, tid)
+                gene_name = self._gene_to_name.get(gene_id)
+                if gene_name is not None:
+                    sub.add_gene_name(gene_id, gene_name)
+
+            biotype = self._transcript_to_biotype.get(tid)
+            if biotype is not None:
+                sub.add_transcript_biotype(tid, biotype)
+
+        return sub
+
     def __repr__(self) -> str:
         return self.summary()

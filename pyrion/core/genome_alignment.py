@@ -194,6 +194,53 @@ class GenomeAlignmentsCollection:
             query_chrom_index[ga.q_chrom].append(i)
         self._query_chrom_index = dict(query_chrom_index)
 
+    def filter(
+        self,
+        t_chrom: Optional[Union[str, List[str]]] = None,
+        q_chrom: Optional[Union[str, List[str]]] = None,
+        min_score: Optional[int] = None,
+        max_score: Optional[int] = None,
+        min_aligned_length: Optional[int] = None,
+    ) -> 'GenomeAlignmentsCollection':
+        """Filter alignments by target/query chromosomes, score, and aligned length.
+
+        All criteria are combined with AND logic. None means no filter on that field.
+        Chromosome arguments accept a single string or a list/set of strings.
+
+        Equivalent to UCSC chainFilter:
+            chainFilter -t=chr11,chrX -q=chr19,chr7 -minScore=15000 in.chain
+        becomes:
+            collection.filter(t_chrom=["chr11", "chrX"],
+                              q_chrom=["chr19", "chr7"],
+                              min_score=15000)
+        """
+        t_set = None
+        if t_chrom is not None:
+            t_set = {t_chrom} if isinstance(t_chrom, str) else set(t_chrom)
+
+        q_set = None
+        if q_chrom is not None:
+            q_set = {q_chrom} if isinstance(q_chrom, str) else set(q_chrom)
+
+        filtered = []
+        for a in self.alignments:
+            if t_set is not None and a.t_chrom not in t_set:
+                continue
+            if q_set is not None and a.q_chrom not in q_set:
+                continue
+            if min_score is not None and a.score < min_score:
+                continue
+            if max_score is not None and a.score > max_score:
+                continue
+            if min_aligned_length is not None and a.aligned_length() < min_aligned_length:
+                continue
+            filtered.append(a)
+
+        return GenomeAlignmentsCollection(
+            alignments=filtered,
+            source_file=self.source_file,
+        )
+
     def sort_by_score(self, max_elems: Optional[int] = None) -> List[Tuple[int, int]]:
         from .genome_alignment_auxiliary import sort_alignments_by_score
         return sort_alignments_by_score(self, max_elems)

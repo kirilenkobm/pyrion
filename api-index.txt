@@ -1,5 +1,5 @@
 PYRION API INDEX
-Generated: 2026-03-12 15:53:37
+Generated: 2026-03-12 16:06:07
 Concise reference with type signatures only.
 ============================================================
 
@@ -130,6 +130,7 @@ MODULE pyrion.core.gene_data
     has_gene_name_mapping(self) -> bool
     has_gene_transcript_mapping(self) -> bool
     has_transcript(self, transcript_id: str) -> bool
+    subset(self, transcript_ids: Set[str]) -> 'GeneData'
     summary(self) -> str
     gene_ids -> Set
     transcript_ids -> Set
@@ -170,10 +171,12 @@ MODULE pyrion.core.genes
     __init__(self, transcripts: Optional[List[pyrion.core.genes.Transcript]] = None, source_file: Optional[str] = None)
     __repr__(self) -> str
     __str__(self) -> str
+    append(self, transcript: pyrion.core.genes.Transcript) -> None
     apply_gene_canonical_mapping(self, gene_to_canonical: Dict[str, str]) -> None
     bind_gene_data(self, gene_data: 'GeneData') -> None
     canonize_transcripts(self, canonizer_func: Optional[Callable] = None, **kwargs) -> None
     copy_with_remapped_ids(self, id_mapping: Union[Dict[str, str], Callable[[str], str]], source_file: Optional[str] = None) -> 'TranscriptsCollection'
+    extend(self, other: Union[List[pyrion.core.genes.Transcript], ForwardRef('TranscriptsCollection')]) -> None
     filter_by_biotype(self, biotype: Union[str, List[str], Set[str]]) -> 'TranscriptsCollection'
     filter_by_chroms(self, chroms: Union[str, List[str], Set[str]]) -> 'TranscriptsCollection'
     from_json(file_path: Union[str, pathlib.Path]) -> 'TranscriptsCollection'
@@ -188,7 +191,8 @@ MODULE pyrion.core.genes
     get_genes_without_canonical_transcript(self) -> List[pyrion.core.genes.Gene]
     get_transcript_ids_by_chrom(self, chrom: str) -> List[str]
     get_transcripts_in_interval(self, interval: pyrion.core.intervals.GenomicInterval, include_partial: bool = True) -> 'TranscriptsCollection'
-    save_biodata(self, tsv_path: Union[str, pathlib.Path], include_gene_transcript: bool = True, include_transcript_biotype: bool = True, include_gene_name: bool = True, separator: str = '\t') -> None
+    get_trimmed_gene_data(self) -> 'GeneData'
+    save_biodata(self, tsv_path: Union[str, pathlib.Path], include_gene_transcript: bool = True, include_transcript_biotype: bool = True, include_gene_name: bool = True, separator: str = '\t', trim: bool = True) -> None
     save_to_bed12(self, file_path: Union[str, pathlib.Path]) -> None
     save_to_json(self, file_path: Union[str, pathlib.Path]) -> None
     summary(self) -> str
@@ -230,6 +234,7 @@ MODULE pyrion.core.genome_alignment
     __init__(self, alignments: Optional[List[pyrion.core.genome_alignment.GenomeAlignment]] = None, source_file: Optional[str] = None)
     __repr__(self) -> str
     __str__(self) -> str
+    filter(self, t_chrom: Union[str, List[str], NoneType] = None, q_chrom: Union[str, List[str], NoneType] = None, min_score: Optional[int] = None, max_score: Optional[int] = None, min_aligned_length: Optional[int] = None) -> 'GenomeAlignmentsCollection'
     from_json(file_path: Union[str, pathlib.Path]) -> 'GenomeAlignmentsCollection'
     get_alignments_fully_contained(self, interval: 'GenomicInterval') -> List[pyrion.core.genome_alignment.GenomeAlignment]
     get_alignments_in_interval(self, interval: 'GenomicInterval', include_partial: bool = True) -> List[pyrion.core.genome_alignment.GenomeAlignment]
@@ -336,7 +341,7 @@ MODULE pyrion.core.sequences_collection
     ids(self) -> 'List[str]'
     items(self)
     keys(self)
-    pop(self, key, default=<object object at 0x1037181d0>)
+    pop(self, key, default=<object object at 0x1035941d0>)
     popitem(self)
     sequences(self) -> 'List[SequenceLike]'
     setdefault(self, key, default=None)
