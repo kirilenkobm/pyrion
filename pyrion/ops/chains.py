@@ -20,6 +20,45 @@ def project_intervals_through_chain(
     return _project_intervals_vectorized(intervals, chain_blocks)
 
 
+def project_intervals_through_chain_strict(
+    intervals: np.ndarray,
+    chain_blocks: np.ndarray
+) -> List[np.ndarray]:
+    """Stricter projection that respects alignment structure and deletions.
+
+    Logic:
+    1. If interval overlaps aligned blocks:
+       - For each terminus (start/end):
+         * If in aligned block: project directly
+         * If in misaligned region: extend from nearest internal block, BUT limited by
+           actual query sequence length between blocks (handles deletions)
+         * If in deletion: don't extend, use closest internal block boundary
+
+    2. If interval is fully within deletion: return [[0, 0]]
+
+    3. If interval has no overlapping blocks (complete misalignment):
+       - Find flanking blocks (before and after)
+       - If query distance between flanks <= target interval length: return that query interval
+       - Otherwise: return [[0, 0]]
+
+    Args:
+        intervals: Array of intervals to project, shape (N, 2)
+        chain_blocks: Chain alignment blocks, shape (M, 4) with [t_start, t_end, q_start, q_end]
+
+    Returns:
+        List of projected intervals. Returns [[0, 0]] if interval can't be reliably projected.
+    """
+    if len(intervals) == 0:
+        return []
+    if len(chain_blocks) == 0:
+        return [np.array([[0, 0]], dtype=np.int64) for _ in range(len(intervals))]
+
+    if HAS_NUMBA:
+        return _project_intervals_strict_numba(intervals, chain_blocks)
+    else:
+        return _project_intervals_strict_numpy(intervals, chain_blocks)
+
+
 def _project_intervals_vectorized(intervals: np.ndarray, chain_blocks: np.ndarray) -> List[np.ndarray]:
     if HAS_NUMBA:
         return _project_intervals_numba(intervals, chain_blocks)
@@ -130,6 +169,209 @@ def _project_intervals_numpy(intervals: np.ndarray, chain_blocks: np.ndarray) ->
             else:
                 results.append(np.array([[0, 0]], dtype=np.int64))
     
+    return results
+
+
+@njit
+def _project_intervals_strict_numba(
+    intervals: np.ndarray,
+    chain_blocks: np.ndarray
+) -> List[np.ndarray]:
+    """Strict projection respecting alignment structure."""
+    results = []
+
+    t_starts = chain_blocks[:, 0]
+    t_ends = chain_blocks[:, 1]
+    q_starts = chain_blocks[:, 2]
+    q_ends = chain_blocks[:, 3]
+
+    for i in range(len(intervals)):
+        interval_start, interval_end = intervals[i, 0], intervals[i, 1]
+        interval_length = interval_end - interval_start
+
+        # Find overlapping blocks
+        overlapping_idxs = []
+        for block_idx in range(len(chain_blocks)):
+            if t_ends[block_idx] > interval_start and t_starts[block_idx] < interval_end:
+                overlapping_idxs.append(block_idx)
+
+        # Branch 1: Has overlapping blocks
+        if len(overlapping_idxs) > 0:
+            first_block_idx = overlapping_idxs[0]
+            last_block_idx = overlapping_idxs[-1]
+
+            # Project start coordinate
+            if interval_start >= t_starts[first_block_idx] and interval_start < t_ends[first_block_idx]:
+                # Start is inside aligned block - direct projection
+                t_offset = interval_start - t_starts[first_block_idx]
+                t_len = t_ends[first_block_idx] - t_starts[first_block_idx]
+                q_len = q_ends[first_block_idx] - q_starts[first_block_idx]
+                q_start = q_starts[first_block_idx] + int((t_offset / t_len) * q_len)
+            else:
+                # Start is before first block - in misaligned region
+                # Distance from interval_start to first block start
+                extension_needed = t_starts[first_block_idx] - interval_start
+
+                # If there's a previous block, try to extend
+                # The available_query_space will naturally limit extension for deletions
+                if first_block_idx > 0:
+                    # Query gap between previous block end and current block start
+                    available_query_space = q_starts[first_block_idx] - q_ends[first_block_idx - 1]
+                    # Only extend by available space (handles deletions)
+                    extension = min(extension_needed, available_query_space)
+                    q_start = q_starts[first_block_idx] - extension
+                else:
+                    # No previous block - chain doesn't propagate before this
+                    q_start = q_starts[first_block_idx]
+
+            # Project end coordinate
+            if interval_end > t_starts[last_block_idx] and interval_end <= t_ends[last_block_idx]:
+                # End is inside aligned block - direct projection
+                t_offset = interval_end - t_starts[last_block_idx]
+                t_len = t_ends[last_block_idx] - t_starts[last_block_idx]
+                q_len = q_ends[last_block_idx] - q_starts[last_block_idx]
+                q_end = q_starts[last_block_idx] + int((t_offset / t_len) * q_len)
+            else:
+                # End is after last block - in misaligned region
+                extension_needed = interval_end - t_ends[last_block_idx]
+
+                # If there's a next block, try to extend
+                # The available_query_space will naturally limit extension for deletions
+                if last_block_idx < len(chain_blocks) - 1:
+                    # Query gap between current block end and next block start
+                    available_query_space = q_starts[last_block_idx + 1] - q_ends[last_block_idx]
+                    # Only extend by available space (handles deletions)
+                    extension = min(extension_needed, available_query_space)
+                    q_end = q_ends[last_block_idx] + extension
+                else:
+                    # No next block - chain doesn't propagate after this
+                    q_end = q_ends[last_block_idx]
+
+            results.append(np.array([[q_start, q_end]], dtype=np.int64))
+
+        # Branch 2 & 3: No overlapping blocks - complete misalignment
+        else:
+            # Find flanking blocks
+            left_block_idx = -1
+            right_block_idx = -1
+
+            for block_idx in range(len(chain_blocks)):
+                if t_ends[block_idx] <= interval_start:
+                    left_block_idx = block_idx
+                if t_starts[block_idx] >= interval_end and right_block_idx == -1:
+                    right_block_idx = block_idx
+                    break
+
+            # Check if we have both flanks
+            if left_block_idx >= 0 and right_block_idx >= 0:
+                # Query interval between flanks
+                q_flank_start = q_ends[left_block_idx]
+                q_flank_end = q_starts[right_block_idx]
+                query_distance = q_flank_end - q_flank_start
+
+                # Only return if query distance doesn't exceed target interval length
+                if query_distance <= interval_length:
+                    results.append(np.array([[q_flank_start, q_flank_end]], dtype=np.int64))
+                else:
+                    results.append(np.array([[0, 0]], dtype=np.int64))
+            else:
+                # Missing flanks or fully in deletion
+                results.append(np.array([[0, 0]], dtype=np.int64))
+
+    return results
+
+
+def _project_intervals_strict_numpy(
+    intervals: np.ndarray,
+    chain_blocks: np.ndarray
+) -> List[np.ndarray]:
+    """NumPy fallback for strict projection."""
+    results = []
+
+    t_starts = chain_blocks[:, 0]
+    t_ends = chain_blocks[:, 1]
+    q_starts = chain_blocks[:, 2]
+    q_ends = chain_blocks[:, 3]
+
+    for interval_start, interval_end in intervals:
+        interval_length = interval_end - interval_start
+
+        # Find overlapping blocks
+        overlapping_idxs = []
+        for block_idx in range(len(chain_blocks)):
+            if t_ends[block_idx] > interval_start and t_starts[block_idx] < interval_end:
+                overlapping_idxs.append(block_idx)
+
+        # Branch 1: Has overlapping blocks
+        if len(overlapping_idxs) > 0:
+            first_block_idx = overlapping_idxs[0]
+            last_block_idx = overlapping_idxs[-1]
+
+            # Project start coordinate
+            if interval_start >= t_starts[first_block_idx] and interval_start < t_ends[first_block_idx]:
+                # Start is inside aligned block
+                t_offset = interval_start - t_starts[first_block_idx]
+                t_len = t_ends[first_block_idx] - t_starts[first_block_idx]
+                q_len = q_ends[first_block_idx] - q_starts[first_block_idx]
+                q_start = q_starts[first_block_idx] + int((t_offset / t_len) * q_len)
+            else:
+                # Start is before first block - in misaligned region
+                extension_needed = t_starts[first_block_idx] - interval_start
+
+                if first_block_idx > 0:
+                    available_query_space = q_starts[first_block_idx] - q_ends[first_block_idx - 1]
+                    extension = min(extension_needed, available_query_space)
+                    q_start = q_starts[first_block_idx] - extension
+                else:
+                    # No previous block - chain doesn't propagate before this
+                    q_start = q_starts[first_block_idx]
+
+            # Project end coordinate
+            if interval_end > t_starts[last_block_idx] and interval_end <= t_ends[last_block_idx]:
+                # End is inside aligned block
+                t_offset = interval_end - t_starts[last_block_idx]
+                t_len = t_ends[last_block_idx] - t_starts[last_block_idx]
+                q_len = q_ends[last_block_idx] - q_starts[last_block_idx]
+                q_end = q_starts[last_block_idx] + int((t_offset / t_len) * q_len)
+            else:
+                # End is after last block - in misaligned region
+                extension_needed = interval_end - t_ends[last_block_idx]
+
+                if last_block_idx < len(chain_blocks) - 1:
+                    available_query_space = q_starts[last_block_idx + 1] - q_ends[last_block_idx]
+                    extension = min(extension_needed, available_query_space)
+                    q_end = q_ends[last_block_idx] + extension
+                else:
+                    # No next block - chain doesn't propagate after this
+                    q_end = q_ends[last_block_idx]
+
+            results.append(np.array([[q_start, q_end]], dtype=np.int64))
+
+        # Branch 2 & 3: No overlapping blocks
+        else:
+            # Find flanking blocks
+            left_block_idx = -1
+            right_block_idx = -1
+
+            for block_idx in range(len(chain_blocks)):
+                if t_ends[block_idx] <= interval_start:
+                    left_block_idx = block_idx
+                if t_starts[block_idx] >= interval_end and right_block_idx == -1:
+                    right_block_idx = block_idx
+                    break
+
+            if left_block_idx >= 0 and right_block_idx >= 0:
+                q_flank_start = q_ends[left_block_idx]
+                q_flank_end = q_starts[right_block_idx]
+                query_distance = q_flank_end - q_flank_start
+
+                if query_distance <= interval_length:
+                    results.append(np.array([[q_flank_start, q_flank_end]], dtype=np.int64))
+                else:
+                    results.append(np.array([[0, 0]], dtype=np.int64))
+            else:
+                results.append(np.array([[0, 0]], dtype=np.int64))
+
     return results
 
 

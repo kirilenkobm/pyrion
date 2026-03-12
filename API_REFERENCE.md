@@ -1,6 +1,6 @@
 # Pyrion API Reference
 
-**Generated:** 2026-03-12 16:06:07
+**Generated:** 2026-03-12 17:05:49
 
 Complete API reference with full docstrings and signatures.
 
@@ -2043,7 +2043,7 @@ D.keys() -> a set-like object providing a view on D's keys
 
 **pop**
 
-*Signature:* `(self, key, default=<object object at 0x1035941d0>)`
+*Signature:* `(self, key, default=<object object at 0x1035401d0>)`
 
 D.pop(k[,d]) -> v, remove specified key and return the corresponding value.
 If key is not found, d is returned if given, otherwise KeyError is raised.
@@ -2671,6 +2671,35 @@ Chain alignment operations for projecting genomic intervals.
 ### project_intervals_through_chain
 
 **Signature:** `(intervals: numpy.ndarray, chain_blocks: numpy.ndarray) -> List[numpy.ndarray]`
+
+
+### project_intervals_through_chain_strict
+
+**Signature:** `(intervals: numpy.ndarray, chain_blocks: numpy.ndarray) -> List[numpy.ndarray]`
+
+Stricter projection that respects alignment structure and deletions.
+
+Logic:
+1. If interval overlaps aligned blocks:
+   - For each terminus (start/end):
+     * If in aligned block: project directly
+     * If in misaligned region: extend from nearest internal block, BUT limited by
+       actual query sequence length between blocks (handles deletions)
+     * If in deletion: don't extend, use closest internal block boundary
+
+2. If interval is fully within deletion: return [[0, 0]]
+
+3. If interval has no overlapping blocks (complete misalignment):
+   - Find flanking blocks (before and after)
+   - If query distance between flanks <= target interval length: return that query interval
+   - Otherwise: return [[0, 0]]
+
+Args:
+    intervals: Array of intervals to project, shape (N, 2)
+    chain_blocks: Chain alignment blocks, shape (M, 4) with [t_start, t_end, q_start, q_end]
+
+Returns:
+    List of projected intervals. Returns [[0, 0]] if interval can't be reliably projected.
 
 
 ### project_intervals_through_genome_alignment
