@@ -1,5 +1,5 @@
 PYRION API INDEX
-Generated: 2026-03-12 17:05:49
+Generated: 2026-03-12 17:19:06
 Concise reference with type signatures only.
 ============================================================
 
@@ -34,7 +34,6 @@ MODULE pyrion.config
   FUNCTION get_max_cores() -> int
   FUNCTION get_min_items_for_parallel() -> int
   FUNCTION is_multiprocessing_available() -> bool
-  FUNCTION njit(func)
   FUNCTION set_loglevel(level: Union[str, int]) -> None
   FUNCTION set_max_cores(cores: int) -> None
   FUNCTION set_min_items_for_parallel(items: int) -> None
@@ -144,6 +143,7 @@ MODULE pyrion.core.genes
     get_transcript(self, transcript_id: str) -> Optional[pyrion.core.genes.Transcript]
     has_transcript(self, transcript_id: str) -> bool
     set_canonical_transcript(self, transcript_id: str) -> None
+    to_union_transcript(self, transcript_id: Optional[str] = None, id_prefix: str = 'U_') -> pyrion.core.genes.Transcript
     canonical_transcript -> Optional
     canonical_transcript_id -> Optional
     chrom -> str
@@ -165,6 +165,8 @@ MODULE pyrion.core.genes
     get_annotated_regions(self, chrom_sizes: dict, flank_size: int = 5000) -> pyrion.core.intervals.AnnotatedIntervalSet
     get_introns(self, use_numba: bool = True) -> numpy.ndarray
     splice_junctions(self)
+    with_fields(self, **kwargs) -> 'Transcript'
+    with_id(self, new_id: str) -> 'Transcript'
     is_coding -> bool
   CLASS TranscriptsCollection
     __init__(self, transcripts: Optional[List[pyrion.core.genes.Transcript]] = None, source_file: Optional[str] = None)
@@ -341,7 +343,7 @@ MODULE pyrion.core.sequences_collection
     ids(self) -> 'List[str]'
     items(self)
     keys(self)
-    pop(self, key, default=<object object at 0x1035401d0>)
+    pop(self, key, default=<object object at 0x1057a41d0>)
     popitem(self)
     sequences(self) -> 'List[SequenceLike]'
     setdefault(self, key, default=None)
@@ -494,7 +496,6 @@ MODULE pyrion.ops.interval_slicing
 MODULE pyrion.ops.intervals
   FUNCTION array_to_intervals(array: numpy.ndarray, chrom: str) -> List
   FUNCTION chains_to_arrays(chains: List, for_q: bool = False) -> Tuple[numpy.ndarray, numpy.ndarray]
-  FUNCTION compute_intersections_core(sorted1, sorted2, sorted_idx1, sorted_idx2)
   FUNCTION compute_overlap_size(start1: int, end1: int, start2: int, end2: int) -> int
   FUNCTION find_intersections(arr1: numpy.ndarray, arr2: numpy.ndarray, ids1: Optional[List] = None, ids2: Optional[List] = None) -> Dict[Any, List]
   FUNCTION intervals_to_array(intervals: List) -> numpy.ndarray

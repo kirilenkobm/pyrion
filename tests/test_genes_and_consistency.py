@@ -483,5 +483,80 @@ class TestErrorHandling(TestFixtures):
         assert "No consistency issues found!" in report
 
 
+class TestUnionTranscript:
+    """Tests for Gene.to_union_transcript()."""
+
+    def _make_gene(self, transcripts):
+        from pyrion.core.genes import Gene
+        return Gene(gene_id="GENE001", transcripts=transcripts, gene_name="TestGene")
+
+    def test_non_coding_union(self):
+        t1 = Transcript(
+            blocks=np.array([[100, 300], [500, 700]], dtype=np.int32),
+            strand=Strand.PLUS, chrom="chr1", id="t1", biotype="lncRNA",
+        )
+        t2 = Transcript(
+            blocks=np.array([[250, 400], [600, 900]], dtype=np.int32),
+            strand=Strand.PLUS, chrom="chr1", id="t2", biotype="lncRNA",
+        )
+        gene = self._make_gene([t1, t2])
+        union = gene.to_union_transcript()
+
+        assert union.id == "U_GENE001"
+        assert union.biotype == "exons_union"
+        assert union.chrom == "chr1"
+        assert union.strand == Strand.PLUS
+        assert not union.is_coding
+        # [100,400] and [500,900] after merge
+        np.testing.assert_array_equal(union.blocks, [[100, 400], [500, 900]])
+
+    def test_coding_union_preserves_cds_bounds(self):
+        t1 = Transcript(
+            blocks=np.array([[1000, 1200], [2000, 2500]], dtype=np.int32),
+            strand=Strand.PLUS, chrom="chr1", id="t1",
+            cds_start=1050, cds_end=2400, biotype="protein_coding",
+        )
+        t2 = Transcript(
+            blocks=np.array([[1100, 1300], [2000, 2600]], dtype=np.int32),
+            strand=Strand.PLUS, chrom="chr1", id="t2",
+            cds_start=1100, cds_end=2500, biotype="protein_coding",
+        )
+        gene = self._make_gene([t1, t2])
+        union = gene.to_union_transcript()
+
+        assert union.is_coding
+        assert union.cds_start == min(t1.cds_start, t2.cds_start)
+        assert union.cds_end == max(t1.cds_end, t2.cds_end)
+        assert union.biotype == "exons_union"
+
+    def test_custom_id(self):
+        t = Transcript(
+            blocks=np.array([[100, 200]], dtype=np.int32),
+            strand=Strand.PLUS, chrom="chr1", id="t1",
+        )
+        gene = self._make_gene([t])
+
+        union_default = gene.to_union_transcript()
+        assert union_default.id == "U_GENE001"
+
+        union_prefix = gene.to_union_transcript(id_prefix="UNION_")
+        assert union_prefix.id == "UNION_GENE001"
+
+        union_explicit = gene.to_union_transcript(transcript_id="my_custom_id")
+        assert union_explicit.id == "my_custom_id"
+
+    def test_single_transcript_roundtrip(self):
+        t = Transcript(
+            blocks=np.array([[100, 200], [300, 400]], dtype=np.int32),
+            strand=Strand.MINUS, chrom="chr5", id="t1", biotype="snoRNA",
+        )
+        gene = self._make_gene([t])
+        union = gene.to_union_transcript()
+
+        np.testing.assert_array_equal(union.blocks, t.blocks)
+        assert union.strand == Strand.MINUS
+        assert union.chrom == "chr5"
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

@@ -1,6 +1,6 @@
 # Pyrion API Reference
 
-**Generated:** 2026-03-12 17:05:49
+**Generated:** 2026-03-12 17:19:06
 
 Complete API reference with full docstrings and signatures.
 
@@ -229,13 +229,6 @@ Get the minimum number of items required for parallel processing.
 **Signature:** `() -> bool`
 
 Check if multiprocessing is available.
-
-
-### njit
-
-**Signature:** `(func)`
-
-No-op decorator used as njit fallback when numba is unavailable.
 
 
 ### set_loglevel
@@ -890,6 +883,22 @@ Args:
 *Signature:* `(self, transcript_id: str) -> None`
 
 
+**to_union_transcript**
+
+*Signature:* `(self, transcript_id: Optional[str] = None, id_prefix: str = 'U_') -> pyrion.core.genes.Transcript`
+
+Merge all isoforms into a single union transcript.
+
+For coding genes: merges CDS and UTR blocks separately, then combines.
+CDS boundaries are derived from the union of all CDS blocks.
+For non-coding genes: merges all exon blocks.
+
+Args:
+    transcript_id: Explicit ID for the union transcript.
+        If None, uses ``id_prefix + gene_id``.
+    id_prefix: Prefix prepended to gene_id when transcript_id is None.
+
+
 #### Properties
 
 **canonical_transcript** -> `Optional`
@@ -992,6 +1001,23 @@ blocks do not overlap.
 *Signature:* `(self)`
 
 Generator yielding splice junction coordinates (donor, acceptor) for transcript.
+
+
+**with_fields**
+
+*Signature:* `(self, **kwargs) -> 'Transcript'`
+
+Return a copy with arbitrary fields replaced.
+
+Example:
+    t.with_fields(id="new_id", biotype="lncRNA")
+
+
+**with_id**
+
+*Signature:* `(self, new_id: str) -> 'Transcript'`
+
+Return a copy of this transcript with a different ID.
 
 
 #### Properties
@@ -2043,7 +2069,7 @@ D.keys() -> a set-like object providing a view on D's keys
 
 **pop**
 
-*Signature:* `(self, key, default=<object object at 0x1035401d0>)`
+*Signature:* `(self, key, default=<object object at 0x1057a41d0>)`
 
 D.pop(k[,d]) -> v, remove specified key and return the corresponding value.
 If key is not found, d is returned if given, otherwise KeyError is raised.
@@ -3063,11 +3089,6 @@ Convert 2D numpy array of [start, end] pairs to list of GenomicInterval objects.
 ### chains_to_arrays
 
 **Signature:** `(chains: List, for_q: bool = False) -> Tuple[numpy.ndarray, numpy.ndarray]`
-
-
-### compute_intersections_core
-
-**Signature:** `(sorted1, sorted2, sorted_idx1, sorted_idx2)`
 
 
 ### compute_overlap_size

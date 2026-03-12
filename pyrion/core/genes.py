@@ -1,6 +1,6 @@
 """Gene and transcript representations."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from functools import cached_property
 from typing import Optional, List, Dict, Set, Tuple, Union, Callable
 import numpy as np
@@ -63,6 +63,18 @@ class Transcript:
             cds_end=cds_end,
             biotype=biotype,
         )
+
+    def with_id(self, new_id: str) -> 'Transcript':
+        """Return a copy of this transcript with a different ID."""
+        return replace(self, id=new_id)
+
+    def with_fields(self, **kwargs) -> 'Transcript':
+        """Return a copy with arbitrary fields replaced.
+
+        Example:
+            t.with_fields(id="new_id", biotype="lncRNA")
+        """
+        return replace(self, **kwargs)
 
     @property
     def is_coding(self) -> bool:
@@ -259,7 +271,68 @@ class Gene:
     def is_coding(self) -> bool:
         """Check if gene has any coding transcripts."""
         return any(t.is_coding for t in self._transcripts)
-    
+
+    def to_union_transcript(
+        self,
+        transcript_id: Optional[str] = None,
+        id_prefix: str = "U_",
+    ) -> Transcript:
+        """Merge all isoforms into a single union transcript.
+
+        For coding genes: merges CDS and UTR blocks separately, then combines.
+        CDS boundaries are derived from the union of all CDS blocks.
+        For non-coding genes: merges all exon blocks.
+
+        Args:
+            transcript_id: Explicit ID for the union transcript.
+                If None, uses ``id_prefix + gene_id``.
+            id_prefix: Prefix prepended to gene_id when transcript_id is None.
+        """
+        from ..ops.interval_ops import merge_intervals
+
+        tid = transcript_id if transcript_id is not None else f"{id_prefix}{self.gene_id}"
+        ts = self._transcripts
+
+        has_coding = any(t.is_coding for t in ts)
+        if has_coding:
+            cds_arrays = [t.cds_blocks for t in ts if t.is_coding and t.cds_blocks.size > 0]
+            utr_arrays = [t.utr_blocks for t in ts if t.is_coding and t.utr_blocks.size > 0]
+
+            cds_union = merge_intervals(np.vstack(cds_arrays)) if cds_arrays else np.empty((0, 2), dtype=np.int32)
+            utr_union = merge_intervals(np.vstack(utr_arrays)) if utr_arrays else np.empty((0, 2), dtype=np.int32)
+
+            if cds_union.size == 0 and utr_union.size == 0:
+                all_blocks = [t.blocks for t in ts if t.blocks.size > 0]
+                merged = merge_intervals(np.vstack(all_blocks)) if all_blocks else np.empty((0, 2), dtype=np.int32)
+                cds_start, cds_end = None, None
+            elif cds_union.size == 0:
+                merged = utr_union
+                cds_start, cds_end = None, None
+            elif utr_union.size == 0:
+                merged = cds_union
+                cds_start = int(cds_union[:, 0].min())
+                cds_end = int(cds_union[:, 1].max())
+            else:
+                merged = merge_intervals(np.vstack([cds_union, utr_union]))
+                cds_start = int(cds_union[:, 0].min())
+                cds_end = int(cds_union[:, 1].max())
+        else:
+            all_blocks = [t.blocks for t in ts if t.blocks.size > 0]
+            if not all_blocks:
+                raise ValueError(f"Gene {self.gene_id} has no exon blocks to merge")
+            merged = merge_intervals(np.vstack(all_blocks))
+            cds_start, cds_end = None, None
+
+        return Transcript(
+            blocks=merged,
+            strand=self._strand,
+            chrom=self._chrom,
+            id=tid,
+            cds_start=cds_start,
+            cds_end=cds_end,
+            biotype="exons_union",
+        )
+
     def apply_canonizer(self, canonizer_func: Optional[Callable] = None, **kwargs) -> None:
         """Set the canonical transcript using a canonizer function.
         
