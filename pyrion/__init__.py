@@ -30,6 +30,8 @@ from .io import (
     read_bed12_file, read_narrow_bed_file,
     # Chain format
     read_chain_file,
+    # GTF format
+    read_gtf,
     # 2bit format  
     TwoBitAccessor,
     # Gene data
@@ -70,6 +72,7 @@ __all__ = [
     # I/O functions
     "read_bed12_file", "read_narrow_bed_file",
     "read_chain_file",
+    "read_gtf",
     "read_gene_data",
     "TwoBitAccessor",
     "read_fasta", "write_fasta", "read_dna_fasta", "read_rna_fasta", "FastaAccessor",

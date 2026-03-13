@@ -172,12 +172,13 @@ def main():
         
         print(f"🎉 Version update complete: {new_version}")
         print("\nNext steps:")
-        print("1. Test the package: python -c 'import pyrion; print(pyrion.__version__)'")
-        print("2. Commit changes: git add -A && git commit -m 'Bump version to {}'".format(new_version))
-        print("3. Tag release: git tag v{}".format(new_version))
-        print("4. Remove old dist: rm -rf dist/")
-        print("4. Build package: python -m build --sdist --wheel")
-        print("5. Upload to PyPI: python -m twine upload dist/*")
+        print("1. Rebuild C extensions:  make build")
+        print("2. Run tests:             make test")
+        print("3. Commit changes:        git add -A && git commit -m 'Bump version to {}'".format(new_version))
+        print("4. Tag release:           git tag v{}".format(new_version))
+        print("5. Publish to PyPI:       make publish")
+        print("")
+        print("Or skip steps 1-2 and 5: 'make publish' does clean/build/test/upload.")
 
 
 if __name__ == "__main__":
