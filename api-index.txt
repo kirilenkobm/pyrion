@@ -1,5 +1,5 @@
 PYRION API INDEX
-Generated: 2026-03-13 16:29:41
+Generated: 2026-03-13 16:34:52
 Concise reference with type signatures only.
 ============================================================
 
@@ -345,7 +345,7 @@ MODULE pyrion.core.sequences_collection
     ids(self) -> 'List[str]'
     items(self)
     keys(self)
-    pop(self, key, default=<object object at 0x1028141e0>)
+    pop(self, key, default=<object object at 0x100a781d0>)
     popitem(self)
     sequences(self) -> 'List[SequenceLike]'
     setdefault(self, key, default=None)

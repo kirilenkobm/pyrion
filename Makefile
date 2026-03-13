@@ -1,4 +1,4 @@
-.PHONY: clean build test test-contracts publish publish-test help
+.PHONY: clean build test test-contracts dist sdist wheel publish publish-test help
 
 PYTHON ?= python
 PIP ?= pip
@@ -36,9 +36,15 @@ dist: clean ## Build both sdist and wheel
 	$(PYTHON) -m build
 	@echo "sdist + wheel built in dist/"
 
-publish-test: dist ## Build and upload to TestPyPI (dry run)
-	@echo "=== Running contract tests before upload ==="
+publish-test: build ## Build, test, and upload to TestPyPI
+	@echo "=== Running contract tests ==="
 	$(PYTHON) -m pytest tests/test_c_extension_contracts.py -v --tb=short
+	@echo ""
+	@echo "=== Running full test suite ==="
+	$(PYTHON) -m pytest tests/ --tb=short -q
+	@echo ""
+	rm -rf dist/
+	$(PYTHON) -m build
 	@echo ""
 	@echo "=== Uploading to TestPyPI ==="
 	$(PYTHON) -m twine upload --repository testpypi dist/*
@@ -46,12 +52,15 @@ publish-test: dist ## Build and upload to TestPyPI (dry run)
 	@echo "Install from TestPyPI with:"
 	@echo "  pip install -i https://test.pypi.org/simple/ pyrion"
 
-publish: dist ## Build and upload to PyPI (PRODUCTION)
-	@echo "=== Running contract tests before upload ==="
+publish: build ## Build, test, and upload to PyPI (PRODUCTION)
+	@echo "=== Running contract tests ==="
 	$(PYTHON) -m pytest tests/test_c_extension_contracts.py -v --tb=short
 	@echo ""
 	@echo "=== Running full test suite ==="
 	$(PYTHON) -m pytest tests/ --tb=short -q
+	@echo ""
+	rm -rf dist/
+	$(PYTHON) -m build
 	@echo ""
 	@read -p "Upload pyrion $$($(PYTHON) -c 'from pyrion._version import __version__; print(__version__)') to PyPI? [y/N] " confirm && \
 		[ "$$confirm" = "y" ] || (echo "Aborted." && exit 1)
