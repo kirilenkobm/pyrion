@@ -1,5 +1,5 @@
 PYRION API INDEX
-Generated: 2026-03-13 16:34:52
+Generated: 2026-03-13 16:52:08
 Concise reference with type signatures only.
 ============================================================
 
@@ -203,6 +203,7 @@ MODULE pyrion.core.genes
     applied_biotypes -> bool
     applied_gene_names -> bool
     available_data_mappings -> List
+    gene_data -> Optional
     gene_ids -> Set
     genes -> List
     has_gene_mapping -> bool
@@ -345,7 +346,7 @@ MODULE pyrion.core.sequences_collection
     ids(self) -> 'List[str]'
     items(self)
     keys(self)
-    pop(self, key, default=<object object at 0x100a781d0>)
+    pop(self, key, default=<object object at 0x1048781e0>)
     popitem(self)
     sequences(self) -> 'List[SequenceLike]'
     setdefault(self, key, default=None)

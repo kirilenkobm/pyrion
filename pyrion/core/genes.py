@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass, replace
 from functools import cached_property
-from typing import Optional, List, Dict, Set, Tuple, Union, Callable
+from typing import Optional, List, Dict, Set, Tuple, Union, Callable, overload
 import numpy as np
 from weakref import WeakKeyDictionary
 from pathlib import Path
@@ -444,9 +444,15 @@ class TranscriptsCollection:
         for i in range(len(self.transcripts)):
             yield self._enrich_transcript(self.transcripts[i])
 
-    def __getitem__(self, idx: int) -> Transcript:
-        transcript = self.transcripts[idx]
-        return self._enrich_transcript(transcript)
+    @overload
+    def __getitem__(self, idx: int) -> Transcript: ...
+    @overload
+    def __getitem__(self, idx: slice) -> List[Transcript]: ...
+
+    def __getitem__(self, idx):
+        if isinstance(idx, slice):
+            return [self._enrich_transcript(t) for t in self.transcripts[idx]]
+        return self._enrich_transcript(self.transcripts[idx])
 
     def get_by_id(self, transcript_id: str) -> Optional[Transcript]:
         if self._id_index is None:
@@ -654,6 +660,11 @@ class TranscriptsCollection:
             self._build_genes_cache()
         
         return set(self._genes_cache.keys())
+
+    @property
+    def gene_data(self) -> Optional['GeneData']:
+        """Bound GeneData object, or None if no gene data has been bound."""
+        return self._gene_data
 
     @property
     def has_gene_mapping(self) -> bool:
