@@ -1,6 +1,6 @@
 # Pyrion API Reference
 
-**Generated:** 2026-03-12 17:19:06
+**Generated:** 2026-03-13 14:13:58
 
 Complete API reference with full docstrings and signatures.
 
@@ -1201,6 +1201,25 @@ Return a copy of bound GeneData containing only entries for transcripts in this 
 *Signature:* `(self, file_path: Union[str, pathlib.Path]) -> None`
 
 
+**sort**
+
+*Signature:* `(self, by: Union[str, List[str]] = 'position', reverse: bool = False) -> 'TranscriptsCollection'`
+
+Sort transcripts in-place and return self for chaining.
+
+Args:
+    by: Sort key(s). A single string or list of strings.
+        Predefined presets:
+            "position" — sort by (chrom, start, end)  [default]
+            "id"       — sort by transcript ID
+        Individual keys: "chrom", "start", "end", "id", "strand".
+        Multiple keys: ["chrom", "start"] sorts by chrom first, then start.
+    reverse: If True, sort in descending order.
+
+Returns:
+    self (for chaining, e.g. ``collection.sort().save_to_bed12(path)``)
+
+
 **summary**
 
 *Signature:* `(self) -> str`
@@ -1512,6 +1531,28 @@ becomes:
 **save_to_json**
 
 *Signature:* `(self, file_path: Union[str, pathlib.Path]) -> None`
+
+
+**sort**
+
+*Signature:* `(self, by: Union[str, List[str]] = 'score', reverse: bool = False) -> 'GenomeAlignmentsCollection'`
+
+Sort alignments in-place and return self for chaining.
+
+Args:
+    by: Sort key(s). A single string or list of strings.
+        Predefined presets:
+            "score"    — sort by alignment score  [default]
+            "position" — sort by (t_chrom, t_start)
+        Individual keys: "score", "chain_id", "t_chrom", "t_start",
+            "q_chrom", "q_start", "aligned_length".
+        Multiple keys: ["t_chrom", "t_start"] sorts by target chrom
+            first, then target start.
+    reverse: If True, sort in descending order.
+        Tip: use ``reverse=True`` with ``by="score"`` for highest-first.
+
+Returns:
+    self (for chaining, e.g. ``collection.sort("score", reverse=True).save_to_chain(path)``)
 
 
 **sort_by_score**
@@ -2069,7 +2110,7 @@ D.keys() -> a set-like object providing a view on D's keys
 
 **pop**
 
-*Signature:* `(self, key, default=<object object at 0x1057a41d0>)`
+*Signature:* `(self, key, default=<object object at 0x1030281d0>)`
 
 D.pop(k[,d]) -> v, remove specified key and return the corresponding value.
 If key is not found, d is returned if given, otherwise KeyError is raised.

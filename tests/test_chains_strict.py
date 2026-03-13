@@ -184,6 +184,80 @@ class TestStrictProjection:
         assert result[2][0, 0] == 0
         assert result[2][0, 1] == 0
 
+    def test_reverse_strand_overlapping_blocks(self):
+        """Reverse-strand chain: query coords decrease as target coords increase."""
+        # Interval overlaps two blocks whose query coords are in reverse order
+        intervals = np.array([[1000, 4000]], dtype=np.int64)
+        blocks = np.array([
+            [500, 2000, 7000, 8500],
+            [3000, 4500, 4000, 5500],
+        ], dtype=np.int64)
+
+        result = project_intervals_through_chain_strict(intervals, blocks)
+
+        assert len(result) == 1
+        projected_start = result[0][0, 0]
+        projected_end = result[0][0, 1]
+        assert projected_start < projected_end, (
+            f"Expected start < end, got ({projected_start}, {projected_end})"
+        )
+
+    def test_reverse_strand_single_block(self):
+        """Reverse-strand chain: interval fully inside one block, coords must normalize."""
+        # Block maps t=[0,100000] -> q=[200000,100000] (reverse strand, q_start > q_end
+        # is actually represented as q_start=200000, q_end=100000 in chain)
+        intervals = np.array([[20000, 80000]], dtype=np.int64)
+        blocks = np.array([
+            [0, 100000, 200000, 100000],
+        ], dtype=np.int64)
+
+        result = project_intervals_through_chain_strict(intervals, blocks)
+
+        assert len(result) == 1
+        projected_start = result[0][0, 0]
+        projected_end = result[0][0, 1]
+        assert projected_start < projected_end, (
+            f"Expected start < end, got ({projected_start}, {projected_end})"
+        )
+
+    def test_reverse_strand_flanking_blocks_acceptable(self):
+        """Reverse-strand chain: flanking blocks with reversed query coords."""
+        # Interval: [2000, 3000] (length 1000)
+        # Blocks have decreasing query coords (reverse strand)
+        # Left flank q_end=7000, right flank q_start=6200 -> abs gap=800 <= 1000 -> accept
+        intervals = np.array([[2000, 3000]], dtype=np.int64)
+        blocks = np.array([
+            [0, 1000, 6500, 7000],
+            [4000, 5000, 6200, 6400],
+        ], dtype=np.int64)
+
+        result = project_intervals_through_chain_strict(intervals, blocks)
+
+        assert len(result) == 1
+        projected_start = result[0][0, 0]
+        projected_end = result[0][0, 1]
+        assert projected_start < projected_end, (
+            f"Expected start < end, got ({projected_start}, {projected_end})"
+        )
+        assert projected_start == 6200
+        assert projected_end == 7000
+
+    def test_reverse_strand_flanking_blocks_too_large(self):
+        """Reverse-strand chain: flanking blocks gap too large, should reject."""
+        # Interval: [2000, 3000] (length 1000)
+        # Left flank q_end=9000, right flank q_start=5000 -> abs gap=4000 > 1000 -> reject
+        intervals = np.array([[2000, 3000]], dtype=np.int64)
+        blocks = np.array([
+            [0, 1000, 8000, 9000],
+            [4000, 5000, 5000, 6000],
+        ], dtype=np.int64)
+
+        result = project_intervals_through_chain_strict(intervals, blocks)
+
+        assert len(result) == 1
+        assert result[0][0, 0] == 0
+        assert result[0][0, 1] == 0
+
     def test_empty_inputs(self):
         """Test edge cases with empty inputs."""
         # Empty intervals

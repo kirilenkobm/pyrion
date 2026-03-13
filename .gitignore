@@ -3,6 +3,12 @@
 .DS_Store
 .venv/
 .build/
+.cache/
+.pytest_cache/
+cmake-build-debug/
+htmlcov/
+pyrion.egg-info/
+
 
 test_outputs/*
 

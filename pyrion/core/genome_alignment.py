@@ -241,6 +241,70 @@ class GenomeAlignmentsCollection:
             source_file=self.source_file,
         )
 
+    _SORT_KEYS = {
+        "score": lambda a: a.score,
+        "chain_id": lambda a: a.chain_id,
+        "t_chrom": lambda a: a.t_chrom,
+        "t_start": lambda a: int(a.t_span[0]),
+        "q_chrom": lambda a: a.q_chrom,
+        "q_start": lambda a: int(a.q_span[0]),
+        "aligned_length": lambda a: a.aligned_length(),
+    }
+
+    def sort(
+        self,
+        by: Union[str, List[str]] = "score",
+        reverse: bool = False,
+    ) -> 'GenomeAlignmentsCollection':
+        """Sort alignments in-place and return self for chaining.
+
+        Args:
+            by: Sort key(s). A single string or list of strings.
+                Predefined presets:
+                    "score"    — sort by alignment score  [default]
+                    "position" — sort by (t_chrom, t_start)
+                Individual keys: "score", "chain_id", "t_chrom", "t_start",
+                    "q_chrom", "q_start", "aligned_length".
+                Multiple keys: ["t_chrom", "t_start"] sorts by target chrom
+                    first, then target start.
+            reverse: If True, sort in descending order.
+                Tip: use ``reverse=True`` with ``by="score"`` for highest-first.
+
+        Returns:
+            self (for chaining, e.g. ``collection.sort("score", reverse=True).save_to_chain(path)``)
+        """
+        if isinstance(by, str):
+            if by == "position":
+                keys = ["t_chrom", "t_start"]
+            elif by in self._SORT_KEYS:
+                keys = [by]
+            else:
+                raise ValueError(
+                    f"Unknown sort key '{by}'. "
+                    f"Use one of: {', '.join(sorted(self._SORT_KEYS))} or 'position'."
+                )
+        else:
+            keys = list(by)
+            for k in keys:
+                if k not in self._SORT_KEYS:
+                    raise ValueError(
+                        f"Unknown sort key '{k}'. "
+                        f"Use one of: {', '.join(sorted(self._SORT_KEYS))}."
+                    )
+
+        extractors = [self._SORT_KEYS[k] for k in keys]
+        self.alignments.sort(
+            key=lambda a: tuple(fn(a) for fn in extractors),
+            reverse=reverse,
+        )
+        self._invalidate_indices()
+        return self
+
+    def _invalidate_indices(self):
+        self._id_index = None
+        self._chrom_index = None
+        self._query_chrom_index = None
+
     def sort_by_score(self, max_elems: Optional[int] = None) -> List[Tuple[int, int]]:
         from .genome_alignment_auxiliary import sort_alignments_by_score
         return sort_alignments_by_score(self, max_elems)

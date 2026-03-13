@@ -683,6 +683,60 @@ class TranscriptsCollection:
     
 
 
+    _SORT_KEYS = {
+        "chrom": lambda t: t.chrom,
+        "start": lambda t: t.start,
+        "end": lambda t: t.end,
+        "id": lambda t: t.id,
+        "strand": lambda t: t.strand.value if isinstance(t.strand, Strand) else int(t.strand),
+    }
+
+    def sort(
+        self,
+        by: Union[str, List[str]] = "position",
+        reverse: bool = False,
+    ) -> 'TranscriptsCollection':
+        """Sort transcripts in-place and return self for chaining.
+
+        Args:
+            by: Sort key(s). A single string or list of strings.
+                Predefined presets:
+                    "position" — sort by (chrom, start, end)  [default]
+                    "id"       — sort by transcript ID
+                Individual keys: "chrom", "start", "end", "id", "strand".
+                Multiple keys: ["chrom", "start"] sorts by chrom first, then start.
+            reverse: If True, sort in descending order.
+
+        Returns:
+            self (for chaining, e.g. ``collection.sort().save_to_bed12(path)``)
+        """
+        if isinstance(by, str):
+            if by == "position":
+                keys = ["chrom", "start", "end"]
+            elif by in self._SORT_KEYS:
+                keys = [by]
+            else:
+                raise ValueError(
+                    f"Unknown sort key '{by}'. "
+                    f"Use one of: {', '.join(sorted(self._SORT_KEYS))} or 'position'."
+                )
+        else:
+            keys = list(by)
+            for k in keys:
+                if k not in self._SORT_KEYS:
+                    raise ValueError(
+                        f"Unknown sort key '{k}'. "
+                        f"Use one of: {', '.join(sorted(self._SORT_KEYS))}."
+                    )
+
+        extractors = [self._SORT_KEYS[k] for k in keys]
+        self.transcripts.sort(
+            key=lambda t: tuple(fn(t) for fn in extractors),
+            reverse=reverse,
+        )
+        self._invalidate_indices()
+        return self
+
     def canonize_transcripts(self, canonizer_func: Optional[Callable] = None, **kwargs) -> None:
         from .genes_auxiliary import set_canonical_transcripts_for_collection
         set_canonical_transcripts_for_collection(self, canonizer_func, **kwargs)

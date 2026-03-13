@@ -1,5 +1,5 @@
 PYRION API INDEX
-Generated: 2026-03-12 17:19:06
+Generated: 2026-03-13 14:13:58
 Concise reference with type signatures only.
 ============================================================
 
@@ -197,6 +197,7 @@ MODULE pyrion.core.genes
     save_biodata(self, tsv_path: Union[str, pathlib.Path], include_gene_transcript: bool = True, include_transcript_biotype: bool = True, include_gene_name: bool = True, separator: str = '\t', trim: bool = True) -> None
     save_to_bed12(self, file_path: Union[str, pathlib.Path]) -> None
     save_to_json(self, file_path: Union[str, pathlib.Path]) -> None
+    sort(self, by: Union[str, List[str]] = 'position', reverse: bool = False) -> 'TranscriptsCollection'
     summary(self) -> str
     to_bed12_string(self) -> str
     applied_biotypes -> bool
@@ -251,6 +252,7 @@ MODULE pyrion.core.genome_alignment
     get_reference_chromosomes(self) -> List[str]
     save_to_chain(self, file_path: Union[str, pathlib.Path]) -> None
     save_to_json(self, file_path: Union[str, pathlib.Path]) -> None
+    sort(self, by: Union[str, List[str]] = 'score', reverse: bool = False) -> 'GenomeAlignmentsCollection'
     sort_by_score(self, max_elems: Optional[int] = None) -> List[Tuple[int, int]]
     summary(self) -> str
 MODULE pyrion.core.genome_alignment_auxiliary
@@ -343,7 +345,7 @@ MODULE pyrion.core.sequences_collection
     ids(self) -> 'List[str]'
     items(self)
     keys(self)
-    pop(self, key, default=<object object at 0x1057a41d0>)
+    pop(self, key, default=<object object at 0x1030281d0>)
     popitem(self)
     sequences(self) -> 'List[SequenceLike]'
     setdefault(self, key, default=None)

@@ -247,6 +247,8 @@ def _project_intervals_strict_numba(
                     # No next block - chain doesn't propagate after this
                     q_end = q_ends[last_block_idx]
 
+            if q_start > q_end:
+                q_start, q_end = q_end, q_start
             results.append(np.array([[q_start, q_end]], dtype=np.int64))
 
         # Branch 2 & 3: No overlapping blocks - complete misalignment
@@ -267,10 +269,12 @@ def _project_intervals_strict_numba(
                 # Query interval between flanks
                 q_flank_start = q_ends[left_block_idx]
                 q_flank_end = q_starts[right_block_idx]
-                query_distance = q_flank_end - q_flank_start
+                query_distance = abs(q_flank_end - q_flank_start)
 
                 # Only return if query distance doesn't exceed target interval length
                 if query_distance <= interval_length:
+                    if q_flank_start > q_flank_end:
+                        q_flank_start, q_flank_end = q_flank_end, q_flank_start
                     results.append(np.array([[q_flank_start, q_flank_end]], dtype=np.int64))
                 else:
                     results.append(np.array([[0, 0]], dtype=np.int64))
@@ -345,6 +349,8 @@ def _project_intervals_strict_numpy(
                     # No next block - chain doesn't propagate after this
                     q_end = q_ends[last_block_idx]
 
+            if q_start > q_end:
+                q_start, q_end = q_end, q_start
             results.append(np.array([[q_start, q_end]], dtype=np.int64))
 
         # Branch 2 & 3: No overlapping blocks
@@ -363,9 +369,11 @@ def _project_intervals_strict_numpy(
             if left_block_idx >= 0 and right_block_idx >= 0:
                 q_flank_start = q_ends[left_block_idx]
                 q_flank_end = q_starts[right_block_idx]
-                query_distance = q_flank_end - q_flank_start
+                query_distance = abs(q_flank_end - q_flank_start)
 
                 if query_distance <= interval_length:
+                    if q_flank_start > q_flank_end:
+                        q_flank_start, q_flank_end = q_flank_end, q_flank_start
                     results.append(np.array([[q_flank_start, q_flank_end]], dtype=np.int64))
                 else:
                     results.append(np.array([[0, 0]], dtype=np.int64))
