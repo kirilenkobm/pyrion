@@ -35,6 +35,9 @@ PYRION_ALL_SYMBOLS = [
 PYRION_DOCUMENTED_EXTRAS = [
     "AminoAcidSequence",
     "GenomicIntervalsCollection",
+    "Assembly",
+    "read_chrom_sizes",
+    "write_chrom_sizes",
 ]
 
 

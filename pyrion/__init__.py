@@ -19,6 +19,7 @@ from .core import (
     Transcript, TranscriptsCollection, Gene, GeneData,
     NucleotideSequence, AminoAcidSequence,
     GenomeAlignment, GenomeAlignmentsCollection,
+    Assembly,
 )
 
 # Type system
@@ -44,7 +45,9 @@ from .io import (
     # FASTA format
     read_fasta, write_fasta, read_dna_fasta, read_rna_fasta, FastaAccessor,
     # FASTA indexing
-    create_fasta_index, load_fasta_index, get_or_create_fasta_index
+    create_fasta_index, load_fasta_index, get_or_create_fasta_index,
+    # Chrom sizes
+    read_chrom_sizes, write_chrom_sizes,
 )
 
 # Visualization is now imported on-demand:
@@ -68,6 +71,9 @@ __all__ = [
     # FASTA indexing
     "FaiEntry", "FaiStore",
     
+    # Assembly
+    "Assembly",
+    
     # Genes and annotations
     "Transcript", "TranscriptsCollection", "Gene", "GeneData",
     
@@ -82,6 +88,7 @@ __all__ = [
     "TwoBitAccessor",
     "read_fasta", "write_fasta", "read_dna_fasta", "read_rna_fasta", "FastaAccessor",
     "create_fasta_index", "load_fasta_index", "get_or_create_fasta_index",
+    "read_chrom_sizes", "write_chrom_sizes",
 
     # Operations
     
