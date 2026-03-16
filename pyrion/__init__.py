@@ -16,13 +16,18 @@ from .config import (
 # Core data structures
 from .core import (
     GenomicInterval, GenomicIntervalsCollection,
-    Transcript, Gene,
-    NucleotideSequence,
+    Transcript, TranscriptsCollection, Gene, GeneData,
+    NucleotideSequence, AminoAcidSequence,
     GenomeAlignment, GenomeAlignmentsCollection,
 )
 
 # Type system
 from .core_types import Strand, ExonType, ChainBlockArray, BlockArray, Metadata
+
+# Sequence types and translation
+from .core.nucleotide_sequences import SequenceType
+from .core.fai import FaiEntry, FaiStore
+from .core.translation import TranslationTable
 
 # I/O operations
 from .io import (
@@ -122,42 +127,49 @@ def cite():
     }
 
 
-# Convenience imports for common workflows
 def quick_start():
     guide = f"""
     Pyrion Quick Start Guide (v{__version__})
     =======================================
-    
+
     # Import main components
-    import pyrion as pyr
-    
-    # Read annotations
-    genes = pyr.read_bed_as_genes("genes.bed")
-    genes = pyr.read_gene_pred_as_genes("genes.gp")
-    
-    # Work with sequences (vectorized operations!)
-    seq = pyr.NucleotideSequence.from_string("ATGAAATAG")
-    
-    # Fast numpy-based sequence analysis
-    gc = pyr.gc_content(seq)           # GC content using abs(data) == 2
-    purines = pyr.purine_content(seq)  # A+G using data > 0  
-    cpg = pyr.cpg_content(seq)         # CpG dinucleotides
-    comp = pyr.nucleotide_composition(seq)  # Full composition
-    
-    protein = pyr.translate_sequence(seq)
-    
-    # Process intervals
-    intervals = [pyr.GenomicInterval("chr1", 100, 200)]
-    merged = pyr.merge_intervals(intervals)
-    
-    # Chain mapping
-    chains = pyr.read_chain_as_alignment_chains("mapping.chain")
-    mapped = pyr.map_via_chains(intervals[0], chains)
-    
-    # Access sequences
-    genome = pyr.TwoBitAccessor("genome.2bit")
+    from pyrion import (
+        GenomicInterval, Strand, NucleotideSequence,
+        TwoBitAccessor, read_bed12_file, read_chain_file,
+    )
+    from pyrion.ops import (
+        merge_intervals, intersect_intervals,
+        extract_cds_sequence, project_transcript_through_chain,
+    )
+
+    # Read transcripts from BED12
+    transcripts = read_bed12_file("annotations.bed")
+    t = transcripts.get_by_id("ENST00000456328")
+
+    # Work with sequences
+    seq = NucleotideSequence.from_string("ATGAAATAG")
+    rc = seq.reverse_complement()
+    protein = seq.to_amino_acids()
+
+    # Genomic intervals
+    iv = GenomicInterval("chr1", 1000, 2000, Strand.PLUS)
+    iv2 = GenomicInterval("chr1", 1500, 2500, Strand.PLUS)
+    print(iv.intersects(iv2))  # True
+    print(iv.overlap(iv2))     # 500
+
+    # Access genome sequences
+    genome = TwoBitAccessor("genome.2bit")
     region_seq = genome.fetch("chr1", 1000, 2000)
-    
-    For detailed documentation, see the individual module docstrings.
+    genome.close()
+
+    # Extract CDS sequence from a transcript
+    cds_seq = extract_cds_sequence(t, genome)
+
+    # Liftover via chain
+    chains = read_chain_file("hg38ToMm39.chain")
+    chain = chains.get_by_chain_id(1)
+    projected = project_transcript_through_chain(t, chain)
+
+    For detailed documentation, see docs/quickstart.md
     """
     print(guide)

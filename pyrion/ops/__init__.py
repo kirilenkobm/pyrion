@@ -4,6 +4,7 @@ from .chains import (
     project_intervals_through_chain, 
     project_intervals_through_genome_alignment,
     project_intervals_through_genome_alignment_to_intervals,
+    project_transcript_through_chain,
     get_chain_target_interval,
     get_chain_query_interval,
     get_chain_t_start,
@@ -12,7 +13,11 @@ from .chains import (
     get_chain_q_end,
     split_genome_alignment,
 )
-from .genes import merge_transcript_intervals
+from .genes import (
+    merge_transcript_intervals,
+    extract_cds_sequence,
+    extract_exon_sequence,
+)
 from .intervals import find_intersections, compute_overlap_size, intervals_to_array, array_to_intervals, chains_to_arrays, transcripts_to_arrays, projected_intervals_to_genomic_intervals
 from .interval_slicing import slice_intervals, remove_intervals, invert_intervals
 from .interval_ops import merge_intervals, intersect_intervals, subtract_intervals, intervals_union
@@ -61,6 +66,10 @@ from .interval_serialization import (
 )
 from .sequence_serialization import (
     sequence_to_fasta_string,
+    nucleotide_sequence_to_fasta_string,
+    amino_acid_sequence_to_fasta_string,
+    save_nucleotide_sequence_to_fasta,
+    save_amino_acid_sequence_to_fasta,
 )
 from .data_consistency import check_data_consistency
 from .chain_serialization import (
@@ -102,6 +111,8 @@ __all__ = [
     "get_chain_q_end",
     "split_genome_alignment",
     "merge_transcript_intervals",
+    "extract_cds_sequence",
+    "extract_exon_sequence",
     # New low-level interval operations
     "slice_intervals",
     "remove_intervals",

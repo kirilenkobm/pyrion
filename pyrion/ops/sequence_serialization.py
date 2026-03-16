@@ -98,3 +98,25 @@ def codon_sequence_to_fasta_string(sequence: CodonSequence,
                                   width: int = 80,
                                   header: Optional[str] = None) -> str:
     return sequence_to_fasta_string(sequence, width=width, header=header)
+
+
+def save_nucleotide_sequence_to_fasta(sequence: NucleotideSequence,
+                                      file_path: Union[str, Path],
+                                      width: int = 80,
+                                      header: Optional[str] = None) -> None:
+    """Save a single NucleotideSequence to a FASTA file."""
+    file_path = Path(file_path)
+    fasta_string = nucleotide_sequence_to_fasta_string(sequence, width=width, header=header)
+    with file_path.open('w') as f:
+        f.write(fasta_string + '\n')
+
+
+def save_amino_acid_sequence_to_fasta(sequence: AminoAcidSequence,
+                                      file_path: Union[str, Path],
+                                      width: int = 80,
+                                      header: Optional[str] = None) -> None:
+    """Save a single AminoAcidSequence to a FASTA file."""
+    file_path = Path(file_path)
+    fasta_string = amino_acid_sequence_to_fasta_string(sequence, width=width, header=header)
+    with file_path.open('w') as f:
+        f.write(fasta_string + '\n')
