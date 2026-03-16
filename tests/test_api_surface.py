@@ -109,6 +109,7 @@ PYRION_OPS_ALL_SYMBOLS = [
 PYRION_OPS_DOCUMENTED_EXTRAS = [
     "extract_cds_sequence",
     "extract_exon_sequence",
+    "extract_intron_sequence",
 ]
 
 

@@ -99,5 +99,10 @@ def extract_utr3_sequence(transcript: Transcript, accessor: SequenceAccessor) ->
         accessor, transcript.chrom, transcript.utr3_blocks, transcript.strand
     )
 
-# TODO: extract introns sequences?
 
+def extract_intron_sequence(transcript: Transcript, accessor: SequenceAccessor) -> NucleotideSequence:
+    """Extract concatenated intron sequences from a transcript."""
+    introns = transcript.get_introns()
+    return _extract_sequence_from_blocks(
+        accessor, transcript.chrom, introns, transcript.strand
+    )
