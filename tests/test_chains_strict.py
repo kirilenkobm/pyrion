@@ -258,6 +258,160 @@ class TestStrictProjection:
         assert result[0][0, 0] == 0
         assert result[0][0, 1] == 0
 
+    def test_minus_strand_single_block_inside(self):
+        """Minus-strand chain: within-block projection reverses direction."""
+        # Block: T=[1000, 1100], Q=[2000, 2100] (100 bp each, genomic + coords)
+        # Interval [1010, 1030] at offset 10-30 from t_start
+        # Plus strand would give: [2010, 2030]
+        # Minus strand should give: [2070, 2090] (q_end - offset)
+        intervals = np.array([[1010, 1030]], dtype=np.int64)
+        blocks = np.array([[1000, 1100, 2000, 2100]], dtype=np.int64)
+
+        result_plus = project_intervals_through_chain_strict(intervals, blocks, q_strand=1)
+        result_minus = project_intervals_through_chain_strict(intervals, blocks, q_strand=-1)
+
+        assert result_plus[0][0, 0] == 2010
+        assert result_plus[0][0, 1] == 2030
+        assert result_minus[0][0, 0] == 2070
+        assert result_minus[0][0, 1] == 2090
+
+    def test_minus_strand_single_block_scaled(self):
+        """Minus-strand chain: proportional projection with different t_len/q_len."""
+        # Block: T=[0, 200], Q=[0, 100], ratio=0.5
+        # Interval [40, 160] → offset [40, 160]
+        # Plus: q_s + int((40/200)*100)=20, q_s + int((160/200)*100)=80 → [20, 80]
+        # Minus: q_e - int((40/200)*100)=80, q_e - int((160/200)*100)=20 → [20, 80]
+        # (symmetric interval → same result either way)
+        # Asymmetric: Interval [20, 60]
+        # Plus: 0 + int((20/200)*100)=10, 0 + int((60/200)*100)=30 → [10, 30]
+        # Minus: 100 - 10=90, 100 - 30=70 → [70, 90]
+        intervals = np.array([[20, 60]], dtype=np.int64)
+        blocks = np.array([[0, 200, 0, 100]], dtype=np.int64)
+
+        result_plus = project_intervals_through_chain_strict(intervals, blocks, q_strand=1)
+        result_minus = project_intervals_through_chain_strict(intervals, blocks, q_strand=-1)
+
+        assert result_plus[0][0, 0] == 10
+        assert result_plus[0][0, 1] == 30
+        assert result_minus[0][0, 0] == 70
+        assert result_minus[0][0, 1] == 90
+
+    def test_minus_strand_two_blocks_spanning(self):
+        """Minus-strand chain: interval spans two blocks with decreasing q."""
+        # Simulates minus-strand parsed blocks (q decreases across blocks)
+        # Block 0: T=[0, 200], Q=[800, 1000] (t_len=200, q_len=200, higher q)
+        # Block 1: T=[300, 500], Q=[400, 600] (t_len=200, q_len=200, lower q)
+        # Interval: [50, 350]
+        #   Start in block 0, offset=50: minus → 1000 - int((50/200)*200) = 1000-50 = 950
+        #   End in block 1, offset=50: minus → 600 - int((50/200)*200) = 600-50 = 550
+        #   After swap: [550, 950]
+        intervals = np.array([[50, 350]], dtype=np.int64)
+        blocks = np.array([
+            [0, 200, 800, 1000],
+            [300, 500, 400, 600],
+        ], dtype=np.int64)
+
+        result_minus = project_intervals_through_chain_strict(intervals, blocks, q_strand=-1)
+        assert result_minus[0][0, 0] == 550
+        assert result_minus[0][0, 1] == 950
+
+    def test_minus_strand_extension_before_block(self):
+        """Minus-strand: extension into misaligned region before first overlapping block."""
+        # Block 0: T=[0, 100], Q=[800, 900] (higher q, previous block)
+        # Block 1: T=[200, 300], Q=[500, 600] (lower q, overlapping block)
+        # Interval: [150, 250] → start is before block 1, end is inside block 1
+        # Minus strand:
+        #   Start extension: needed=200-150=50
+        #     Available: q_starts[block0] - q_ends[block1] = 800 - 600 = 200
+        #     Extension = min(50, 200) = 50
+        #     q_start = q_ends[block1] + 50 = 600 + 50 = 650
+        #   End projection: offset=250-200=50, q_end = q_ends[1] - int((50/100)*100) = 600-50 = 550
+        #   After swap: [550, 650]
+        intervals = np.array([[150, 250]], dtype=np.int64)
+        blocks = np.array([
+            [0, 100, 800, 900],
+            [200, 300, 500, 600],
+        ], dtype=np.int64)
+
+        result = project_intervals_through_chain_strict(intervals, blocks, q_strand=-1)
+        assert result[0][0, 0] == 550
+        assert result[0][0, 1] == 650
+
+    def test_minus_strand_extension_after_block(self):
+        """Minus-strand: extension into misaligned region after last overlapping block."""
+        # Block 0: T=[0, 100], Q=[800, 900] (higher q, overlapping block)
+        # Block 1: T=[200, 300], Q=[500, 600] (lower q, next block)
+        # Interval: [50, 150] → start is inside block 0, end is after block 0
+        # Minus strand:
+        #   Start projection: offset=50-0=50, q_start = q_ends[0] - int((50/100)*100) = 900-50 = 850
+        #   End extension: needed=150-100=50
+        #     Available: q_starts[block0] - q_ends[block1] = 800 - 600 = 200
+        #     Extension = min(50, 200) = 50
+        #     q_end = q_starts[block0] - 50 = 800 - 50 = 750
+        #   After swap: [750, 850]
+        intervals = np.array([[50, 150]], dtype=np.int64)
+        blocks = np.array([
+            [0, 100, 800, 900],
+            [200, 300, 500, 600],
+        ], dtype=np.int64)
+
+        result = project_intervals_through_chain_strict(intervals, blocks, q_strand=-1)
+        assert result[0][0, 0] == 750
+        assert result[0][0, 1] == 850
+
+    def test_minus_strand_flanking_blocks(self):
+        """Minus-strand: interval entirely in gap, flanking blocks provide boundaries."""
+        # Block 0: T=[0, 100], Q=[800, 900] (left flank, higher q)
+        # Block 1: T=[400, 500], Q=[500, 600] (right flank, lower q)
+        # Interval: [200, 300] (length 100)
+        # Minus strand flanking:
+        #   q_flank_start = q_ends[right] = 600
+        #   q_flank_end = q_starts[left] = 800
+        #   distance = 200, interval_length = 100 → 200 > 100 → reject
+        intervals = np.array([[200, 300]], dtype=np.int64)
+        blocks = np.array([
+            [0, 100, 800, 900],
+            [400, 500, 500, 600],
+        ], dtype=np.int64)
+
+        result = project_intervals_through_chain_strict(intervals, blocks, q_strand=-1)
+        assert result[0][0, 0] == 0
+        assert result[0][0, 1] == 0
+
+    def test_minus_strand_flanking_blocks_acceptable(self):
+        """Minus-strand: flanking gap within acceptable distance."""
+        # Block 0: T=[0, 100], Q=[850, 900] (left flank)
+        # Block 1: T=[400, 500], Q=[800, 830] (right flank)
+        # Interval: [200, 300] (length 100)
+        # Minus strand:
+        #   q_flank_start = q_ends[right] = 830
+        #   q_flank_end = q_starts[left] = 850
+        #   distance = 20, interval_length = 100 → 20 <= 100 → accept
+        #   After normalize: [830, 850]
+        intervals = np.array([[200, 300]], dtype=np.int64)
+        blocks = np.array([
+            [0, 100, 850, 900],
+            [400, 500, 800, 830],
+        ], dtype=np.int64)
+
+        result = project_intervals_through_chain_strict(intervals, blocks, q_strand=-1)
+        assert result[0][0, 0] == 830
+        assert result[0][0, 1] == 850
+
+    def test_minus_strand_no_propagation_before(self):
+        """Minus-strand: no previous block, can't extend before first block."""
+        # Single block: T=[100, 200], Q=[500, 600]
+        # Interval: [50, 150] → start before block, end inside block
+        # No previous block → q_start = q_ends[0] = 600 (for minus strand)
+        # End: offset=150-100=50, q_end = 600 - 50 = 550
+        # After swap: [550, 600]
+        intervals = np.array([[50, 150]], dtype=np.int64)
+        blocks = np.array([[100, 200, 500, 600]], dtype=np.int64)
+
+        result = project_intervals_through_chain_strict(intervals, blocks, q_strand=-1)
+        assert result[0][0, 0] == 550
+        assert result[0][0, 1] == 600
+
     def test_empty_inputs(self):
         """Test edge cases with empty inputs."""
         # Empty intervals

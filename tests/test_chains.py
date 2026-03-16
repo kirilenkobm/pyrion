@@ -420,3 +420,66 @@ class TestEdgeCases(TestFixtures):
         assert result[1] <= 1500  # Max bound
 
 
+class TestMinusStrandProjection(TestFixtures):
+    """Tests for minus-strand chain projection (non-strict)."""
+
+    def test_minus_strand_single_block(self):
+        """Within-block projection reverses for minus strand."""
+        blocks = np.array([[1000, 1100, 2000, 2100]], dtype=np.int64)
+        intervals = np.array([[1010, 1030]], dtype=np.int64)
+
+        result_plus = project_intervals_through_chain(intervals, blocks, q_strand=1)
+        result_minus = project_intervals_through_chain(intervals, blocks, q_strand=-1)
+
+        assert result_plus[0][0, 0] == 2010
+        assert result_plus[0][0, 1] == 2030
+        assert result_minus[0][0, 0] == 2070
+        assert result_minus[0][0, 1] == 2090
+
+    def test_minus_strand_two_blocks(self):
+        """Multi-block minus-strand projection uses q_end-offset."""
+        blocks = np.array([
+            [0, 100, 900, 1000],
+            [200, 300, 500, 600],
+        ], dtype=np.int64)
+        intervals = np.array([[30, 230]], dtype=np.int64)
+
+        result_minus = project_intervals_through_chain(intervals, blocks, q_strand=-1)
+        # Start in block 0: q_end - offset = 1000 - 30 = 970
+        # End in block 1: q_end - (230-200) = 600 - 30 = 570
+        # After swap: [570, 970]
+        assert result_minus[0][0, 0] == 570
+        assert result_minus[0][0, 1] == 970
+
+    def test_minus_strand_gap_between_blocks(self):
+        """Minus-strand gap handling uses correct block boundaries."""
+        blocks = np.array([
+            [0, 100, 800, 900],
+            [300, 400, 500, 600],
+        ], dtype=np.int64)
+        intervals = np.array([[150, 250]], dtype=np.int64)
+
+        result_minus = project_intervals_through_chain(intervals, blocks, q_strand=-1)
+        # Gap boundaries for minus strand:
+        #   gap_lo = q_ends[right_block] = 600
+        #   gap_hi = q_starts[left_block] = 800
+        #   Result: [600, 800]
+        assert result_minus[0][0, 0] == 600
+        assert result_minus[0][0, 1] == 800
+
+    def test_minus_strand_genome_alignment(self):
+        """project_intervals_through_genome_alignment passes q_strand correctly."""
+        from pyrion.ops.chains import project_intervals_through_genome_alignment
+        blocks = np.array([[1000, 1100, 2000, 2100]], dtype=np.int64)
+        alignment = GenomeAlignment(
+            chain_id=99, score=1000, t_chrom="chr1", t_strand=1, t_size=1000000,
+            q_chrom="chr2", q_strand=-1, q_size=1000000, blocks=blocks
+        )
+        intervals = np.array([[1010, 1030]], dtype=np.int64)
+
+        result = project_intervals_through_genome_alignment(intervals, alignment)
+        # q_strand=-1 should produce minus-strand projection
+        assert result[0][0, 0] == 2070
+        assert result[0][0, 1] == 2090
+
+

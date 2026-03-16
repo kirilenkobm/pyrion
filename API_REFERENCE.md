@@ -1,6 +1,6 @@
 # Pyrion API Reference
 
-**Generated:** 2026-03-13 16:52:08
+**Generated:** 2026-03-16 11:34:06
 
 Complete API reference with full docstrings and signatures.
 
@@ -2115,7 +2115,7 @@ D.keys() -> a set-like object providing a view on D's keys
 
 **pop**
 
-*Signature:* `(self, key, default=<object object at 0x1048781e0>)`
+*Signature:* `(self, key, default=<object object at 0x1052881d0>)`
 
 D.pop(k[,d]) -> v, remove specified key and return the corresponding value.
 If key is not found, d is returned if given, otherwise KeyError is raised.
@@ -2153,7 +2153,7 @@ Slice all sequences consistently. Requires aligned collection.
 *Signature:* `(self, other=(), /, **kwds)`
 
 D.update([E, ]**F) -> None.  Update D from mapping/iterable E and F.
-If E present and has a .keys() method, does:     for k in E: D[k] = E[k]
+If E present and has a .keys() method, does:     for k in E.keys(): D[k] = E[k]
 If E present and lacks .keys() method, does:     for (k, v) in E: D[k] = v
 In either case, this is followed by: for k, v in F.items(): D[k] = v
 
@@ -2742,12 +2742,12 @@ Chain alignment operations for projecting genomic intervals.
 
 ### project_intervals_through_chain
 
-**Signature:** `(intervals: numpy.ndarray, chain_blocks: numpy.ndarray) -> List[numpy.ndarray]`
+**Signature:** `(intervals: numpy.ndarray, chain_blocks: numpy.ndarray, q_strand: int = 1) -> List[numpy.ndarray]`
 
 
 ### project_intervals_through_chain_strict
 
-**Signature:** `(intervals: numpy.ndarray, chain_blocks: numpy.ndarray) -> List[numpy.ndarray]`
+**Signature:** `(intervals: numpy.ndarray, chain_blocks: numpy.ndarray, q_strand: int = 1) -> List[numpy.ndarray]`
 
 Stricter projection that respects alignment structure and deletions.
 
@@ -2769,6 +2769,8 @@ Logic:
 Args:
     intervals: Array of intervals to project, shape (N, 2)
     chain_blocks: Chain alignment blocks, shape (M, 4) with [t_start, t_end, q_start, q_end]
+    q_strand: Query strand (1 for plus, -1 for minus). For minus-strand chains,
+        within-block projection direction is reversed (anti-parallel alignment).
 
 Returns:
     List of projected intervals. Returns [[0, 0]] if interval can't be reliably projected.
@@ -2796,7 +2798,7 @@ Args:
 
 ### project_transcript_through_chain
 
-**Signature:** `(transcript: pyrion.core.genes.Transcript, chain: pyrion.core.genome_alignment.GenomeAlignment, only_cds=False) -> pyrion.core.intervals.GenomicInterval | None`
+**Signature:** `(transcript: pyrion.core.genes.Transcript, chain: pyrion.core.genome_alignment.GenomeAlignment, only_cds=False) -> Optional[pyrion.core.intervals.GenomicInterval]`
 
 
 ### split_genome_alignment
