@@ -6,13 +6,14 @@
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Made with Cursor](https://img.shields.io/badge/Made%20with-Cursor-0066cc?style=flat&logo=cursor&logoColor=white)
 
-Tools and abstractions for comparative genomics. Reliable, fast, and minimal-dependency tools 
-for common genomics tasks without unnecessary overhead.
+Pyrion is a lightweight toolkit for comparative genomics focused on fast,
+reliable manipulation of genome annotations and alignments.
 
-Pyrion includes tools for manipulating genomic intervals, genome alignments, and sequences.
-It handles common formats like BED (6 or 12), chain, 2bit, and FASTA, and can also parse genePred and GTF annotations.
+It provides efficient abstractions for genomic intervals, genome alignment
+chains, and sequence access, supporting formats such as BED, chain, 2bit,
+FASTA, genePred, and GTF.
 
-Work in progress: [plans](TODO.md).
+Development plans and open tasks are tracked in the [issue tracker](https://github.com/kirilenkobm/pyrion/issues).
 
 ## Installation
 

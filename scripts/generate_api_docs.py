@@ -26,18 +26,22 @@ class APIDocGenerator:
     def generate_all(self):
         """Generate both API reference and index files."""
         print("🔍 Scanning pyrion package...")
-        
+
         # Process the main pyrion package
         self._process_module(pyrion, "pyrion")
-        
+
         # Write detailed API reference
         print("📝 Writing detailed API reference...")
         self._write_detailed_reference()
-        
+
         # Write concise API index
         print("📋 Writing concise API index...")
         self._write_concise_index()
-        
+
+        # Update agent-focused docs with fresh imports
+        print("🤖 Updating agent documentation with fresh imports...")
+        self._update_agent_docs()
+
         print("✅ API documentation generated successfully!")
     
     def _process_module(self, module: Any, module_name: str, prefix: str = ""):
@@ -270,6 +274,181 @@ class APIDocGenerator:
                 f.write(line + "\n")
         
         print(f"📋 API index written to: {output_path}")
+
+    def _update_agent_docs(self):
+        """Update AGENTS.md and CLAUDE.md with fresh import statements."""
+        import pyrion
+        import pyrion.ops
+
+        # Generate import blocks from actual __all__
+        main_imports = self._generate_import_block(pyrion, "pyrion")
+        ops_imports = self._generate_import_block(pyrion.ops, "pyrion.ops")
+
+        # Update AGENTS.md
+        self._update_agents_md(main_imports, ops_imports)
+
+        # Update CLAUDE.md
+        self._update_claude_md(main_imports, ops_imports)
+
+        print("📝 Agent documentation updated with current imports")
+
+    def _generate_import_block(self, module: Any, module_name: str) -> List[str]:
+        """Generate a sorted list of public exports from a module."""
+        if hasattr(module, '__all__'):
+            # Filter out version/internal stuff for cleaner agent docs
+            skip_items = {'__version__', '__version_info__', '__author__', '__github__',
+                         '__license__', '__copyright__', 'get_version', 'get_version_info',
+                         'quick_start', 'cite', 'SequenceType', 'FaiEntry', 'FaiStore',
+                         'TranslationTable', 'ExonType', 'Metadata', 'BlockArray',
+                         'ChainBlockArray', 'get_available_cores', 'get_max_cores',
+                         'set_max_cores', 'get_min_items_for_parallel',
+                         'set_min_items_for_parallel', 'disable_parallel',
+                         'enable_parallel', 'is_multiprocessing_available',
+                         'get_config_summary', 'set_loglevel'}
+
+            items = [item for item in module.__all__ if item not in skip_items]
+            return sorted(items)
+        return []
+
+    def _update_agents_md(self, main_imports: List[str], ops_imports: List[str]):
+        """Update AGENTS.md with fresh import statements."""
+        agents_path = Path("AGENTS.md")
+        if not agents_path.exists():
+            print(f"⚠️  {agents_path} not found, skipping")
+            return
+
+        with open(agents_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        # Format imports nicely (max ~80 chars per line)
+        main_block = self._format_imports("pyrion", main_imports)
+        ops_block = self._format_imports("pyrion.ops", ops_imports)
+
+        new_imports = f'''```python
+{main_block}
+
+# I/O
+from pyrion import (
+    read_bed12_file,
+    read_narrow_bed_file,
+    read_chain_file,
+    read_gene_data,
+    read_fasta,
+    write_fasta,
+    read_dna_fasta,
+    FastaAccessor,
+    read_gtf,
+)
+
+# Operations
+{ops_block}
+```'''
+
+        # Replace between "## Canonical imports" and next "##"
+        import re
+        pattern = r'(## Canonical imports\s*\n\n)```python\n.*?```(\s*\n## )'
+        replacement = r'\1' + new_imports + r'\2'
+        new_content = re.sub(pattern, replacement, content, flags=re.DOTALL)
+
+        # Add reference link if not present
+        if 'API_REFERENCE.md' not in new_content:
+            footer = "\n\n**For complete API signatures, see [API_REFERENCE.md](API_REFERENCE.md) or [api-index.txt](api-index.txt)**\n"
+            # Add before "## Where to find docs"
+            new_content = new_content.replace('## Where to find docs', footer + '## Where to find docs')
+
+        with open(agents_path, 'w', encoding='utf-8') as f:
+            f.write(new_content)
+
+        print(f"✅ Updated {agents_path}")
+
+    def _update_claude_md(self, main_imports: List[str], ops_imports: List[str]):
+        """Update CLAUDE.md with fresh import statements."""
+        claude_path = Path("CLAUDE.md")
+        if not claude_path.exists():
+            print(f"⚠️  {claude_path} not found, skipping")
+            return
+
+        with open(claude_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        # Pick most commonly used items for CLAUDE.md (keep it concise)
+        essential_main = [
+            'GenomicInterval', 'GenomicIntervalsCollection',
+            'Transcript', 'TranscriptsCollection', 'Gene', 'GeneData',
+            'GenomeAlignment', 'GenomeAlignmentsCollection',
+            'NucleotideSequence', 'AminoAcidSequence', 'Strand',
+            'TwoBitAccessor', 'FastaAccessor',
+            'read_bed12_file', 'read_chain_file', 'read_gene_data',
+            'read_fasta', 'write_fasta'
+        ]
+
+        essential_ops = [
+            'project_transcript_through_chain',
+            'project_intervals_through_genome_alignment',
+            'extract_cds_sequence', 'extract_exon_sequence',
+            'merge_intervals', 'intersect_intervals', 'subtract_intervals',
+            'slice_transcript', 'transcript_to_bed12_string',
+            'save_transcripts_collection_to_bed12'
+        ]
+
+        main_block = self._format_imports("pyrion", essential_main)
+        ops_block = self._format_imports("pyrion.ops", essential_ops)
+
+        new_imports = f'''```python
+{main_block}
+{ops_block}
+```'''
+
+        # Replace between "## Core imports" and next "##"
+        import re
+        pattern = r'(## Core imports\s*\n\n)```python\n.*?```(\s*\n## )'
+        replacement = r'\1' + new_imports + r'\2'
+        new_content = re.sub(pattern, replacement, content, flags=re.DOTALL)
+
+        # Add reference link to Docs section if not present
+        if 'API_REFERENCE.md' not in new_content:
+            docs_section = new_content.find('## Docs')
+            if docs_section != -1:
+                # Find the end of the list
+                end_of_list = new_content.find('\n\n', docs_section)
+                if end_of_list != -1:
+                    insert_point = end_of_list
+                    new_content = (new_content[:insert_point] +
+                                 "\n- `API_REFERENCE.md` — complete auto-generated API reference" +
+                                 "\n- `api-index.txt` — concise type signatures index" +
+                                 new_content[insert_point:])
+
+        with open(claude_path, 'w', encoding='utf-8') as f:
+            f.write(new_content)
+
+        print(f"✅ Updated {claude_path}")
+
+    def _format_imports(self, module_name: str, items: List[str]) -> str:
+        """Format import statements with nice line wrapping."""
+        if not items:
+            return f"from {module_name} import ()"
+
+        # Group items to fit ~80 chars per line
+        lines = [f"from {module_name} import ("]
+        current_line = "    "
+
+        for i, item in enumerate(items):
+            if i == len(items) - 1:
+                # Last item
+                current_line += item + ","
+                lines.append(current_line)
+            else:
+                # Check if adding this item would exceed ~75 chars
+                test_line = current_line + item + ", "
+                if len(test_line) > 75:
+                    # Start new line
+                    lines.append(current_line.rstrip())
+                    current_line = "    " + item + ", "
+                else:
+                    current_line += item + ", "
+
+        lines.append(")")
+        return "\n".join(lines)
 
 
 def main():

@@ -13,15 +13,17 @@ pip install pyrion
 
 ```python
 from pyrion import (
-    GenomicInterval, Transcript, TranscriptsCollection,
-    GenomeAlignment, GenomeAlignmentsCollection,
-    NucleotideSequence, Strand, TwoBitAccessor,
-    read_bed12_file, read_chain_file, read_gene_data,
+    GenomicInterval, GenomicIntervalsCollection, Transcript,
+    TranscriptsCollection, Gene, GeneData, GenomeAlignment,
+    GenomeAlignmentsCollection, NucleotideSequence, AminoAcidSequence,
+    Strand, TwoBitAccessor, FastaAccessor, read_bed12_file,
+    read_chain_file, read_gene_data, read_fasta, write_fasta,
 )
 from pyrion.ops import (
     project_transcript_through_chain,
-    extract_cds_sequence, merge_intervals, intersect_intervals,
-    slice_transcript, transcript_to_bed12_string,
+    project_intervals_through_genome_alignment, extract_cds_sequence,
+    extract_exon_sequence, merge_intervals, intersect_intervals,
+    subtract_intervals, slice_transcript, transcript_to_bed12_string, save_transcripts_collection_to_bed12,
 )
 ```
 
@@ -72,6 +74,8 @@ iv = GenomicInterval.from_string("chr1:1000-2000:+")
 - Forget to close `TwoBitAccessor`
 
 ## Docs
+- `API_REFERENCE.md` — complete auto-generated API reference
+- `api-index.txt` — concise type signatures index
 
 - `docs/quickstart.md` — installation and first steps
 - `docs/api_reference.md` — structured API overview
