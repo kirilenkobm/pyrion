@@ -13,14 +13,28 @@ class TwoBitAccessor:
     def __init__(self, file_path: str):
         self.file_path = file_path
         self._chrom_sizes_cache: Optional[ChromSizes] = None
-        
+
         try:
             import py2bit
-            self._backend = py2bit.open(self.file_path)
         except ImportError as e:
-            raise ImportError("py2bit is required for 2bit file support. Install with: pip install py2bit") from e
+            raise ImportError(
+                "py2bit is required for 2bit file support. "
+                "Install with: pip install py2bit"
+            ) from e
+
+        p = Path(self.file_path)
+        if not p.exists():
+            raise FileNotFoundError(f"2bit file not found: {p.resolve()}")
+        if not p.is_file():
+            raise ValueError(f"Not a file: {p.resolve()}")
+
+        try:
+            self._backend = py2bit.open(self.file_path)
         except Exception as e:
-            raise ValueError(f"Failed to open 2bit file {self.file_path}: {e}") from e
+            raise ValueError(
+                f"Failed to open 2bit file '{p.resolve()}'. "
+                f"Is it a valid 2bit file? (py2bit: {e})"
+            ) from e
     
     def __repr__(self) -> str:
         try:
