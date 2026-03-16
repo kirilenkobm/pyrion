@@ -112,6 +112,8 @@ PYRION_OPS_ALL_SYMBOLS = [
 PYRION_OPS_DOCUMENTED_EXTRAS = [
     "extract_cds_sequence",
     "extract_exon_sequence",
+    "extract_utr5_sequence",
+    "extract_utr3_sequence",
     "extract_intron_sequence",
 ]
 
@@ -263,3 +265,15 @@ def test_pyrion_symbols_are_callable(symbol):
     mod = importlib.import_module("pyrion")
     obj = getattr(mod, symbol)
     assert callable(obj), f"pyrion.{symbol} exists but is not callable"
+
+
+# ── Context manager protocol ─────────────────────────────────────────────
+
+
+@pytest.mark.parametrize("accessor_name", ["TwoBitAccessor", "FastaAccessor"])
+def test_accessors_support_context_manager(accessor_name):
+    """Both sequence accessors must support the 'with' statement."""
+    mod = importlib.import_module("pyrion")
+    cls = getattr(mod, accessor_name)
+    assert hasattr(cls, "__enter__"), f"{accessor_name} missing __enter__"
+    assert hasattr(cls, "__exit__"), f"{accessor_name} missing __exit__"

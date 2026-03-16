@@ -17,6 +17,8 @@ from .genes import (
     merge_transcript_intervals,
     extract_cds_sequence,
     extract_exon_sequence,
+    extract_utr5_sequence,
+    extract_utr3_sequence,
     extract_intron_sequence,
 )
 from .intervals import find_intersections, compute_overlap_size, intervals_to_array, array_to_intervals, chains_to_arrays, transcripts_to_arrays, projected_intervals_to_genomic_intervals
@@ -114,6 +116,8 @@ __all__ = [
     "merge_transcript_intervals",
     "extract_cds_sequence",
     "extract_exon_sequence",
+    "extract_utr5_sequence",
+    "extract_utr3_sequence",
     "extract_intron_sequence",
     # New low-level interval operations
     "slice_intervals",

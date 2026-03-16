@@ -104,6 +104,12 @@ class TwoBitAccessor:
         chrom_size = sizes[chrom]
         return 0 <= start < end <= chrom_size
     
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
+
     def close(self):
         if hasattr(self._backend, 'close'):
             self._backend.close()
