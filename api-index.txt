@@ -1,5 +1,5 @@
 PYRION API INDEX
-Generated: 2026-03-16 14:49:40
+Generated: 2026-03-16 15:50:13
 Concise reference with type signatures only.
 ============================================================
 
@@ -64,6 +64,34 @@ MODULE pyrion.core.amino_acid_sequences
     slice(self, start: 'int', end: 'int') -> "'AminoAcidSequence'"
     to_fasta_string(self, width: 'int' = 80, header: 'Optional[str]' = None) -> 'str'
     to_string(self) -> 'str'
+MODULE pyrion.core.assembly
+  CLASS Assembly
+    __init__(self, name: 'str', chrom_sizes: 'Dict[str, int]', aliases: 'Tuple[str, ...]' = (), species: 'Optional[str]' = None, metadata: 'Optional[Dict[str, Any]]' = None)
+    __init__(self, name: 'str', chrom_sizes: 'Dict[str, int]', aliases: 'Tuple[str, ...]' = (), species: 'Optional[str]' = None, metadata: 'Optional[Dict[str, Any]]' = None)
+    __repr__(self) -> 'str'
+    all_names(self) -> 'Tuple[str, ...]'
+    fetch(self, chrom: 'str', start: 'Optional[int]' = None, end: 'Optional[int]' = None, strand: 'Strand' = <Strand.PLUS: 1>) -> 'NucleotideSequence'
+    fetch_interval(self, interval: 'GenomicInterval') -> 'NucleotideSequence'
+    find_chrom(self, chrom: 'str') -> 'Optional[str]'
+    from_2bit(path_or_accessor, name: 'str', aliases: 'Tuple[str, ...]' = (), species: 'Optional[str]' = None, metadata: 'Optional[Dict[str, Any]]' = None) -> 'Assembly'
+    from_chrom_sizes_file(path: 'Union[str, Path]', name: 'str', aliases: 'Tuple[str, ...]' = (), species: 'Optional[str]' = None, metadata: 'Optional[Dict[str, Any]]' = None) -> 'Assembly'
+    from_dict(d: 'Dict[str, Any]') -> 'Assembly'
+    from_fasta_index(path_or_accessor, name: 'str', aliases: 'Tuple[str, ...]' = (), species: 'Optional[str]' = None, metadata: 'Optional[Dict[str, Any]]' = None) -> 'Assembly'
+    get_chrom_size(self, chrom: 'str') -> 'int'
+    has_chrom(self, chrom: 'str') -> 'bool'
+    matches_name(self, name: 'str') -> 'bool'
+    save_chrom_sizes(self, path: 'Union[str, Path]') -> 'None'
+    set_accessor(self, accessor) -> 'None'
+    to_dict(self) -> 'Dict[str, Any]'
+    validate_collection(self, collection) -> 'List[str]'
+    validate_interval(self, interval: 'GenomicInterval') -> 'bool'
+    validate_transcript(self, transcript) -> 'bool'
+    accessor -> Any
+    chrom_names -> List[str]
+    has_accessor -> bool
+    num_chroms -> int
+    total_size -> int
+    uses_chr_prefix -> bool
 MODULE pyrion.core.canonizer
   FUNCTION DEFAULT_CANONIZER(transcripts: List, **kwargs) -> Optional[str]
   FUNCTION first_transcript_canonizer(transcripts: List, **kwargs) -> Optional[str]
@@ -346,7 +374,7 @@ MODULE pyrion.core.sequences_collection
     ids(self) -> 'List[str]'
     items(self)
     keys(self)
-    pop(self, key, default=<object object at 0x104c881d0>)
+    pop(self, key, default=<object object at 0x10479c1d0>)
     popitem(self)
     sequences(self) -> 'List[SequenceLike]'
     setdefault(self, key, default=None)
@@ -380,6 +408,9 @@ MODULE pyrion.io.bed
   FUNCTION read_narrow_bed_file(file_path: Union[str, pathlib.Path]) -> List[pyrion.core.intervals.GenomicInterval]
 MODULE pyrion.io.chain
   FUNCTION read_chain_file(file_path: Union[str, pathlib.Path], min_score: Optional[int] = None) -> pyrion.core.genome_alignment.GenomeAlignmentsCollection
+MODULE pyrion.io.chrom_sizes
+  FUNCTION read_chrom_sizes(path: Union[str, pathlib.Path]) -> Dict[str, int]
+  FUNCTION write_chrom_sizes(chrom_sizes: Dict[str, int], path: Union[str, pathlib.Path]) -> None
 MODULE pyrion.io.fai
   FUNCTION create_fasta_index(fasta_file: 'Union[str, Path]', fai_file: 'Optional[Union[str, Path]]' = None) -> 'FaiStore'
   FUNCTION get_or_create_fasta_index(fasta_file: 'Union[str, Path]', force_recreate: 'bool' = False) -> 'FaiStore'
@@ -473,6 +504,7 @@ MODULE pyrion.ops.genes
     fetch(self, chrom: str, start: int, end: int, strand: pyrion.core.strand.Strand) -> pyrion.core.nucleotide_sequences.NucleotideSequence
   FUNCTION extract_cds_sequence(transcript: pyrion.core.genes.Transcript, accessor: pyrion.ops.genes.SequenceAccessor) -> pyrion.core.nucleotide_sequences.NucleotideSequence
   FUNCTION extract_exon_sequence(transcript: pyrion.core.genes.Transcript, accessor: pyrion.ops.genes.SequenceAccessor) -> pyrion.core.nucleotide_sequences.NucleotideSequence
+  FUNCTION extract_intron_sequence(transcript: pyrion.core.genes.Transcript, accessor: pyrion.ops.genes.SequenceAccessor) -> pyrion.core.nucleotide_sequences.NucleotideSequence
   FUNCTION extract_utr3_sequence(transcript: pyrion.core.genes.Transcript, accessor: pyrion.ops.genes.SequenceAccessor) -> pyrion.core.nucleotide_sequences.NucleotideSequence
   FUNCTION extract_utr5_sequence(transcript: pyrion.core.genes.Transcript, accessor: pyrion.ops.genes.SequenceAccessor) -> pyrion.core.nucleotide_sequences.NucleotideSequence
   FUNCTION merge_transcript_intervals(transcripts: List[pyrion.core.genes.Transcript], cds_only: bool = False, use_numba: bool = True) -> List[pyrion.core.intervals.GenomicInterval]
@@ -510,6 +542,8 @@ MODULE pyrion.ops.sequence_serialization
   FUNCTION format_fasta_sequence(sequence_string: str, width: int = 80) -> str
   FUNCTION get_sequence_header(sequence: Any, index: Optional[int] = None) -> str
   FUNCTION nucleotide_sequence_to_fasta_string(sequence: pyrion.core.nucleotide_sequences.NucleotideSequence, width: int = 80, header: Optional[str] = None) -> str
+  FUNCTION save_amino_acid_sequence_to_fasta(sequence: pyrion.core.amino_acid_sequences.AminoAcidSequence, file_path: Union[str, pathlib.Path], width: int = 80, header: Optional[str] = None) -> None
+  FUNCTION save_nucleotide_sequence_to_fasta(sequence: pyrion.core.nucleotide_sequences.NucleotideSequence, file_path: Union[str, pathlib.Path], width: int = 80, header: Optional[str] = None) -> None
   FUNCTION save_sequences_to_fasta(sequences: List[Any], file_path: Union[str, pathlib.Path], width: int = 80) -> None
   FUNCTION sequence_to_fasta_string(sequence: Any, width: int = 80, header: Optional[str] = None) -> str
   FUNCTION sequences_to_fasta_string(sequences: List[Any], width: int = 80) -> str

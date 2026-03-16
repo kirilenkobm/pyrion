@@ -35,12 +35,13 @@ PDB structures, GenBank/Swiss-Prot parsing, and other tasks Pyrion does not cove
 
 ```python
 from pyrion import (
-    FastaAccessor, Gene, GeneData, GenomeAlignment,
+    Assembly, FastaAccessor, Gene, GeneData, GenomeAlignment,
     GenomeAlignmentsCollection, GenomicInterval, NucleotideSequence,
     Strand, Transcript, TranscriptsCollection, TwoBitAccessor,
     create_fasta_index, get_or_create_fasta_index, load_fasta_index,
-    read_bed12_file, read_chain_file, read_dna_fasta, read_fasta,
-    read_gene_data, read_gtf, read_narrow_bed_file, read_rna_fasta, write_fasta,
+    read_bed12_file, read_chain_file, read_chrom_sizes, read_dna_fasta,
+    read_fasta, read_gene_data, read_gtf, read_narrow_bed_file,
+    read_rna_fasta, write_chrom_sizes, write_fasta,
 )
 
 # I/O
@@ -61,6 +62,7 @@ from pyrion.ops import (
     amino_acid_sequence_to_fasta_string, array_to_intervals,
     bed_to_transcripts, chains_to_arrays, check_data_consistency,
     compute_overlap_size, create_collections_from_mixed_intervals,
+    extract_cds_sequence, extract_exon_sequence, extract_intron_sequence,
     filter_collection, find_alignment_gaps, find_intersections,
     find_transcript_overlaps, genome_alignment_from_dict,
     genome_alignment_to_chain_string, genome_alignment_to_dict,

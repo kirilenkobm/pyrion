@@ -1,7 +1,7 @@
 # Pyrion
 
 [![CI](https://github.com/kirilenkobm/pyrion/actions/workflows/ci.yml/badge.svg)](https://github.com/kirilenkobm/pyrion/actions/workflows/ci.yml)
-![PyPI version](https://img.shields.io/badge/version-0.2.2-blue)
+![PyPI version](https://img.shields.io/badge/version-0.3.0-blue)
 ![Python](https://img.shields.io/badge/python-3.9%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Made with Cursor](https://img.shields.io/badge/Made%20with-Cursor-0066cc?style=flat&logo=cursor&logoColor=white)

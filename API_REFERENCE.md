@@ -1,6 +1,6 @@
 # Pyrion API Reference
 
-**Generated:** 2026-03-16 14:49:40
+**Generated:** 2026-03-16 15:50:13
 
 Complete API reference with full docstrings and signatures.
 
@@ -423,6 +423,197 @@ Calculate approximate molecular weight in Daltons.
 **to_string**
 
 *Signature:* `(self) -> 'str'`
+
+
+
+---
+
+# pyrion.core.assembly
+
+Genome assembly representation with optional sequence accessor.
+
+
+## Classes
+
+### Assembly
+
+A genome assembly: named chromosome sizes with optional sequence accessor.
+
+Assembly is a mutable context object (not a frozen data record).
+Two assemblies are equal if they have the same name and chrom_sizes.
+
+Parameters
+----------
+name : str
+    Primary identifier, e.g. "hg38".
+chrom_sizes : dict
+    Mapping of chromosome name to size in bp.
+aliases : tuple of str, optional
+    Alternative names, e.g. ("GRCh38", "GCA_000001405.15").
+species : str, optional
+    Species name, e.g. "Homo sapiens".
+metadata : dict, optional
+    Arbitrary extra information.
+
+**Signature:** `(self, name: 'str', chrom_sizes: 'Dict[str, int]', aliases: 'Tuple[str, ...]' = (), species: 'Optional[str]' = None, metadata: 'Optional[Dict[str, Any]]' = None)`
+
+#### Methods
+
+**__init__**
+
+*Signature:* `(self, name: 'str', chrom_sizes: 'Dict[str, int]', aliases: 'Tuple[str, ...]' = (), species: 'Optional[str]' = None, metadata: 'Optional[Dict[str, Any]]' = None)`
+
+Initialize self.  See help(type(self)) for accurate signature.
+
+
+**__repr__**
+
+*Signature:* `(self) -> 'str'`
+
+Return repr(self).
+
+
+**all_names**
+
+*Signature:* `(self) -> 'Tuple[str, ...]'`
+
+Return (name,) + aliases.
+
+
+**fetch**
+
+*Signature:* `(self, chrom: 'str', start: 'Optional[int]' = None, end: 'Optional[int]' = None, strand: 'Strand' = <Strand.PLUS: 1>) -> 'NucleotideSequence'`
+
+Fetch sequence via the attached accessor.
+
+
+**fetch_interval**
+
+*Signature:* `(self, interval: 'GenomicInterval') -> 'NucleotideSequence'`
+
+Fetch sequence for a GenomicInterval via the attached accessor.
+
+
+**find_chrom**
+
+*Signature:* `(self, chrom: 'str') -> 'Optional[str]'`
+
+Fuzzy-match a chromosome name, handling chr prefix differences.
+
+Returns the matching chrom name from this assembly, or None.
+
+
+**from_2bit**
+
+*Signature:* `(path_or_accessor, name: 'str', aliases: 'Tuple[str, ...]' = (), species: 'Optional[str]' = None, metadata: 'Optional[Dict[str, Any]]' = None) -> 'Assembly'`
+
+Create an Assembly from a 2bit file or an open TwoBitAccessor.
+
+The accessor is attached automatically.
+
+
+**from_chrom_sizes_file**
+
+*Signature:* `(path: 'Union[str, Path]', name: 'str', aliases: 'Tuple[str, ...]' = (), species: 'Optional[str]' = None, metadata: 'Optional[Dict[str, Any]]' = None) -> 'Assembly'`
+
+Create an Assembly from a .chrom.sizes file (two-column TSV).
+
+
+**from_dict**
+
+*Signature:* `(d: 'Dict[str, Any]') -> 'Assembly'`
+
+
+**from_fasta_index**
+
+*Signature:* `(path_or_accessor, name: 'str', aliases: 'Tuple[str, ...]' = (), species: 'Optional[str]' = None, metadata: 'Optional[Dict[str, Any]]' = None) -> 'Assembly'`
+
+Create an Assembly from a FastaAccessor (or path to indexed FASTA).
+
+The accessor is attached automatically.
+
+
+**get_chrom_size**
+
+*Signature:* `(self, chrom: 'str') -> 'int'`
+
+
+**has_chrom**
+
+*Signature:* `(self, chrom: 'str') -> 'bool'`
+
+
+**matches_name**
+
+*Signature:* `(self, name: 'str') -> 'bool'`
+
+Check if `name` matches this assembly's name or any alias (case-insensitive).
+
+
+**save_chrom_sizes**
+
+*Signature:* `(self, path: 'Union[str, Path]') -> 'None'`
+
+Write chrom sizes to a two-column TSV file.
+
+
+**set_accessor**
+
+*Signature:* `(self, accessor) -> 'None'`
+
+Attach a TwoBitAccessor or FastaAccessor for sequence retrieval.
+
+
+**to_dict**
+
+*Signature:* `(self) -> 'Dict[str, Any]'`
+
+
+**validate_collection**
+
+*Signature:* `(self, collection) -> 'List[str]'`
+
+Validate a TranscriptsCollection against this assembly.
+
+Returns a list of issue descriptions (empty = all valid).
+
+
+**validate_interval**
+
+*Signature:* `(self, interval: 'GenomicInterval') -> 'bool'`
+
+Check if a GenomicInterval fits within this assembly.
+
+
+**validate_transcript**
+
+*Signature:* `(self, transcript) -> 'bool'`
+
+Check if a Transcript fits within this assembly.
+
+
+#### Properties
+
+**accessor** -> `Any`
+
+Return the attached sequence accessor, or raise if none is set.
+
+
+**chrom_names** -> `List[str]`
+
+
+**has_accessor** -> `bool`
+
+
+**num_chroms** -> `int`
+
+
+**total_size** -> `int`
+
+
+**uses_chr_prefix** -> `bool`
+
+Whether this assembly uses 'chr' prefixed chromosome names.
 
 
 
@@ -2115,7 +2306,7 @@ D.keys() -> a set-like object providing a view on D's keys
 
 **pop**
 
-*Signature:* `(self, key, default=<object object at 0x104c881d0>)`
+*Signature:* `(self, key, default=<object object at 0x10479c1d0>)`
 
 D.pop(k[,d]) -> v, remove specified key and return the corresponding value.
 If key is not found, d is returned if given, otherwise KeyError is raised.
@@ -2339,6 +2530,32 @@ Read a .chain or .chain.gz file and return parsed alignments.
 
 Internally parses in batches (<= 1_000_000 chunks per call) to satisfy the
 C-extension limit and to keep memory bounded for very large files.
+
+
+---
+
+# pyrion.io.chrom_sizes
+
+Read and write .chrom.sizes files (two-column TSV: chrom_name   size).
+
+
+## Functions
+
+### read_chrom_sizes
+
+**Signature:** `(path: Union[str, pathlib.Path]) -> Dict[str, int]`
+
+Read a chrom.sizes file into a dict.
+
+Format: tab-separated, one chromosome per line.
+Lines starting with '#' are skipped.
+
+
+### write_chrom_sizes
+
+**Signature:** `(chrom_sizes: Dict[str, int], path: Union[str, pathlib.Path]) -> None`
+
+Write a chrom_sizes dict to a two-column TSV file.
 
 
 ---
@@ -2965,6 +3182,13 @@ Fetch sequence from chrom:start-end.
 **Signature:** `(transcript: pyrion.core.genes.Transcript, accessor: pyrion.ops.genes.SequenceAccessor) -> pyrion.core.nucleotide_sequences.NucleotideSequence`
 
 
+### extract_intron_sequence
+
+**Signature:** `(transcript: pyrion.core.genes.Transcript, accessor: pyrion.ops.genes.SequenceAccessor) -> pyrion.core.nucleotide_sequences.NucleotideSequence`
+
+Extract concatenated intron sequences from a transcript.
+
+
 ### extract_utr3_sequence
 
 **Signature:** `(transcript: pyrion.core.genes.Transcript, accessor: pyrion.ops.genes.SequenceAccessor) -> pyrion.core.nucleotide_sequences.NucleotideSequence`
@@ -3209,6 +3433,20 @@ Extract or generate FASTA header for a sequence object.
 ### nucleotide_sequence_to_fasta_string
 
 **Signature:** `(sequence: pyrion.core.nucleotide_sequences.NucleotideSequence, width: int = 80, header: Optional[str] = None) -> str`
+
+
+### save_amino_acid_sequence_to_fasta
+
+**Signature:** `(sequence: pyrion.core.amino_acid_sequences.AminoAcidSequence, file_path: Union[str, pathlib.Path], width: int = 80, header: Optional[str] = None) -> None`
+
+Save a single AminoAcidSequence to a FASTA file.
+
+
+### save_nucleotide_sequence_to_fasta
+
+**Signature:** `(sequence: pyrion.core.nucleotide_sequences.NucleotideSequence, file_path: Union[str, pathlib.Path], width: int = 80, header: Optional[str] = None) -> None`
+
+Save a single NucleotideSequence to a FASTA file.
 
 
 ### save_sequences_to_fasta
