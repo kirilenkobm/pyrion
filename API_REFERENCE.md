@@ -1,6 +1,6 @@
 # Pyrion API Reference
 
-**Generated:** 2026-03-16 15:50:13
+**Generated:** 2026-03-18 19:56:36
 
 Complete API reference with full docstrings and signatures.
 
@@ -2306,7 +2306,7 @@ D.keys() -> a set-like object providing a view on D's keys
 
 **pop**
 
-*Signature:* `(self, key, default=<object object at 0x10479c1d0>)`
+*Signature:* `(self, key, default=<object object at 0x1008641d0>)`
 
 D.pop(k[,d]) -> v, remove specified key and return the corresponding value.
 If key is not found, d is returned if given, otherwise KeyError is raised.
@@ -2964,7 +2964,7 @@ Chain alignment operations for projecting genomic intervals.
 
 ### project_intervals_through_chain_strict
 
-**Signature:** `(intervals: numpy.ndarray, chain_blocks: numpy.ndarray, q_strand: int = 1) -> List[numpy.ndarray]`
+**Signature:** `(intervals: numpy.ndarray, chain_blocks: numpy.ndarray, q_strand: int = 1, max_gap_ratio: float = 1.0) -> List[numpy.ndarray]`
 
 Stricter projection that respects alignment structure and deletions.
 
@@ -2980,7 +2980,8 @@ Logic:
 
 3. If interval has no overlapping blocks (complete misalignment):
    - Find flanking blocks (before and after)
-   - If query distance between flanks <= target interval length: return that query interval
+   - If query distance between flanks <= max_gap_ratio * target interval length:
+     return that query interval
    - Otherwise: return [[0, 0]]
 
 Args:
@@ -2988,6 +2989,10 @@ Args:
     chain_blocks: Chain alignment blocks, shape (M, 4) with [t_start, t_end, q_start, q_end]
     q_strand: Query strand (1 for plus, -1 for minus). For minus-strand chains,
         within-block projection direction is reversed (anti-parallel alignment).
+    max_gap_ratio: When an interval falls entirely in a misaligned gap, accept it
+        if query_distance <= max_gap_ratio * interval_length. Default 1.0 (strict:
+        query gap must not exceed reference interval). Use higher values (e.g. 25.0)
+        for liftover of flanked regions where query expansion is expected.
 
 Returns:
     List of projected intervals. Returns [[0, 0]] if interval can't be reliably projected.

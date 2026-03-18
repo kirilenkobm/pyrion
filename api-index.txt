@@ -1,5 +1,5 @@
 PYRION API INDEX
-Generated: 2026-03-16 15:50:13
+Generated: 2026-03-18 19:56:36
 Concise reference with type signatures only.
 ============================================================
 
@@ -374,7 +374,7 @@ MODULE pyrion.core.sequences_collection
     ids(self) -> 'List[str]'
     items(self)
     keys(self)
-    pop(self, key, default=<object object at 0x10479c1d0>)
+    pop(self, key, default=<object object at 0x1008641d0>)
     popitem(self)
     sequences(self) -> 'List[SequenceLike]'
     setdefault(self, key, default=None)
@@ -479,7 +479,7 @@ MODULE pyrion.ops.chains
   FUNCTION get_chain_t_start(genome_alignment) -> int
   FUNCTION get_chain_target_interval(genome_alignment) -> pyrion.core.intervals.GenomicInterval
   FUNCTION project_intervals_through_chain(intervals: numpy.ndarray, chain_blocks: numpy.ndarray, q_strand: int = 1) -> List[numpy.ndarray]
-  FUNCTION project_intervals_through_chain_strict(intervals: numpy.ndarray, chain_blocks: numpy.ndarray, q_strand: int = 1) -> List[numpy.ndarray]
+  FUNCTION project_intervals_through_chain_strict(intervals: numpy.ndarray, chain_blocks: numpy.ndarray, q_strand: int = 1, max_gap_ratio: float = 1.0) -> List[numpy.ndarray]
   FUNCTION project_intervals_through_genome_alignment(intervals: numpy.ndarray, genome_alignment) -> List[numpy.ndarray]
   FUNCTION project_intervals_through_genome_alignment_to_intervals(intervals: numpy.ndarray, genome_alignment, target_chrom: Optional[str] = None, target_strand: Optional[pyrion.core.strand.Strand] = None) -> List[pyrion.core.intervals.GenomicInterval]
   FUNCTION project_transcript_through_chain(transcript: pyrion.core.genes.Transcript, chain: pyrion.core.genome_alignment.GenomeAlignment, only_cds=False) -> Optional[pyrion.core.intervals.GenomicInterval]
