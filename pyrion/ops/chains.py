@@ -25,6 +25,7 @@ def project_intervals_through_chain_strict(
     intervals: np.ndarray,
     chain_blocks: np.ndarray,
     q_strand: int = 1,
+    max_gap_ratio: float = 1.0,
 ) -> List[np.ndarray]:
     """Stricter projection that respects alignment structure and deletions.
 
@@ -40,7 +41,8 @@ def project_intervals_through_chain_strict(
 
     3. If interval has no overlapping blocks (complete misalignment):
        - Find flanking blocks (before and after)
-       - If query distance between flanks <= target interval length: return that query interval
+       - If query distance between flanks <= max_gap_ratio * target interval length:
+         return that query interval
        - Otherwise: return [[0, 0]]
 
     Args:
@@ -48,6 +50,10 @@ def project_intervals_through_chain_strict(
         chain_blocks: Chain alignment blocks, shape (M, 4) with [t_start, t_end, q_start, q_end]
         q_strand: Query strand (1 for plus, -1 for minus). For minus-strand chains,
             within-block projection direction is reversed (anti-parallel alignment).
+        max_gap_ratio: When an interval falls entirely in a misaligned gap, accept it
+            if query_distance <= max_gap_ratio * interval_length. Default 1.0 (strict:
+            query gap must not exceed reference interval). Use higher values (e.g. 25.0)
+            for liftover of flanked regions where query expansion is expected.
 
     Returns:
         List of projected intervals. Returns [[0, 0]] if interval can't be reliably projected.
@@ -58,9 +64,9 @@ def project_intervals_through_chain_strict(
         return [np.array([[0, 0]], dtype=np.int64) for _ in range(len(intervals))]
 
     if HAS_NUMBA:
-        return _project_intervals_strict_numba(intervals, chain_blocks, q_strand)
+        return _project_intervals_strict_numba(intervals, chain_blocks, q_strand, max_gap_ratio)
     else:
-        return _project_intervals_strict_numpy(intervals, chain_blocks, q_strand)
+        return _project_intervals_strict_numpy(intervals, chain_blocks, q_strand, max_gap_ratio)
 
 
 def _project_intervals_vectorized(intervals: np.ndarray, chain_blocks: np.ndarray, q_strand: int = 1) -> List[np.ndarray]:
@@ -198,6 +204,7 @@ def _project_intervals_strict_numba(
     intervals: np.ndarray,
     chain_blocks: np.ndarray,
     q_strand: int = 1,
+    max_gap_ratio: float = 1.0,
 ) -> List[np.ndarray]:
     """Strict projection respecting alignment structure and query strand."""
     results = []
@@ -304,7 +311,7 @@ def _project_intervals_strict_numba(
                     q_flank_end = q_starts[right_block_idx]
                 query_distance = abs(q_flank_end - q_flank_start)
 
-                if query_distance <= interval_length:
+                if query_distance <= interval_length * max_gap_ratio:
                     if q_flank_start > q_flank_end:
                         q_flank_start, q_flank_end = q_flank_end, q_flank_start
                     results.append(np.array([[q_flank_start, q_flank_end]], dtype=np.int64))
@@ -320,6 +327,7 @@ def _project_intervals_strict_numpy(
     intervals: np.ndarray,
     chain_blocks: np.ndarray,
     q_strand: int = 1,
+    max_gap_ratio: float = 1.0,
 ) -> List[np.ndarray]:
     """NumPy fallback for strict projection."""
     results = []
@@ -422,7 +430,7 @@ def _project_intervals_strict_numpy(
                     q_flank_end = int(q_starts[right_block_idx])
                 query_distance = abs(q_flank_end - q_flank_start)
 
-                if query_distance <= interval_length:
+                if query_distance <= interval_length * max_gap_ratio:
                     if q_flank_start > q_flank_end:
                         q_flank_start, q_flank_end = q_flank_end, q_flank_start
                     results.append(np.array([[q_flank_start, q_flank_end]], dtype=np.int64))
