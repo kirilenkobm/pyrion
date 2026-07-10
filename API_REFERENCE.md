@@ -1,6 +1,6 @@
 # Pyrion API Reference
 
-**Generated:** 2026-03-18 19:56:36
+**Generated:** 2026-07-10 14:34:42
 
 Complete API reference with full docstrings and signatures.
 
@@ -134,14 +134,14 @@ Disable all parallel processing by setting max_cores to 0.
 
 **enable_parallel**
 
-*Signature:* `(self, max_cores: Optional[int] = None) -> None`
+*Signature:* `(self, max_cores: int | None = None) -> None`
 
 Enable parallel processing.
 
 
 **set_log_level**
 
-*Signature:* `(self, level: Union[str, int]) -> None`
+*Signature:* `(self, level: str | int) -> None`
 
 Configure logging for the pyrion package.
 
@@ -191,7 +191,7 @@ Disable all parallel processing.
 
 ### enable_parallel
 
-**Signature:** `(max_cores: Optional[int] = None) -> None`
+**Signature:** `(max_cores: int | None = None) -> None`
 
 Enable parallel processing with optional core limit.
 
@@ -233,7 +233,7 @@ Check if multiprocessing is available.
 
 ### set_loglevel
 
-**Signature:** `(level: Union[str, int]) -> None`
+**Signature:** `(level: str | int) -> None`
 
 Set logging level for the pyrion package.
 
@@ -628,36 +628,36 @@ Canonizer functions for selecting canonical transcripts from transcript lists.
 
 ### DEFAULT_CANONIZER
 
-**Signature:** `(transcripts: List, **kwargs) -> Optional[str]`
+**Signature:** `(transcripts: List, **kwargs) -> str | None`
 
 Default canonizer that selects the transcript with the longest total exonic length.
 
 
 ### first_transcript_canonizer
 
-**Signature:** `(transcripts: List, **kwargs) -> Optional[str]`
+**Signature:** `(transcripts: List, **kwargs) -> str | None`
 
 
 ### longest_cds_canonizer
 
-**Signature:** `(transcripts: List, **kwargs) -> Optional[str]`
+**Signature:** `(transcripts: List, **kwargs) -> str | None`
 
 
 ### longest_isoform_canonizer
 
-**Signature:** `(transcripts: List, **kwargs) -> Optional[str]`
+**Signature:** `(transcripts: List, **kwargs) -> str | None`
 
 Default canonizer that selects the transcript with the longest total exonic length.
 
 
 ### longest_transcript_span_canonizer
 
-**Signature:** `(transcripts: List, **kwargs) -> Optional[str]`
+**Signature:** `(transcripts: List, **kwargs) -> str | None`
 
 
 ### most_exons_canonizer
 
-**Signature:** `(transcripts: List, **kwargs) -> Optional[str]`
+**Signature:** `(transcripts: List, **kwargs) -> str | None`
 
 
 ---
@@ -720,13 +720,13 @@ Check if codon has exactly 3 non-gap symbols.
 
 Codon sequence wrapper around NucleotideSequence with codon-wise operations.
 
-**Signature:** `(self, nucleotide_sequence, id: Optional[str] = None)`
+**Signature:** `(self, nucleotide_sequence, id: str | None = None)`
 
 #### Methods
 
 **__init__**
 
-*Signature:* `(self, nucleotide_sequence, id: Optional[str] = None)`
+*Signature:* `(self, nucleotide_sequence, id: str | None = None)`
 
 Initialize from a NucleotideSequence object.
 
@@ -776,7 +776,7 @@ Remove frameshift after the Nth valid nucleotide (atgcnATGCN).
 
 **to_fasta_string**
 
-*Signature:* `(self, width: int = 80, header: Optional[str] = None) -> str`
+*Signature:* `(self, width: int = 80, header: str | None = None) -> str`
 
 
 **translate**
@@ -892,13 +892,13 @@ Gene data storage with multiple mappings.
 
 Gene data container with optional mappings for gene-transcript relationships, biotypes, and names.
 
-**Signature:** `(self, source_file: Optional[str] = None)`
+**Signature:** `(self, source_file: str | None = None)`
 
 #### Methods
 
 **__init__**
 
-*Signature:* `(self, source_file: Optional[str] = None)`
+*Signature:* `(self, source_file: str | None = None)`
 
 Initialize self.  See help(type(self)) for accurate signature.
 
@@ -932,12 +932,12 @@ Return repr(self).
 
 **get_gene**
 
-*Signature:* `(self, transcript_id: str) -> Optional[str]`
+*Signature:* `(self, transcript_id: str) -> str | None`
 
 
 **get_gene_name**
 
-*Signature:* `(self, gene_id: str) -> Optional[str]`
+*Signature:* `(self, gene_id: str) -> str | None`
 
 
 **get_gene_name_count**
@@ -957,7 +957,7 @@ Return repr(self).
 
 **get_transcript_biotype**
 
-*Signature:* `(self, transcript_id: str) -> Optional[str]`
+*Signature:* `(self, transcript_id: str) -> str | None`
 
 
 **get_transcripts**
@@ -1024,13 +1024,13 @@ Gene and transcript representations.
 
 Gene containing multiple transcripts with computed genomic bounds.
 
-**Signature:** `(self, gene_id: str, transcripts: List[pyrion.core.genes.Transcript], gene_name: Optional[str] = None)`
+**Signature:** `(self, gene_id: str, transcripts: List[pyrion.core.genes.Transcript], gene_name: str | None = None)`
 
 #### Methods
 
 **__init__**
 
-*Signature:* `(self, gene_id: str, transcripts: List[pyrion.core.genes.Transcript], gene_name: Optional[str] = None)`
+*Signature:* `(self, gene_id: str, transcripts: List[pyrion.core.genes.Transcript], gene_name: str | None = None)`
 
 Initialize self.  See help(type(self)) for accurate signature.
 
@@ -1044,7 +1044,7 @@ Return repr(self).
 
 **apply_canonizer**
 
-*Signature:* `(self, canonizer_func: Optional[Callable] = None, **kwargs) -> None`
+*Signature:* `(self, canonizer_func: Callable | None = None, **kwargs) -> None`
 
 Set the canonical transcript using a canonizer function.
 
@@ -1061,7 +1061,7 @@ Args:
 
 **get_transcript**
 
-*Signature:* `(self, transcript_id: str) -> Optional[pyrion.core.genes.Transcript]`
+*Signature:* `(self, transcript_id: str) -> pyrion.core.genes.Transcript | None`
 
 
 **has_transcript**
@@ -1076,7 +1076,7 @@ Args:
 
 **to_union_transcript**
 
-*Signature:* `(self, transcript_id: Optional[str] = None, id_prefix: str = 'U_') -> pyrion.core.genes.Transcript`
+*Signature:* `(self, transcript_id: str | None = None, id_prefix: str = 'U_') -> pyrion.core.genes.Transcript`
 
 Merge all isoforms into a single union transcript.
 
@@ -1092,10 +1092,10 @@ Args:
 
 #### Properties
 
-**canonical_transcript** -> `Optional`
+**canonical_transcript** -> `Union`
 
 
-**canonical_transcript_id** -> `Optional`
+**canonical_transcript_id** -> `Union`
 
 
 **chrom** -> `str`
@@ -1124,15 +1124,15 @@ Check if gene has any coding transcripts.
 
 ### Transcript
 
-Transcript(blocks: numpy.ndarray, strand: pyrion.core.strand.Strand, chrom: str, id: str, cds_start: Optional[int] = None, cds_end: Optional[int] = None, biotype: Optional[str] = None)
+Transcript(blocks: numpy.ndarray, strand: pyrion.core.strand.Strand, chrom: str, id: str, cds_start: int | None = None, cds_end: int | None = None, biotype: str | None = None)
 
-**Signature:** `(self, blocks: numpy.ndarray, strand: pyrion.core.strand.Strand, chrom: str, id: str, cds_start: Optional[int] = None, cds_end: Optional[int] = None, biotype: Optional[str] = None) -> None`
+**Signature:** `(self, blocks: numpy.ndarray, strand: pyrion.core.strand.Strand, chrom: str, id: str, cds_start: int | None = None, cds_end: int | None = None, biotype: str | None = None) -> None`
 
 #### Methods
 
 **__init__**
 
-*Signature:* `(self, blocks: numpy.ndarray, strand: pyrion.core.strand.Strand, chrom: str, id: str, cds_start: Optional[int] = None, cds_end: Optional[int] = None, biotype: Optional[str] = None) -> None`
+*Signature:* `(self, blocks: numpy.ndarray, strand: pyrion.core.strand.Strand, chrom: str, id: str, cds_start: int | None = None, cds_end: int | None = None, biotype: str | None = None) -> None`
 
 Initialize self.  See help(type(self)) for accurate signature.
 
@@ -1153,7 +1153,7 @@ Return str(self).
 
 **compute_flanks**
 
-*Signature:* `(self, flank_size: int, chrom_sizes: Dict[str, int]) -> Tuple[Optional[pyrion.core.intervals.GenomicInterval], Optional[pyrion.core.intervals.GenomicInterval]]`
+*Signature:* `(self, flank_size: int, chrom_sizes: Dict[str, int]) -> Tuple[pyrion.core.intervals.GenomicInterval | None, pyrion.core.intervals.GenomicInterval | None]`
 
 
 **contains_interval**
@@ -1168,7 +1168,7 @@ Return str(self).
 
 **from_intervals_collection**
 
-*Signature:* `(collection: pyrion.core.intervals.GenomicIntervalsCollection, transcript_id: str, cds_start: Optional[int] = None, cds_end: Optional[int] = None, biotype: Optional[str] = None) -> 'Transcript'`
+*Signature:* `(collection: pyrion.core.intervals.GenomicIntervalsCollection, transcript_id: str, cds_start: int | None = None, cds_end: int | None = None, biotype: str | None = None) -> 'Transcript'`
 
 Create a Transcript from a GenomicIntervalsCollection.
 
@@ -1221,13 +1221,13 @@ Return a copy of this transcript with a different ID.
 
 Container for many transcripts.
 
-**Signature:** `(self, transcripts: Optional[List[pyrion.core.genes.Transcript]] = None, source_file: Optional[str] = None)`
+**Signature:** `(self, transcripts: List[pyrion.core.genes.Transcript] | None = None, source_file: str | None = None)`
 
 #### Methods
 
 **__init__**
 
-*Signature:* `(self, transcripts: Optional[List[pyrion.core.genes.Transcript]] = None, source_file: Optional[str] = None)`
+*Signature:* `(self, transcripts: List[pyrion.core.genes.Transcript] | None = None, source_file: str | None = None)`
 
 Initialize self.  See help(type(self)) for accurate signature.
 
@@ -1267,12 +1267,12 @@ gene_to_canonical: Dictionary mapping gene IDs to canonical transcript IDs
 
 **canonize_transcripts**
 
-*Signature:* `(self, canonizer_func: Optional[Callable] = None, **kwargs) -> None`
+*Signature:* `(self, canonizer_func: Callable | None = None, **kwargs) -> None`
 
 
 **copy_with_remapped_ids**
 
-*Signature:* `(self, id_mapping: Union[Dict[str, str], Callable[[str], str]], source_file: Optional[str] = None) -> 'TranscriptsCollection'`
+*Signature:* `(self, id_mapping: Dict[str, str] | Callable[[str], str], source_file: str | None = None) -> 'TranscriptsCollection'`
 
 Return a new collection with the same transcripts but different IDs.
 
@@ -1282,14 +1282,14 @@ with the requested IDs. See pyrion.ops.transformations.remap_transcript_ids.
 
 **extend**
 
-*Signature:* `(self, other: Union[List[pyrion.core.genes.Transcript], ForwardRef('TranscriptsCollection')]) -> None`
+*Signature:* `(self, other: List[pyrion.core.genes.Transcript] | ForwardRef('TranscriptsCollection')) -> None`
 
 Extend this collection with transcripts from a list or another collection.
 
 
 **filter_by_biotype**
 
-*Signature:* `(self, biotype: Union[str, List[str], Set[str]]) -> 'TranscriptsCollection'`
+*Signature:* `(self, biotype: str | List[str] | Set[str]) -> 'TranscriptsCollection'`
 
 Return a new collection containing only transcripts with the given biotype(s).
 
@@ -1299,7 +1299,7 @@ Uses bound GeneData for biotype when transcript.biotype is not set.
 
 **filter_by_chroms**
 
-*Signature:* `(self, chroms: Union[str, List[str], Set[str]]) -> 'TranscriptsCollection'`
+*Signature:* `(self, chroms: str | List[str] | Set[str]) -> 'TranscriptsCollection'`
 
 Return a new subcollection containing only transcripts on the given chromosome(s).
 
@@ -1308,7 +1308,7 @@ Carries over bound GeneData and source_file from the parent collection.
 
 **from_json**
 
-*Signature:* `(file_path: Union[str, pathlib.Path]) -> 'TranscriptsCollection'`
+*Signature:* `(file_path: str | pathlib.Path) -> 'TranscriptsCollection'`
 
 
 **get_all_chromosomes**
@@ -1318,7 +1318,7 @@ Carries over bound GeneData and source_file from the parent collection.
 
 **get_by_biotype**
 
-*Signature:* `(self, biotype: Union[str, List[str], Set[str]]) -> 'TranscriptsCollection'`
+*Signature:* `(self, biotype: str | List[str] | Set[str]) -> 'TranscriptsCollection'`
 
 Alias for filter_by_biotype.
 
@@ -1337,7 +1337,7 @@ Get Gene objects by gene name. Multiple genes can have the same name.
 
 **get_by_id**
 
-*Signature:* `(self, transcript_id: str) -> Optional[pyrion.core.genes.Transcript]`
+*Signature:* `(self, transcript_id: str) -> pyrion.core.genes.Transcript | None`
 
 
 **get_canonical_transcripts**
@@ -1347,12 +1347,12 @@ Get Gene objects by gene name. Multiple genes can have the same name.
 
 **get_gene_by_id**
 
-*Signature:* `(self, gene_id: str) -> Optional[pyrion.core.genes.Gene]`
+*Signature:* `(self, gene_id: str) -> pyrion.core.genes.Gene | None`
 
 
 **get_gene_by_transcript_id**
 
-*Signature:* `(self, transcript_id: str) -> Optional[pyrion.core.genes.Gene]`
+*Signature:* `(self, transcript_id: str) -> pyrion.core.genes.Gene | None`
 
 
 **get_genes_without_canonical_transcript**
@@ -1379,22 +1379,22 @@ Return a copy of bound GeneData containing only entries for transcripts in this 
 
 **save_biodata**
 
-*Signature:* `(self, tsv_path: Union[str, pathlib.Path], include_gene_transcript: bool = True, include_transcript_biotype: bool = True, include_gene_name: bool = True, separator: str = '\t', trim: bool = True) -> None`
+*Signature:* `(self, tsv_path: str | pathlib.Path, include_gene_transcript: bool = True, include_transcript_biotype: bool = True, include_gene_name: bool = True, separator: str = '\t', trim: bool = True) -> None`
 
 
 **save_to_bed12**
 
-*Signature:* `(self, file_path: Union[str, pathlib.Path]) -> None`
+*Signature:* `(self, file_path: str | pathlib.Path) -> None`
 
 
 **save_to_json**
 
-*Signature:* `(self, file_path: Union[str, pathlib.Path]) -> None`
+*Signature:* `(self, file_path: str | pathlib.Path) -> None`
 
 
 **sort**
 
-*Signature:* `(self, by: Union[str, List[str]] = 'position', reverse: bool = False) -> 'TranscriptsCollection'`
+*Signature:* `(self, by: str | List[str] = 'position', reverse: bool = False) -> 'TranscriptsCollection'`
 
 Sort transcripts in-place and return self for chaining.
 
@@ -1432,7 +1432,7 @@ Returns:
 **available_data_mappings** -> `List`
 
 
-**gene_data** -> `Optional`
+**gene_data** -> `Union`
 
 Bound GeneData object, or None if no gene data has been bound.
 
@@ -1463,7 +1463,7 @@ Auxiliary functions for gene and transcript objects.
 
 ### compute_flanks
 
-**Signature:** `(transcript, flank_size: int, chrom_sizes: Dict[str, int]) -> Tuple[Optional[pyrion.core.intervals.GenomicInterval], Optional[pyrion.core.intervals.GenomicInterval]]`
+**Signature:** `(transcript, flank_size: int, chrom_sizes: Dict[str, int]) -> Tuple[pyrion.core.intervals.GenomicInterval | None, pyrion.core.intervals.GenomicInterval | None]`
 
 Get flanking regions of specified size around a transcript.
 
@@ -1487,7 +1487,7 @@ Filter transcripts that are within or intersect with a genomic interval.
 
 ### get_canonical_transcripts_from_collection
 
-**Signature:** `(transcripts_collection, canonizer_func: Optional[Callable] = None, **kwargs)`
+**Signature:** `(transcripts_collection, canonizer_func: Callable | None = None, **kwargs)`
 
 Get a new collection containing only canonical transcripts.
 
@@ -1529,7 +1529,7 @@ Get UTR blocks to the right of CDS (chromosomally after CDS end).
 
 ### get_transcript_cds_interval
 
-**Signature:** `(transcript) -> Optional[pyrion.core.intervals.GenomicInterval]`
+**Signature:** `(transcript) -> pyrion.core.intervals.GenomicInterval | None`
 
 Get genomic interval spanning the CDS region.
 
@@ -1553,7 +1553,7 @@ Get genomic interval spanning the entire transcript.
 
 ### set_canonical_transcripts_for_collection
 
-**Signature:** `(transcripts_collection, canonizer_func: Optional[Callable] = None, **kwargs) -> None`
+**Signature:** `(transcripts_collection, canonizer_func: Callable | None = None, **kwargs) -> None`
 
 Set canonical transcripts for all genes in a collection using a canonizer function.
 
@@ -1567,15 +1567,15 @@ Set canonical transcripts for all genes in a collection using a canonizer functi
 
 ### GenomeAlignment
 
-GenomeAlignment(chain_id: int, score: int, t_chrom: str, t_strand: int, t_size: int, q_chrom: str, q_strand: int, q_size: int, blocks: numpy.ndarray, child_id: Optional[int] = None)
+GenomeAlignment(chain_id: int, score: int, t_chrom: str, t_strand: int, t_size: int, q_chrom: str, q_strand: int, q_size: int, blocks: numpy.ndarray, child_id: int | None = None)
 
-**Signature:** `(self, chain_id: int, score: int, t_chrom: str, t_strand: int, t_size: int, q_chrom: str, q_strand: int, q_size: int, blocks: numpy.ndarray, child_id: Optional[int] = None) -> None`
+**Signature:** `(self, chain_id: int, score: int, t_chrom: str, t_strand: int, t_size: int, q_chrom: str, q_strand: int, q_size: int, blocks: numpy.ndarray, child_id: int | None = None) -> None`
 
 #### Methods
 
 **__init__**
 
-*Signature:* `(self, chain_id: int, score: int, t_chrom: str, t_strand: int, t_size: int, q_chrom: str, q_strand: int, q_size: int, blocks: numpy.ndarray, child_id: Optional[int] = None) -> None`
+*Signature:* `(self, chain_id: int, score: int, t_chrom: str, t_strand: int, t_size: int, q_chrom: str, q_strand: int, q_size: int, blocks: numpy.ndarray, child_id: int | None = None) -> None`
 
 Initialize self.  See help(type(self)) for accurate signature.
 
@@ -1617,13 +1617,13 @@ Return repr(self).
 
 Container for many genome alignments.
 
-**Signature:** `(self, alignments: Optional[List[pyrion.core.genome_alignment.GenomeAlignment]] = None, source_file: Optional[str] = None)`
+**Signature:** `(self, alignments: List[pyrion.core.genome_alignment.GenomeAlignment] | None = None, source_file: str | None = None)`
 
 #### Methods
 
 **__init__**
 
-*Signature:* `(self, alignments: Optional[List[pyrion.core.genome_alignment.GenomeAlignment]] = None, source_file: Optional[str] = None)`
+*Signature:* `(self, alignments: List[pyrion.core.genome_alignment.GenomeAlignment] | None = None, source_file: str | None = None)`
 
 Initialize self.  See help(type(self)) for accurate signature.
 
@@ -1644,7 +1644,7 @@ String representation with summary.
 
 **filter**
 
-*Signature:* `(self, t_chrom: Union[str, List[str], NoneType] = None, q_chrom: Union[str, List[str], NoneType] = None, min_score: Optional[int] = None, max_score: Optional[int] = None, min_aligned_length: Optional[int] = None) -> 'GenomeAlignmentsCollection'`
+*Signature:* `(self, t_chrom: str | List[str] | None = None, q_chrom: str | List[str] | None = None, min_score: int | None = None, max_score: int | None = None, min_aligned_length: int | None = None) -> 'GenomeAlignmentsCollection'`
 
 Filter alignments by target/query chromosomes, score, and aligned length.
 
@@ -1661,7 +1661,7 @@ becomes:
 
 **from_json**
 
-*Signature:* `(file_path: Union[str, pathlib.Path]) -> 'GenomeAlignmentsCollection'`
+*Signature:* `(file_path: str | pathlib.Path) -> 'GenomeAlignmentsCollection'`
 
 
 **get_alignments_fully_contained**
@@ -1686,7 +1686,7 @@ becomes:
 
 **get_by_chain_id**
 
-*Signature:* `(self, chain_id: int) -> Optional[pyrion.core.genome_alignment.GenomeAlignment]`
+*Signature:* `(self, chain_id: int) -> pyrion.core.genome_alignment.GenomeAlignment | None`
 
 
 **get_by_query_chrom**
@@ -1721,17 +1721,17 @@ becomes:
 
 **save_to_chain**
 
-*Signature:* `(self, file_path: Union[str, pathlib.Path]) -> None`
+*Signature:* `(self, file_path: str | pathlib.Path) -> None`
 
 
 **save_to_json**
 
-*Signature:* `(self, file_path: Union[str, pathlib.Path]) -> None`
+*Signature:* `(self, file_path: str | pathlib.Path) -> None`
 
 
 **sort**
 
-*Signature:* `(self, by: Union[str, List[str]] = 'score', reverse: bool = False) -> 'GenomeAlignmentsCollection'`
+*Signature:* `(self, by: str | List[str] = 'score', reverse: bool = False) -> 'GenomeAlignmentsCollection'`
 
 Sort alignments in-place and return self for chaining.
 
@@ -1753,7 +1753,7 @@ Returns:
 
 **sort_by_score**
 
-*Signature:* `(self, max_elems: Optional[int] = None) -> List[Tuple[int, int]]`
+*Signature:* `(self, max_elems: int | None = None) -> List[Tuple[int, int]]`
 
 
 **summary**
@@ -1773,7 +1773,7 @@ Auxiliary functions for genome alignment objects.
 
 ### sort_alignments_by_score
 
-**Signature:** `(alignments_collection, max_elems: Optional[int] = None) -> List[Tuple[int, int]]`
+**Signature:** `(alignments_collection, max_elems: int | None = None) -> List[Tuple[int, int]]`
 
 
 ---
@@ -1812,13 +1812,13 @@ Return repr(self).
 
 Single genomic interval with strand information and optional ID.
 
-**Signature:** `(self, chrom: str, start: int, end: int, strand: pyrion.core.strand.Strand = <Strand.UNKNOWN: 0>, id: Optional[str] = None) -> None`
+**Signature:** `(self, chrom: str, start: int, end: int, strand: pyrion.core.strand.Strand = <Strand.UNKNOWN: 0>, id: str | None = None) -> None`
 
 #### Methods
 
 **__init__**
 
-*Signature:* `(self, chrom: str, start: int, end: int, strand: pyrion.core.strand.Strand = <Strand.UNKNOWN: 0>, id: Optional[str] = None) -> None`
+*Signature:* `(self, chrom: str, start: int, end: int, strand: pyrion.core.strand.Strand = <Strand.UNKNOWN: 0>, id: str | None = None) -> None`
 
 Initialize self.  See help(type(self)) for accurate signature.
 
@@ -1849,7 +1849,7 @@ Return str(self).
 
 **from_string**
 
-*Signature:* `(interval_string: str, id: Optional[str] = None) -> 'GenomicInterval'`
+*Signature:* `(interval_string: str, id: str | None = None) -> 'GenomicInterval'`
 
 Create GenomicInterval from string representation.
 
@@ -1885,7 +1885,7 @@ Convert to BED6 format string.
 
 **union**
 
-*Signature:* `(self, other: 'GenomicInterval') -> Optional[ForwardRef('GenomicInterval')]`
+*Signature:* `(self, other: 'GenomicInterval') -> ForwardRef('GenomicInterval') | None`
 
 
 
@@ -1925,7 +1925,7 @@ Return str(self).
 
 **from_array**
 
-*Signature:* `(array: numpy.ndarray, chrom: str, strand: Optional[pyrion.core.strand.Strand] = None, ids: Optional[List[str]] = None) -> 'GenomicIntervalsCollection'`
+*Signature:* `(array: numpy.ndarray, chrom: str, strand: pyrion.core.strand.Strand | None = None, ids: List[str] | None = None) -> 'GenomicIntervalsCollection'`
 
 Create collection from numpy array.
 
@@ -1939,7 +1939,7 @@ Create collection from list of GenomicInterval objects.
 
 **from_strings**
 
-*Signature:* `(interval_strings, ids: Optional[List[str]] = None) -> Dict[Tuple[str, pyrion.core.strand.Strand], ForwardRef('GenomicIntervalsCollection')]`
+*Signature:* `(interval_strings, ids: List[str] | None = None) -> Dict[Tuple[str, pyrion.core.strand.Strand], ForwardRef('GenomicIntervalsCollection')]`
 
 
 **group_by_proximity**
@@ -1949,7 +1949,7 @@ Create collection from list of GenomicInterval objects.
 
 **intersect**
 
-*Signature:* `(self, other: Union[ForwardRef('GenomicIntervalsCollection'), pyrion.core.intervals.GenomicInterval]) -> 'GenomicIntervalsCollection'`
+*Signature:* `(self, other: ForwardRef('GenomicIntervalsCollection') | pyrion.core.intervals.GenomicInterval) -> 'GenomicIntervalsCollection'`
 
 
 **is_empty**
@@ -1982,16 +1982,9 @@ Create collection from list of GenomicInterval objects.
 
 Enum where members are also (and must be) ints
 
-**Signature:** `(self, *args, **kwds)`
+**Signature:** `(self, /, *args, **kwargs)`
 
 #### Methods
-
-**__init__**
-
-*Signature:* `(self, *args, **kwds)`
-
-Initialize self.  See help(type(self)) for accurate signature.
-
 
 **__repr__**
 
@@ -2012,7 +2005,7 @@ Auxiliary functions for interval objects.
 
 ### create_intervals_collections_from_strings
 
-**Signature:** `(interval_strings, ids: Optional[List[str]] = None) -> Dict[Tuple[str, pyrion.core.strand.Strand], pyrion.core.intervals.GenomicIntervalsCollection]`
+**Signature:** `(interval_strings, ids: List[str] | None = None) -> Dict[Tuple[str, pyrion.core.strand.Strand], pyrion.core.intervals.GenomicIntervalsCollection]`
 
 Create collections from iterable of string representations, grouped by chromosome and strand.
 
@@ -2160,16 +2153,9 @@ Sequence type detection.
 Uses integer values for efficient C function calls while maintaining
 string compatibility through the string_value property.
 
-**Signature:** `(self, *args, **kwds)`
+**Signature:** `(self, /, *args, **kwargs)`
 
 #### Methods
-
-**__init__**
-
-*Signature:* `(self, *args, **kwds)`
-
-Initialize self.  See help(type(self)) for accurate signature.
-
 
 **__repr__**
 
@@ -2195,7 +2181,7 @@ Auxiliary functions for sequences objects.
 
 ### mask_nucleotide_sequence_slice
 
-**Signature:** `(sequence, start: Optional[int] = None, end: Optional[int] = None)`
+**Signature:** `(sequence, start: int | None = None, end: int | None = None)`
 
 
 ### merge_nucleotide_sequences
@@ -2205,7 +2191,7 @@ Auxiliary functions for sequences objects.
 
 ### unmask_nucleotide_sequence_slice
 
-**Signature:** `(sequence, start: Optional[int] = None, end: Optional[int] = None)`
+**Signature:** `(sequence, start: int | None = None, end: int | None = None)`
 
 
 ---
@@ -2306,7 +2292,7 @@ D.keys() -> a set-like object providing a view on D's keys
 
 **pop**
 
-*Signature:* `(self, key, default=<object object at 0x1008641d0>)`
+*Signature:* `(self, key, default=<object object at 0x10460c1e0>)`
 
 D.pop(k[,d]) -> v, remove specified key and return the corresponding value.
 If key is not found, d is returned if given, otherwise KeyError is raised.
@@ -2376,16 +2362,9 @@ D.values() -> an object providing a view on D's values
 
 Enum where members are also (and must be) ints
 
-**Signature:** `(self, *args, **kwds)`
+**Signature:** `(self, /, *args, **kwargs)`
 
 #### Methods
-
-**__init__**
-
-*Signature:* `(self, *args, **kwds)`
-
-Initialize self.  See help(type(self)) for accurate signature.
-
 
 **__repr__**
 
@@ -2476,7 +2455,7 @@ Shared types, enums, and protocols for pyrion.
 
 Enumeration for exon types in genomic annotations.
 
-**Signature:** `(self, *args, **kwds)`
+**Signature:** `(self, /, *args, **kwargs)`
 
 
 ---
@@ -2497,14 +2476,14 @@ BED format I/O support.
 
 ### read_bed12_file
 
-**Signature:** `(file_path: Union[str, pathlib.Path]) -> pyrion.core.genes.TranscriptsCollection`
+**Signature:** `(file_path: str | pathlib.Path) -> pyrion.core.genes.TranscriptsCollection`
 
 Read BED12 file and return TranscriptsCollection.
 
 
 ### read_narrow_bed_file
 
-**Signature:** `(file_path: Union[str, pathlib.Path]) -> List[pyrion.core.intervals.GenomicInterval]`
+**Signature:** `(file_path: str | pathlib.Path) -> List[pyrion.core.intervals.GenomicInterval]`
 
 Read a narrow BED file with 3-9 fields and return a list of GenomicInterval objects.
 
@@ -2524,7 +2503,7 @@ peak memory usage. The public API remains unchanged.
 
 ### read_chain_file
 
-**Signature:** `(file_path: Union[str, pathlib.Path], min_score: Optional[int] = None) -> pyrion.core.genome_alignment.GenomeAlignmentsCollection`
+**Signature:** `(file_path: str | pathlib.Path, min_score: int | None = None) -> pyrion.core.genome_alignment.GenomeAlignmentsCollection`
 
 Read a .chain or .chain.gz file and return parsed alignments.
 
@@ -2543,7 +2522,7 @@ Read and write .chrom.sizes files (two-column TSV: chrom_name   size).
 
 ### read_chrom_sizes
 
-**Signature:** `(path: Union[str, pathlib.Path]) -> Dict[str, int]`
+**Signature:** `(path: str | pathlib.Path) -> Dict[str, int]`
 
 Read a chrom.sizes file into a dict.
 
@@ -2553,7 +2532,7 @@ Lines starting with '#' are skipped.
 
 ### write_chrom_sizes
 
-**Signature:** `(chrom_sizes: Dict[str, int], path: Union[str, pathlib.Path]) -> None`
+**Signature:** `(chrom_sizes: Dict[str, int], path: str | pathlib.Path) -> None`
 
 Write a chrom_sizes dict to a two-column TSV file.
 
@@ -2677,19 +2656,19 @@ Gene data I/O support.
 
 ### read_gene_data
 
-**Signature:** `(file_path: Union[str, pathlib.Path], gene_column: Union[int, str, NoneType] = None, transcript_id_column: Union[int, str, NoneType] = None, gene_name_column: Union[int, str, NoneType] = None, transcript_type_column: Union[int, str, NoneType] = None, separator: str = '\t', has_header: bool = True) -> pyrion.core.gene_data.GeneData`
+**Signature:** `(file_path: str | pathlib.Path, gene_column: int | str | None = None, transcript_id_column: int | str | None = None, gene_name_column: int | str | None = None, transcript_type_column: int | str | None = None, separator: str = '\t', has_header: bool = True) -> pyrion.core.gene_data.GeneData`
 
 Read gene data from TSV/CSV file and build mappings.
 
 
 ### resolve_index
 
-**Signature:** `(column_idx: Union[int, str], header: List[str]) -> int | None`
+**Signature:** `(column_idx: int | str, header: List[str]) -> int | None`
 
 
 ### write_gene_data_tsv
 
-**Signature:** `(gene_data: pyrion.core.gene_data.GeneData, file_path: Union[str, pathlib.Path], include_gene_transcript: bool = True, include_transcript_biotype: bool = True, include_gene_name: bool = True, separator: str = '\t') -> None`
+**Signature:** `(gene_data: pyrion.core.gene_data.GeneData, file_path: str | pathlib.Path, include_gene_transcript: bool = True, include_transcript_biotype: bool = True, include_gene_name: bool = True, separator: str = '\t') -> None`
 
 
 ---
@@ -2703,14 +2682,14 @@ GenePred format I/O support.
 
 ### read_genepred_file
 
-**Signature:** `(file_path: Union[str, pathlib.Path], has_header: bool = False, extended: bool = False) -> pyrion.core.genes.TranscriptsCollection`
+**Signature:** `(file_path: str | pathlib.Path, has_header: bool = False, extended: bool = False) -> pyrion.core.genes.TranscriptsCollection`
 
 Read genePred file and return TranscriptsCollection.
 
 
 ### read_refflat_file
 
-**Signature:** `(file_path: Union[str, pathlib.Path], has_header: bool = False) -> pyrion.core.genes.TranscriptsCollection`
+**Signature:** `(file_path: str | pathlib.Path, has_header: bool = False) -> pyrion.core.genes.TranscriptsCollection`
 
 Read refFlat file and return TranscriptsCollection.
 
@@ -2729,13 +2708,13 @@ High-performance GTF format I/O support using C extension.
 
 ### GTFChunkReader
 
-**Signature:** `(self, file_path: Union[str, pathlib.Path], chunk_size_mb: int = 512)`
+**Signature:** `(self, file_path: str | pathlib.Path, chunk_size_mb: int = 512)`
 
 #### Methods
 
 **__init__**
 
-*Signature:* `(self, file_path: Union[str, pathlib.Path], chunk_size_mb: int = 512)`
+*Signature:* `(self, file_path: str | pathlib.Path, chunk_size_mb: int = 512)`
 
 Initialize self.  See help(type(self)) for accurate signature.
 
@@ -2750,7 +2729,7 @@ Initialize self.  See help(type(self)) for accurate signature.
 
 ### read_gtf
 
-**Signature:** `(file_path: Union[str, pathlib.Path], chunk_size_mb: int = 512) -> pyrion.core.genes.TranscriptsCollection`
+**Signature:** `(file_path: str | pathlib.Path, chunk_size_mb: int = 512) -> pyrion.core.genes.TranscriptsCollection`
 
 
 ---
@@ -2801,7 +2780,7 @@ Return repr(self).
 
 **fetch**
 
-*Signature:* `(self, chrom: str, start: Optional[int] = None, end: Optional[int] = None, strand: pyrion.core.strand.Strand = <Strand.PLUS: 1>) -> pyrion.core.nucleotide_sequences.NucleotideSequence`
+*Signature:* `(self, chrom: str, start: int | None = None, end: int | None = None, strand: pyrion.core.strand.Strand = <Strand.PLUS: 1>) -> pyrion.core.nucleotide_sequences.NucleotideSequence`
 
 
 **fetch_interval**
@@ -2881,17 +2860,17 @@ chain {score} {t_chrom} {t_size} {t_strand} {t_start} {t_end} {q_chrom} {q_size}
 
 ### load_genome_alignments_collection_from_json
 
-**Signature:** `(file_path: Union[str, pathlib.Path]) -> pyrion.core.genome_alignment.GenomeAlignmentsCollection`
+**Signature:** `(file_path: str | pathlib.Path) -> pyrion.core.genome_alignment.GenomeAlignmentsCollection`
 
 
 ### save_genome_alignments_collection_to_chain
 
-**Signature:** `(collection: pyrion.core.genome_alignment.GenomeAlignmentsCollection, file_path: Union[str, pathlib.Path]) -> None`
+**Signature:** `(collection: pyrion.core.genome_alignment.GenomeAlignmentsCollection, file_path: str | pathlib.Path) -> None`
 
 
 ### save_genome_alignments_collection_to_json
 
-**Signature:** `(collection: pyrion.core.genome_alignment.GenomeAlignmentsCollection, file_path: Union[str, pathlib.Path]) -> None`
+**Signature:** `(collection: pyrion.core.genome_alignment.GenomeAlignmentsCollection, file_path: str | pathlib.Path) -> None`
 
 
 ---
@@ -3007,7 +2986,7 @@ Convenience function to project intervals through a GenomeAlignment object.
 
 ### project_intervals_through_genome_alignment_to_intervals
 
-**Signature:** `(intervals: numpy.ndarray, genome_alignment, target_chrom: Optional[str] = None, target_strand: Optional[pyrion.core.strand.Strand] = None) -> List[pyrion.core.intervals.GenomicInterval]`
+**Signature:** `(intervals: numpy.ndarray, genome_alignment, target_chrom: str | None = None, target_strand: pyrion.core.strand.Strand | None = None) -> List[pyrion.core.intervals.GenomicInterval]`
 
 Project intervals through genome alignment and convert to GenomicInterval objects.
 
@@ -3020,7 +2999,7 @@ Args:
 
 ### project_transcript_through_chain
 
-**Signature:** `(transcript: pyrion.core.genes.Transcript, chain: pyrion.core.genome_alignment.GenomeAlignment, only_cds=False) -> Optional[pyrion.core.intervals.GenomicInterval]`
+**Signature:** `(transcript: pyrion.core.genes.Transcript, chain: pyrion.core.genome_alignment.GenomeAlignment, only_cds=False) -> pyrion.core.intervals.GenomicInterval | None`
 
 
 ### split_genome_alignment
@@ -3237,7 +3216,7 @@ Bulk operations for GenomicIntervalsCollection using vectorized numpy operations
 
 ### intersect_collections
 
-**Signature:** `(collection: pyrion.core.intervals.GenomicIntervalsCollection, other: Union[pyrion.core.intervals.GenomicIntervalsCollection, pyrion.core.intervals.GenomicInterval]) -> pyrion.core.intervals.GenomicIntervalsCollection`
+**Signature:** `(collection: pyrion.core.intervals.GenomicIntervalsCollection, other: pyrion.core.intervals.GenomicIntervalsCollection | pyrion.core.intervals.GenomicInterval) -> pyrion.core.intervals.GenomicIntervalsCollection`
 
 
 ### merge_close_intervals
@@ -3302,7 +3281,7 @@ Convert a single GenomicInterval to BED6 format string.
 
 ### save_genomic_intervals_to_bed6
 
-**Signature:** `(intervals: List[pyrion.core.intervals.GenomicInterval], file_path: Union[str, pathlib.Path], score: int = 1000) -> None`
+**Signature:** `(intervals: List[pyrion.core.intervals.GenomicInterval], file_path: str | pathlib.Path, score: int = 1000) -> None`
 
 
 ---
@@ -3375,7 +3354,7 @@ Convert 2D numpy array of [start, end] pairs to list of GenomicInterval objects.
 
 ### find_intersections
 
-**Signature:** `(arr1: numpy.ndarray, arr2: numpy.ndarray, ids1: Optional[List] = None, ids2: Optional[List] = None) -> Dict[Any, List]`
+**Signature:** `(arr1: numpy.ndarray, arr2: numpy.ndarray, ids1: List | None = None, ids2: List | None = None) -> Dict[Any, List]`
 
 Find intersections between two arrays of intervals.
 
@@ -3389,7 +3368,7 @@ Convert list of GenomicInterval objects to 2D numpy array of [start, end] pairs.
 
 ### projected_intervals_to_genomic_intervals
 
-**Signature:** `(projected_arrays: List[numpy.ndarray], target_chrom: str, target_strand: pyrion.core.strand.Strand = <Strand.UNKNOWN: 0>, ids: Optional[List[str]] = None) -> List[List[pyrion.core.intervals.GenomicInterval]]`
+**Signature:** `(projected_arrays: List[numpy.ndarray], target_chrom: str, target_strand: pyrion.core.strand.Strand = <Strand.UNKNOWN: 0>, ids: List[str] | None = None) -> List[List[pyrion.core.intervals.GenomicInterval]]`
 
 Convert projected interval arrays to GenomicInterval objects.
 
@@ -3413,12 +3392,12 @@ Sequence serialization operations for FASTA format.
 
 ### amino_acid_sequence_to_fasta_string
 
-**Signature:** `(sequence: pyrion.core.amino_acid_sequences.AminoAcidSequence, width: int = 80, header: Optional[str] = None) -> str`
+**Signature:** `(sequence: pyrion.core.amino_acid_sequences.AminoAcidSequence, width: int = 80, header: str | None = None) -> str`
 
 
 ### codon_sequence_to_fasta_string
 
-**Signature:** `(sequence: pyrion.core.codons.CodonSequence, width: int = 80, header: Optional[str] = None) -> str`
+**Signature:** `(sequence: pyrion.core.codons.CodonSequence, width: int = 80, header: str | None = None) -> str`
 
 
 ### format_fasta_sequence
@@ -3430,38 +3409,38 @@ Format sequence string with specified line width.
 
 ### get_sequence_header
 
-**Signature:** `(sequence: Any, index: Optional[int] = None) -> str`
+**Signature:** `(sequence: Any, index: int | None = None) -> str`
 
 Extract or generate FASTA header for a sequence object.
 
 
 ### nucleotide_sequence_to_fasta_string
 
-**Signature:** `(sequence: pyrion.core.nucleotide_sequences.NucleotideSequence, width: int = 80, header: Optional[str] = None) -> str`
+**Signature:** `(sequence: pyrion.core.nucleotide_sequences.NucleotideSequence, width: int = 80, header: str | None = None) -> str`
 
 
 ### save_amino_acid_sequence_to_fasta
 
-**Signature:** `(sequence: pyrion.core.amino_acid_sequences.AminoAcidSequence, file_path: Union[str, pathlib.Path], width: int = 80, header: Optional[str] = None) -> None`
+**Signature:** `(sequence: pyrion.core.amino_acid_sequences.AminoAcidSequence, file_path: str | pathlib.Path, width: int = 80, header: str | None = None) -> None`
 
 Save a single AminoAcidSequence to a FASTA file.
 
 
 ### save_nucleotide_sequence_to_fasta
 
-**Signature:** `(sequence: pyrion.core.nucleotide_sequences.NucleotideSequence, file_path: Union[str, pathlib.Path], width: int = 80, header: Optional[str] = None) -> None`
+**Signature:** `(sequence: pyrion.core.nucleotide_sequences.NucleotideSequence, file_path: str | pathlib.Path, width: int = 80, header: str | None = None) -> None`
 
 Save a single NucleotideSequence to a FASTA file.
 
 
 ### save_sequences_to_fasta
 
-**Signature:** `(sequences: List[Any], file_path: Union[str, pathlib.Path], width: int = 80) -> None`
+**Signature:** `(sequences: List[Any], file_path: str | pathlib.Path, width: int = 80) -> None`
 
 
 ### sequence_to_fasta_string
 
-**Signature:** `(sequence: Any, width: int = 80, header: Optional[str] = None) -> str`
+**Signature:** `(sequence: Any, width: int = 80, header: str | None = None) -> str`
 
 
 ### sequences_to_fasta_string
@@ -3480,17 +3459,17 @@ Transcript serialization operations for BED12 and JSON formats.
 
 ### load_transcripts_collection_from_json
 
-**Signature:** `(file_path: Union[str, pathlib.Path]) -> pyrion.core.genes.TranscriptsCollection`
+**Signature:** `(file_path: str | pathlib.Path) -> pyrion.core.genes.TranscriptsCollection`
 
 
 ### save_transcripts_collection_to_bed12
 
-**Signature:** `(collection: pyrion.core.genes.TranscriptsCollection, file_path: Union[str, pathlib.Path]) -> None`
+**Signature:** `(collection: pyrion.core.genes.TranscriptsCollection, file_path: str | pathlib.Path) -> None`
 
 
 ### save_transcripts_collection_to_json
 
-**Signature:** `(collection: pyrion.core.genes.TranscriptsCollection, file_path: Union[str, pathlib.Path]) -> None`
+**Signature:** `(collection: pyrion.core.genes.TranscriptsCollection, file_path: str | pathlib.Path) -> None`
 
 
 ### transcript_from_dict
@@ -3583,7 +3562,7 @@ Data transformation utilities for converting between different genomic data type
 
 ### intervals_to_transcripts
 
-**Signature:** `(intervals: List[pyrion.core.intervals.GenomicInterval], source_file: Optional[str] = None) -> pyrion.core.genes.TranscriptsCollection`
+**Signature:** `(intervals: List[pyrion.core.intervals.GenomicInterval], source_file: str | None = None) -> pyrion.core.genes.TranscriptsCollection`
 
 Convert a list of GenomicInterval objects to a TranscriptsCollection.
 
@@ -3592,7 +3571,7 @@ May be helpful if bed-6 formatted data is needed as is was bed-12.
 
 ### remap_transcript_ids
 
-**Signature:** `(collection: pyrion.core.genes.TranscriptsCollection, id_mapping: Union[Dict[str, str], Callable[[str], str]], source_file: Optional[str] = None) -> pyrion.core.genes.TranscriptsCollection`
+**Signature:** `(collection: pyrion.core.genes.TranscriptsCollection, id_mapping: Dict[str, str] | Callable[[str], str], source_file: str | None = None) -> pyrion.core.genes.TranscriptsCollection`
 
 Build a new TranscriptsCollection with the same transcripts but new IDs.
 
@@ -3807,375 +3786,6 @@ Remove masking by dividing by 5.
 ---
 
 # pyrion.utils.numpy_utils
-
-
----
-
-# pyrion.visualization
-
-The visualization module was quickly prototyped in Cursor without thorough design.
-
-A cleaner architecture and improved visuals are planned for a future release.
-
-
-## Classes
-
-### AlignmentFeature
-
-Wrapper for GenomeAlignment.
-
-**Signature:** `(self, alignment: pyrion.core.genome_alignment.GenomeAlignment)`
-
-#### Methods
-
-**__init__**
-
-*Signature:* `(self, alignment: pyrion.core.genome_alignment.GenomeAlignment)`
-
-Initialize self.  See help(type(self)) for accurate signature.
-
-
-#### Properties
-
-**end** -> `int`
-
-
-**length** -> `int`
-
-
-**start** -> `int`
-
-
-
-### Band
-
-Holds non-overlapping features placed in same vertical band.
-
-**Signature:** `(self, index: int)`
-
-#### Methods
-
-**__init__**
-
-*Signature:* `(self, index: int)`
-
-Initialize self.  See help(type(self)) for accurate signature.
-
-
-**add_feature**
-
-*Signature:* `(self, feature: pyrion.visualization.GenomicFeature)`
-
-Add feature to this band.
-
-
-**can_add_feature**
-
-*Signature:* `(self, feature: pyrion.visualization.GenomicFeature) -> bool`
-
-Check if feature can be added without overlap.
-
-
-
-### GenomicFeature
-
-Abstract base class for genomic features with start/end coordinates.
-
-**Signature:** `(self, /, *args, **kwargs)`
-
-#### Properties
-
-**end** -> `int`
-
-
-**length** -> `int`
-
-
-**start** -> `int`
-
-
-
-### GenomicRuler
-
-Renders genomic coordinate ruler with fixed height.
-
-**Signature:** `(self, interval: pyrion.core.intervals.GenomicInterval, tick_count: int = 10, inverted: bool = False, height: float = 0.15)`
-
-#### Methods
-
-**__init__**
-
-*Signature:* `(self, interval: pyrion.core.intervals.GenomicInterval, tick_count: int = 10, inverted: bool = False, height: float = 0.15)`
-
-Initialize self.  See help(type(self)) for accurate signature.
-
-
-**draw**
-
-*Signature:* `(self, ax, y: float = 0.0)`
-
-Draw ruler at specified y position.
-
-
-
-### IntervalFeature
-
-Wrapper for GenomicInterval.
-
-**Signature:** `(self, interval: pyrion.core.intervals.GenomicInterval)`
-
-#### Methods
-
-**__init__**
-
-*Signature:* `(self, interval: pyrion.core.intervals.GenomicInterval)`
-
-Initialize self.  See help(type(self)) for accurate signature.
-
-
-#### Properties
-
-**end** -> `int`
-
-
-**length** -> `int`
-
-
-**start** -> `int`
-
-
-
-### LayoutManager
-
-Assigns tracks to levels and produces packed band layout.
-
-**Signature:** `(self)`
-
-#### Methods
-
-**__init__**
-
-*Signature:* `(self)`
-
-Initialize self.  See help(type(self)) for accurate signature.
-
-
-**add_track**
-
-*Signature:* `(self, track: 'Track')`
-
-Assign track to correct level based on type.
-
-
-**compute_layout**
-
-*Signature:* `(self)`
-
-Run layout logic for all levels.
-
-
-**get_total_bands**
-
-*Signature:* `(self) -> int`
-
-Get total number of bands across all levels.
-
-
-
-### Level
-
-Contains features of one type, produces non-overlapping bands.
-
-**Signature:** `(self)`
-
-#### Methods
-
-**__init__**
-
-*Signature:* `(self)`
-
-Initialize self.  See help(type(self)) for accurate signature.
-
-
-**add_features**
-
-*Signature:* `(self, features: List[pyrion.visualization.GenomicFeature])`
-
-Add features to this level.
-
-
-**compute_bands**
-
-*Signature:* `(self)`
-
-Greedy algorithm to assign features to non-overlapping bands.
-
-
-
-### Track
-
-Logical unit of data belonging to one category.
-
-**Signature:** `(self, name: str, features: List[pyrion.visualization.GenomicFeature], track_type: pyrion.visualization.TrackType)`
-
-#### Methods
-
-**__init__**
-
-*Signature:* `(self, name: str, features: List[pyrion.visualization.GenomicFeature], track_type: pyrion.visualization.TrackType)`
-
-Initialize self.  See help(type(self)) for accurate signature.
-
-
-
-### TrackType
-
-Create a collection of name/value pairs.
-
-Example enumeration:
-
->>> class Color(Enum):
-...     RED = 1
-...     BLUE = 2
-...     GREEN = 3
-
-Access them by:
-
-- attribute access:
-
-  >>> Color.RED
-  <Color.RED: 1>
-
-- value lookup:
-
-  >>> Color(1)
-  <Color.RED: 1>
-
-- name lookup:
-
-  >>> Color['RED']
-  <Color.RED: 1>
-
-Enumerations can be iterated over, and know how many members they have:
-
->>> len(Color)
-3
-
->>> list(Color)
-[<Color.RED: 1>, <Color.BLUE: 2>, <Color.GREEN: 3>]
-
-Methods can be added to enumerations, and members can have their own
-attributes -- see the documentation for details.
-
-**Signature:** `(self, *args, **kwds)`
-
-
-### TranscriptFeature
-
-Wrapper for Transcript.
-
-**Signature:** `(self, transcript: pyrion.core.genes.Transcript)`
-
-#### Methods
-
-**__init__**
-
-*Signature:* `(self, transcript: pyrion.core.genes.Transcript)`
-
-Initialize self.  See help(type(self)) for accurate signature.
-
-
-#### Properties
-
-**end** -> `int`
-
-
-**length** -> `int`
-
-
-**start** -> `int`
-
-
-
-### VisualizationWindow
-
-Entry point for rendering genomic data visualization.
-
-**Signature:** `(self, interval: pyrion.core.intervals.GenomicInterval, height: Optional[float] = None, band_height: float = 0.35, band_spacing: float = 0.05, level_spacing: float = 0.2, ruler_height: float = 0.4, label_height: float = 0.15, show_labels: bool = True, left_padding_width: int = 15000, show_feature_labels: bool = True)`
-
-#### Methods
-
-**__init__**
-
-*Signature:* `(self, interval: pyrion.core.intervals.GenomicInterval, height: Optional[float] = None, band_height: float = 0.35, band_spacing: float = 0.05, level_spacing: float = 0.2, ruler_height: float = 0.4, label_height: float = 0.15, show_labels: bool = True, left_padding_width: int = 15000, show_feature_labels: bool = True)`
-
-Initialize self.  See help(type(self)) for accurate signature.
-
-
-**add_track**
-
-*Signature:* `(self, track: pyrion.visualization.Track)`
-
-Add a track to the window.
-
-
-**show**
-
-*Signature:* `(self, figsize: tuple = (12, 6))`
-
-Trigger layout and rendering.
-
-
-
-## Functions
-
-### create_alignment_track
-
-**Signature:** `(name: str, alignments: List[pyrion.core.genome_alignment.GenomeAlignment]) -> pyrion.visualization.Track`
-
-Create an alignment track from a list of GenomeAlignment objects.
-
-
-### create_interval_track
-
-**Signature:** `(name: str, intervals: List[pyrion.core.intervals.GenomicInterval]) -> pyrion.visualization.Track`
-
-Create an interval track from a list of GenomicInterval objects.
-
-
-### create_transcript_track
-
-**Signature:** `(name: str, transcripts: List[pyrion.core.genes.Transcript]) -> pyrion.visualization.Track`
-
-Create a transcript track from a list of Transcript objects.
-
-
-### create_window_for_region
-
-**Signature:** `(chrom: str, start: int, end: int, **kwargs) -> pyrion.visualization.VisualizationWindow`
-
-Create a VisualizationWindow for a specific genomic region.
-
-
-### visualize_alignments
-
-**Signature:** `(alignments: List[pyrion.core.genome_alignment.GenomeAlignment], window_interval: pyrion.core.intervals.GenomicInterval = None, track_name: str = 'Alignments', band_height: float = 0.35, **kwargs)`
-
-Quick function to visualize a list of alignments.
-
-
-### visualize_intervals
-
-**Signature:** `(intervals: List[pyrion.core.intervals.GenomicInterval], window_interval: pyrion.core.intervals.GenomicInterval = None, track_name: str = 'Intervals', band_height: float = 0.35, **kwargs)`
-
-Quick function to visualize a list of intervals.
-
-
-### visualize_transcripts
-
-**Signature:** `(transcripts: List[pyrion.core.genes.Transcript], window_interval: pyrion.core.intervals.GenomicInterval = None, track_name: str = 'Transcripts', band_height: float = 0.35, **kwargs)`
-
-Quick function to visualize a list of transcripts.
 
 
 ---
