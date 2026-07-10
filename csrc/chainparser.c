@@ -132,10 +132,11 @@ static PyObject* parse_chain_chunk(PyObject* self, PyObject* args) {
     const char *hdr = hdr_buf;
 
     // Parse header with safer approach
-    int chain_id, t_size, t_start, t_end, q_size, q_start, q_end, score;
+    int chain_id, t_size, t_start, t_end, q_size, q_start, q_end;
+    long long score;  // 64-bit: whole-chromosome chains score > INT_MAX
     char t_chrom[256], q_chrom[256], t_strand[8], q_strand[8];  // Larger buffers
-    
-    int parsed = sscanf(hdr, "chain %d %255s %d %7s %d %d %255s %d %7s %d %d %d",
+
+    int parsed = sscanf(hdr, "chain %lld %255s %d %7s %d %d %255s %d %7s %d %d %d",
                         &score, t_chrom, &t_size, t_strand, &t_start, &t_end,
                         q_chrom, &q_size, q_strand, &q_start, &q_end, &chain_id);
     
@@ -145,8 +146,8 @@ static PyObject* parse_chain_chunk(PyObject* self, PyObject* args) {
     }
 
     // Validate header values
-    if (score < -INT_MAX || score > INT_MAX) {
-        PyErr_Format(PyExc_ValueError, "Invalid score: %d", score);
+    if (score < -LLONG_MAX || score > LLONG_MAX) {
+        PyErr_Format(PyExc_ValueError, "Invalid score: %lld", score);
         return NULL;
     }
     
@@ -339,9 +340,9 @@ static PyObject* parse_chain_chunk(PyObject* self, PyObject* args) {
 
     // Create GenomeAlignment object
     PyObject *genome_alignment = PyObject_CallFunction(
-        GenomeAlignment, "iiOiiOiiO",
+        GenomeAlignment, "iLOiiOiiO",
         chain_id,           // chain_id
-        score,              // score
+        score,              // score (long long, 64-bit)
         t_chrom_str,        // t_chrom
         t_strand_int,       // t_strand
         t_size,             // t_size
